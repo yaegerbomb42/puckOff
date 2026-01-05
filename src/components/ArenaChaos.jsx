@@ -202,15 +202,38 @@ export default function ArenaChaos({ mapType = 'SAWBLADE CITY' }) {
                 </>
             )}
 
-            {/* Deep Space Light - Optimized */}
-            <ambientLight intensity={0.4} />
+            {/* VIBRANT DAYTIME LIGHTING */}
+            <ambientLight intensity={0.8} color="#fff5e6" />
+
+            {/* Main Sun Light */}
             <directionalLight
-                position={[10, 20, 10]}
-                intensity={0.8}
+                position={[15, 30, 10]}
+                intensity={1.5}
+                color="#fffaf0"
                 castShadow
-                shadow-mapSize-width={1024}
-                shadow-mapSize-height={1024}
+                shadow-mapSize-width={2048}
+                shadow-mapSize-height={2048}
             />
+
+            {/* Colorful Accent Lights */}
+            <pointLight position={[-10, 5, -10]} intensity={1} color="#00d4ff" distance={20} />
+            <pointLight position={[10, 5, 10]} intensity={1} color="#ff006e" distance={20} />
+            <pointLight position={[0, 8, 0]} intensity={0.5} color="#00ff87" distance={25} />
+
+            {/* Rim Lights for Drama */}
+            <spotLight
+                position={[0, 15, -15]}
+                angle={0.5}
+                penumbra={0.5}
+                intensity={0.8}
+                color="#ffd700"
+            />
+
+            {/* Edge Glow Lights */}
+            <pointLight position={[-12, 0.5, 0]} intensity={0.8} color="#ff006e" distance={5} />
+            <pointLight position={[12, 0.5, 0]} intensity={0.8} color="#00d4ff" distance={5} />
+            <pointLight position={[0, 0.5, -8]} intensity={0.8} color="#00ff87" distance={5} />
+            <pointLight position={[0, 0.5, 8]} intensity={0.8} color="#ffd700" distance={5} />
         </group>
     );
 }

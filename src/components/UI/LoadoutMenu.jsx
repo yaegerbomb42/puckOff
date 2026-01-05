@@ -2,102 +2,216 @@ import React, { useState } from 'react';
 import { POWERUP_REGISTRY, getPowerupInfo, DEFAULT_LOADOUT } from '../../utils/powerups';
 
 export default function LoadoutMenu({ equipped = DEFAULT_LOADOUT, onEquip, onClose }) {
-    const [selectedSlot, setSelectedSlot] = useState(0); // 0, 1, 2
+    const [selectedSlot, setSelectedSlot] = useState(0);
 
     const handleSelectPowerup = (id) => {
         const newLoadout = [...equipped];
         newLoadout[selectedSlot] = id;
         onEquip(newLoadout);
+        // Auto-advance to next slot
+        if (selectedSlot < 2) setSelectedSlot(selectedSlot + 1);
     };
 
     const powerupList = Object.values(POWERUP_REGISTRY);
 
+    // Group powerups by type
+    const grouped = {
+        'Offensive': powerupList.filter(p => ['projectile', 'trap', 'beam', 'curse'].includes(p.type)),
+        'Defensive': powerupList.filter(p => p.type === 'buff' && ['shield', 'spike_armor', 'ghost', 'shrink'].includes(p.id)),
+        'Mobility': powerupList.filter(p => ['speed_boost', 'jump_jet', 'teleport', 'grapple'].includes(p.id)),
+        'Chaos': powerupList.filter(p => ['giant', 'invisible', 'magnet', 'black_hole', 'fart'].includes(p.id))
+    };
+
     return (
-        <div className="loadout-overlay">
-            <div className="loadout-container">
+        <div className="loadout-overlay" onClick={onClose}>
+            <div className="loadout-container" onClick={e => e.stopPropagation()}>
                 <div className="header">
-                    <h2>TACTICAL LOADOUT</h2>
-                    <button className="close-btn" onClick={onClose}>CONFIRM</button>
+                    <div className="header-text">
+                        <h2>🎒 TACTICAL LOADOUT</h2>
+                        <p className="header-desc">
+                            Choose 3 powerups to bring into battle. Press 1, 2, or 3 during combat to activate them!
+                        </p>
+                    </div>
+                    <button className="close-btn" onClick={onClose}>✓ CONFIRM</button>
                 </div>
 
-                <div className="slots-row">
-                    {equipped.map((id, index) => {
-                        const info = getPowerupInfo(id);
-                        return (
-                            <div
-                                key={index}
-                                className={`loadout-slot ${selectedSlot === index ? 'active' : ''}`}
-                                onClick={() => setSelectedSlot(index)}
-                            >
-                                <div className="slot-label">SLOT {index + 1}</div>
-                                <div className="slot-icon" style={{ background: info.color }}>{info.icon}</div>
-                                <div className="slot-name">{info.name}</div>
-                            </div>
-                        );
-                    })}
+                <div className="slots-section">
+                    <div className="slots-row">
+                        {equipped.map((id, index) => {
+                            const info = getPowerupInfo(id);
+                            return (
+                                <div
+                                    key={index}
+                                    className={`loadout-slot ${selectedSlot === index ? 'active' : ''}`}
+                                    onClick={() => setSelectedSlot(index)}
+                                >
+                                    <div className="slot-number">{index + 1}</div>
+                                    <div className="slot-icon" style={{
+                                        background: `linear-gradient(135deg, ${info.color}, ${info.color}88)`,
+                                        boxShadow: `0 0 20px ${info.color}66`
+                                    }}>
+                                        {info.icon}
+                                    </div>
+                                    <div className="slot-name">{info.name}</div>
+                                    <div className="slot-hint">Press {index + 1}</div>
+                                </div>
+                            );
+                        })}
+                    </div>
+                    <div className="slot-instruction">
+                        Click a slot above, then choose a powerup below
+                    </div>
                 </div>
 
                 <div className="powerup-grid-container">
-                    <h3>AVAILABLE ARSENAL</h3>
-                    <div className="powerup-grid">
-                        {powerupList.map(p => (
-                            <div
-                                key={p.id}
-                                className={`powerup-item ${equipped.includes(p.id) ? 'equipped' : ''}`}
-                                onClick={() => handleSelectPowerup(p.id)}
-                            >
-                                <div className="p-icon" style={{ color: p.color }}>{p.icon}</div>
-                                <div className="p-info">
-                                    <h4>{p.name}</h4>
-                                    <p>{p.desc}</p>
-                                </div>
-                                {equipped.includes(p.id) && <div className="equipped-badge">EQUIPPED</div>}
+                    {Object.entries(grouped).map(([category, powerups]) => (
+                        <div key={category} className="powerup-category">
+                            <h3 className="category-title">{category}</h3>
+                            <div className="powerup-grid">
+                                {powerups.map(p => (
+                                    <div
+                                        key={p.id}
+                                        className={`powerup-item ${equipped.includes(p.id) ? 'equipped' : ''}`}
+                                        onClick={() => !equipped.includes(p.id) && handleSelectPowerup(p.id)}
+                                        style={{
+                                            borderColor: equipped.includes(p.id) ? p.color : 'transparent'
+                                        }}
+                                    >
+                                        <div className="p-icon" style={{
+                                            background: `linear-gradient(135deg, ${p.color}33, transparent)`,
+                                            color: p.color
+                                        }}>
+                                            {p.icon}
+                                        </div>
+                                        <div className="p-info">
+                                            <h4>{p.name}</h4>
+                                            <p>{p.desc}</p>
+                                        </div>
+                                        {equipped.includes(p.id) && (
+                                            <div className="equipped-badge" style={{ background: p.color }}>
+                                                SLOT {equipped.indexOf(p.id) + 1}
+                                            </div>
+                                        )}
+                                    </div>
+                                ))}
                             </div>
-                        ))}
-                    </div>
+                        </div>
+                    ))}
                 </div>
             </div>
 
             <style jsx>{`
-        .loadout-overlay {
-          position: fixed; top: 0; left: 0; right: 0; bottom: 0;
-          background: rgba(0,0,0,0.9); z-index: 1500;
-          display: flex; justify-content: center; align-items: center;
-          color: white; font-family: 'Orbitron', sans-serif;
-        }
-        .loadout-container {
-          width: 900px; height: 80%; background: #1a1a1a;
-          border: 2px solid #444; border-radius: 12px;
-          padding: 2rem; display: flex; flex-direction: column;
-        }
-        .header { display: flex; justify-content: space-between; margin-bottom: 2rem; }
-        .slots-row { display: flex; gap: 2rem; justify-content: center; margin-bottom: 2rem; }
-        .loadout-slot {
-          width: 150px; height: 200px; border: 2px solid #555; border-radius: 8px;
-          display: flex; flex-direction: column; align-items: center; justify-content: center;
-          background: #222; cursor: pointer; transition: 0.2s;
-        }
-        .loadout-slot.active { border-color: #00ff87; box-shadow: 0 0 20px rgba(0,255,135,0.3); transform: scale(1.05); }
-        .slot-icon { font-size: 3rem; width: 80px; height: 80px; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 1rem 0; color: black; }
-        
-        .powerup-grid {
-          display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-          gap: 1rem; overflow-y: auto; padding-right: 1rem;
-        }
-        .powerup-item {
-          background: #333; padding: 1rem; border-radius: 8px; display: flex; gap: 1rem;
-          cursor: pointer; border: 1px solid transparent; position: relative;
-        }
-        .powerup-item:hover { background: #444; }
-        .powerup-item.equipped { border-color: #00d4ff; opacity: 0.5; }
-        .p-icon { font-size: 2rem; }
-        .p-info h4 { margin: 0 0 0.5rem 0; font-size: 0.9rem; }
-        .p-info p { margin: 0; font-size: 0.7rem; color: #aaa; }
-        .equipped-badge {
-            position: absolute; top: 5px; right: 5px; font-size: 0.6rem;
-            background: #00d4ff; color: black; padding: 2px 5px; border-radius: 4px;
-        }
-      `}</style>
+                .loadout-overlay {
+                    position: fixed; inset: 0;
+                    background: rgba(0,0,0,0.95); z-index: 1500;
+                    display: flex; justify-content: center; align-items: center;
+                    color: white; font-family: 'Orbitron', sans-serif;
+                }
+                .loadout-container {
+                    width: 95%; max-width: 1000px; height: 90%;
+                    background: linear-gradient(135deg, #0a0a1a, #1a0a2e);
+                    border: 1px solid #333; border-radius: 20px;
+                    padding: 2rem; display: flex; flex-direction: column;
+                    overflow: hidden;
+                }
+
+                .header { 
+                    display: flex; justify-content: space-between; 
+                    align-items: flex-start; margin-bottom: 1.5rem;
+                }
+                .header-text h2 { 
+                    margin: 0; 
+                    background: linear-gradient(45deg, #ff006e, #00d4ff);
+                    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+                }
+                .header-desc { color: #888; font-size: 0.85rem; margin-top: 0.5rem; }
+                .close-btn {
+                    background: linear-gradient(45deg, #00ff87, #00d4ff);
+                    border: none; padding: 0.8rem 1.5rem; border-radius: 30px;
+                    color: #000; font-weight: bold; cursor: pointer;
+                    font-family: 'Orbitron'; font-size: 0.9rem;
+                }
+
+                .slots-section { text-align: center; margin-bottom: 1.5rem; }
+                .slots-row { 
+                    display: flex; gap: 1.5rem; justify-content: center; 
+                    margin-bottom: 0.5rem;
+                }
+                .loadout-slot {
+                    width: 140px; padding: 1rem; 
+                    border: 2px solid #333; border-radius: 15px;
+                    display: flex; flex-direction: column; align-items: center;
+                    background: rgba(0,0,0,0.3); cursor: pointer; 
+                    transition: all 0.3s; position: relative;
+                }
+                .loadout-slot:hover { border-color: #555; }
+                .loadout-slot.active { 
+                    border-color: #00ff87; 
+                    box-shadow: 0 0 30px rgba(0,255,135,0.3);
+                    transform: scale(1.05);
+                }
+                .slot-number {
+                    position: absolute; top: -10px; left: 50%; transform: translateX(-50%);
+                    background: #00ff87; color: #000; width: 24px; height: 24px;
+                    border-radius: 50%; display: flex; align-items: center; justify-content: center;
+                    font-weight: bold; font-size: 0.8rem;
+                }
+                .slot-icon { 
+                    font-size: 2.5rem; width: 70px; height: 70px; 
+                    border-radius: 50%; display: flex; align-items: center; justify-content: center;
+                    margin: 0.8rem 0;
+                }
+                .slot-name { font-size: 0.8rem; font-weight: bold; }
+                .slot-hint { font-size: 0.65rem; color: #555; margin-top: 0.3rem; }
+                .slot-instruction { color: #555; font-size: 0.75rem; }
+
+                .powerup-grid-container { 
+                    flex: 1; overflow-y: auto; padding-right: 0.5rem;
+                }
+                .powerup-category { margin-bottom: 1.5rem; }
+                .category-title {
+                    color: #888; font-size: 0.85rem; margin-bottom: 0.8rem;
+                    padding-bottom: 0.3rem; border-bottom: 1px solid #333;
+                }
+
+                .powerup-grid {
+                    display: grid; 
+                    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+                    gap: 0.8rem;
+                }
+                .powerup-item {
+                    background: rgba(255,255,255,0.03); padding: 0.8rem;
+                    border-radius: 12px; display: flex; gap: 0.8rem;
+                    cursor: pointer; border: 2px solid transparent;
+                    position: relative; transition: all 0.2s;
+                }
+                .powerup-item:hover:not(.equipped) { 
+                    background: rgba(255,255,255,0.08);
+                    transform: translateY(-2px);
+                }
+                .powerup-item.equipped { 
+                    opacity: 0.5; cursor: not-allowed;
+                }
+                .p-icon { 
+                    font-size: 1.8rem; width: 50px; height: 50px;
+                    border-radius: 10px; display: flex; 
+                    align-items: center; justify-content: center;
+                    flex-shrink: 0;
+                }
+                .p-info { flex: 1; min-width: 0; }
+                .p-info h4 { margin: 0 0 0.3rem 0; font-size: 0.85rem; }
+                .p-info p { margin: 0; font-size: 0.7rem; color: #888; line-height: 1.3; }
+                .equipped-badge {
+                    position: absolute; top: 8px; right: 8px; 
+                    font-size: 0.6rem; color: #000; padding: 3px 8px; 
+                    border-radius: 10px; font-weight: bold;
+                }
+
+                /* Scrollbar */
+                .powerup-grid-container::-webkit-scrollbar { width: 6px; }
+                .powerup-grid-container::-webkit-scrollbar-track { background: #111; }
+                .powerup-grid-container::-webkit-scrollbar-thumb { background: #333; border-radius: 3px; }
+            `}</style>
         </div>
     );
 }

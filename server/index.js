@@ -223,6 +223,29 @@ app.post('/api/claim-packs', (req, res) => {
     res.json({ success: true, remainingPacks: inventory.freePacks });
 });
 
+// ============ ADMIN API ENDPOINTS ============
+app.get('/api/admin/rooms', (req, res) => {
+    const roomsList = [];
+    for (const [code, room] of rooms) {
+        roomsList.push({
+            code,
+            playerCount: room.players?.size || 0,
+            status: room.gameStarted ? 'playing' : 'lobby'
+        });
+    }
+
+    // Count total players online
+    let playersOnline = 0;
+    for (const room of rooms.values()) {
+        playersOnline += room.players?.size || 0;
+    }
+
+    res.json({
+        rooms: roomsList,
+        playersOnline,
+        totalRooms: rooms.size
+    });
+});
 
 const server = http.createServer(app);
 const io = new Server(server, {

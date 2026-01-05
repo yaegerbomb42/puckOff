@@ -1,8 +1,11 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { io } from 'socket.io-client';
 
-// Server URL - will use Glitch when deployed
-const SERVER_URL = process.env.REACT_APP_SERVER_URL || 'http://localhost:3002';
+// Server URL - will use Render when deployed
+let SERVER_URL = process.env.REACT_APP_SERVER_URL || 'http://localhost:3002';
+if (SERVER_URL && !SERVER_URL.startsWith('http')) {
+    SERVER_URL = `https://${SERVER_URL}`;
+}
 
 export function useMultiplayer() {
     const [socket, setSocket] = useState(null);

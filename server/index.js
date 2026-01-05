@@ -45,12 +45,25 @@ async function handleStripeWebhook(req, res) {
             const session = event.data.object;
             console.log('💰 Payment succeeded:', session.id);
 
-            // Get customer email and product info from metadata
-            const email = session.customer_email || session.metadata?.email;
-            const packType = session.metadata?.packType || 'single';
+            // Get customer email
+            const email = session.customer_email || session.customer_details?.email || session.metadata?.email;
+
+            // Detect pack type from amount (in cents)
+            // $0.50 = 50 cents = single, $3.00 = 300 cents = bundle10, $99.99 = 9999 cents = unlockAll
+            const amount = session.amount_total || session.amount || 0;
+            let packType = 'single';
+            if (amount >= 9900) { // $99+
+                packType = 'unlockAll';
+            } else if (amount >= 250) { // $2.50+
+                packType = 'bundle10';
+            }
+
+            console.log(`📦 Detected pack type: ${packType} from amount: $${(amount / 100).toFixed(2)}`);
 
             if (email) {
                 await fulfillPurchase(email, packType);
+            } else {
+                console.log('⚠️ No email found in session, cannot fulfill');
             }
             break;
 

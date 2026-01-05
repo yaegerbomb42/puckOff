@@ -156,61 +156,16 @@ app.get('/api/admin/rooms', (req, res) => {
 
     res.json({ rooms: roomsList, playersOnline, totalRooms: rooms.size });
 });
-        < !DOCTYPE html >
-    <html>
+// ============ SUCCESS/CANCEL PAGES ============
+app.get('/payment/success', (req, res) => {
+    res.send(`
+        <!DOCTYPE html>
+        <html>
         <head>
             <title>Payment Successful!</title>
             <style>
                 body {
-                    font - family: 'Inter', sans-serif;
-                background: linear-gradient(135deg, #0a0a1a, #1a0a2e);
-                color: white;
-                display: flex;
-                align-items: center;
-                justify-content: center;
-                height: 100vh;
-                margin: 0;
-                }
-                .container {text - align: center; }
-                h1 {color: #00ff87; font-size: 3rem; }
-                p {color: #888; font-size: 1.2rem; }
-                .btn {
-                    display: inline-block;
-                background: linear-gradient(45deg, #00ff87, #00d4ff);
-                color: black;
-                padding: 1rem 2rem;
-                border-radius: 30px;
-                text-decoration: none;
-                font-weight: bold;
-                margin-top: 2rem;
-                }
-            </style>
-        </head>
-        <body>
-            <div class="container">
-                <h1>🎉 Payment Successful!</h1>
-                <p>Your packs are being added to your account.</p>
-                <p>Return to the game to open them!</p>
-                <a href="/" class="btn">Back to Game</a>
-            </div>
-            <script>
-                // Auto-redirect after 3 seconds
-                setTimeout(() => window.location.href = '/', 3000);
-            </script>
-        </body>
-    </html>
-`);
-});
-
-app.get('/payment/cancel', (req, res) => {
-    res.send(`
-    < !DOCTYPE html >
-        <html>
-            <head>
-                <title>Payment Cancelled</title>
-                <style>
-                    body {
-                        font - family: 'Inter', sans-serif;
+                    font-family: 'Inter', sans-serif;
                     background: linear-gradient(135deg, #0a0a1a, #1a0a2e);
                     color: white;
                     display: flex;
@@ -218,32 +173,87 @@ app.get('/payment/cancel', (req, res) => {
                     justify-content: center;
                     height: 100vh;
                     margin: 0;
+                    text-align: center;
                 }
-                    .container {text - align: center; }
-                    h1 {color: #ff006e; font-size: 3rem; }
-                    p {color: #888; font-size: 1.2rem; }
-                    .btn {
-                        display: inline-block;
-                    background: rgba(255,255,255,0.1);
+                .card {
+                    background: rgba(255, 255, 255, 0.05);
+                    padding: 3rem;
+                    border-radius: 24px;
+                    border: 1px solid rgba(255, 255, 255, 0.1);
+                    backdrop-filter: blur(10px);
+                    box-shadow: 0 0 50px rgba(0, 212, 255, 0.2);
+                }
+                h1 { color: #00ff87; margin-bottom: 1rem; }
+                p { color: #8892b0; margin-bottom: 2rem; }
+                .btn {
+                    background: #00d4ff;
+                    color: #000;
+                    padding: 1rem 2rem;
+                    text-decoration: none;
+                    border-radius: 50px;
+                    font-weight: bold;
+                    transition: transform 0.2s;
+                    display: inline-block;
+                }
+                .btn:hover { transform: scale(1.05); }
+            </style>
+        </head>
+        <body>
+            <div class="card">
+                <h1>Purchase Successful! 🎉</h1>
+                <p>Your packs have been added to your inventory.</p>
+                <a href="${process.env.CLIENT_URL || '/'}" class="btn">Return to Arena</a>
+            </div>
+        </body>
+        </html>
+    `);
+});
+
+app.get('/payment/cancel', (req, res) => {
+    res.send(`
+        <!DOCTYPE html>
+        <html>
+        <head>
+            <title>Payment Cancelled</title>
+            <style>
+                body {
+                    font-family: 'Inter', sans-serif;
+                    background: linear-gradient(135deg, #0a0a1a, #1a0a2e);
+                    color: white;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    height: 100vh;
+                    margin: 0;
+                    text-align: center;
+                }
+                .card {
+                    background: rgba(255, 255, 255, 0.05);
+                    padding: 3rem;
+                    border-radius: 24px;
+                    border: 1px solid rgba(255, 255, 255, 0.1);
+                }
+                h1 { color: #ff4757; margin-bottom: 1rem; }
+                .btn {
+                    background: rgba(255, 255, 255, 0.1);
                     color: white;
                     padding: 1rem 2rem;
-                    border-radius: 30px;
                     text-decoration: none;
-                    font-weight: bold;
-                    margin-top: 2rem;
-                    border: 1px solid #444;
+                    border-radius: 50px;
+                    margin-top: 1rem;
+                    display: inline-block;
                 }
-                </style>
-            </head>
-            <body>
-                <div class="container">
-                    <h1>Payment Cancelled</h1>
-                    <p>No worries! Your payment was not processed.</p>
-                    <a href="/" class="btn">Back to Game</a>
-                </div>
-            </body>
+            </style>
+        </head>
+        <body>
+            <div class="card">
+                <h1>Payment Cancelled</h1>
+                <p>No charge was made.</p>
+                <a href="${process.env.CLIENT_URL || '/'}" class="btn">Return to Store</a>
+            </div>
+        </body>
         </html>
-`);
+    `);
 });
 
 // ============ API: Get Player Inventory ============
@@ -312,7 +322,7 @@ function generateRoomCode() {
 const PLAYER_COLORS = ['#00d4ff', '#ff006e', '#00ff87', '#9d4edd'];
 
 io.on('connection', (socket) => {
-    console.log(`Player connected: ${ socket.id } `);
+    console.log(`Player connected: ${socket.id} `);
 
     // Create a new room
     socket.on('createRoom', (callback) => {
@@ -497,7 +507,7 @@ io.on('connection', (socket) => {
 
     // Disconnect
     socket.on('disconnect', () => {
-        console.log(`Player disconnected: ${ socket.id } `);
+        console.log(`Player disconnected: ${socket.id} `);
 
         const roomCode = playerRooms.get(socket.id);
         if (roomCode) {
@@ -593,7 +603,7 @@ io.on('connection', (socket) => {
 
             if (room.powerups.length < 3) {
                 const powerup = {
-                    id: `pw_${ Date.now() } `,
+                    id: `pw_${Date.now()} `,
                     type: ['speed', 'damage', 'shield', 'superboost'][Math.floor(Math.random() * 4)],
                     position: [
                         (Math.random() - 0.5) * 10,
@@ -629,5 +639,5 @@ app.get('/', (req, res) => {
 
 const PORT = process.env.PORT || 3002;
 server.listen(PORT, () => {
-    console.log(`🎮 Puck Arena Server running on port ${ PORT } `);
+    console.log(`🎮 Puck Arena Server running on port ${PORT} `);
 });

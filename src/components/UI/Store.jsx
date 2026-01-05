@@ -3,9 +3,9 @@ import { TIERS, PACK_PRICES, TOTAL_ICONS, getCollectionStats } from '../../utils
 
 // Stripe Payment Links (Replace with your real URLs)
 const STRIPE_LINKS = {
-    single: 'https://buy.stripe.com/YOUR_SINGLE_PACK',
-    bundle10: 'https://buy.stripe.com/YOUR_10_PACK',
-    unlockAll: 'https://buy.stripe.com/YOUR_UNLOCK_ALL'
+    single: 'https://buy.stripe.com/5kQeV577v6FsgIZ0m1aIM07',
+    bundle10: 'https://buy.stripe.com/3cIbIT0J78NAgIZ0m1aIM06',
+    unlockAll: 'https://buy.stripe.com/6oU4grcrPgg29gx0m1aIM08'
 };
 
 export default function Store({ onClose, onOpenPack, playerInventory = [] }) {

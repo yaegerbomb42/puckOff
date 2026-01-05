@@ -12,6 +12,9 @@ const app = express();
 // IMPORTANT: Stripe webhooks need raw body, so this must come BEFORE express.json()
 app.post('/webhook/stripe', express.raw({ type: 'application/json' }), handleStripeWebhook);
 
+// Ping endpoint for keep-alive services (Cron-job.org / UptimeRobot)
+app.get('/ping', (req, res) => res.status(200).send('pong'));
+
 // Now apply JSON parsing for other routes
 app.use(cors());
 app.use(express.json());

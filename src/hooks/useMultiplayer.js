@@ -94,10 +94,10 @@ export function useMultiplayer() {
     }, []);
 
     // Create room
-    const createRoom = useCallback(() => {
+    const createRoom = useCallback((playerName, userEmail) => {
         if (!socket) return;
 
-        socket.emit('createRoom', (response) => {
+        socket.emit('createRoom', { playerName, userEmail }, (response) => {
             if (response.success) {
                 setRoomCode(response.roomCode);
                 setPlayerId(response.playerId);
@@ -110,11 +110,11 @@ export function useMultiplayer() {
     }, [socket]);
 
     // Join room
-    const joinRoom = useCallback((code) => {
+    const joinRoom = useCallback((code, playerName, userEmail) => {
         if (!socket) return Promise.reject('Not connected');
 
         return new Promise((resolve, reject) => {
-            socket.emit('joinRoom', { roomCode: code }, (response) => {
+            socket.emit('joinRoom', { roomCode: code, playerName, userEmail }, (response) => {
                 if (response.success) {
                     setRoomCode(response.roomCode);
                     setPlayerId(response.playerId);
@@ -131,10 +131,10 @@ export function useMultiplayer() {
     }, [socket]);
 
     // Quick join
-    const quickJoin = useCallback(() => {
+    const quickJoin = useCallback((playerName, userEmail) => {
         if (!socket) return;
 
-        socket.emit('quickJoin', (response) => {
+        socket.emit('quickJoin', { playerName, userEmail }, (response) => {
             if (response.success) {
                 setRoomCode(response.roomCode);
                 setPlayerId(response.playerId);

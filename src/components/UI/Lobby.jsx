@@ -174,10 +174,10 @@ export default function Lobby({
                         />
 
                         <div className="main-buttons">
-                            <button className="btn btn-primary btn-large shimmer" onClick={() => onQuickJoin(playerName)}>
+                            <button className="btn btn-primary btn-large shimmer" onClick={() => onQuickJoin(playerName, user?.email)}>
                                 ⚡ QUICK PLAY
                             </button>
-                            <button className="btn btn-secondary btn-large" onClick={() => onCreateRoom(playerName)}>
+                            <button className="btn btn-secondary btn-large" onClick={() => onCreateRoom(playerName, user?.email)}>
                                 🏠 CREATE ROOM
                             </button>
                         </div>
@@ -186,7 +186,7 @@ export default function Lobby({
                             <input type="text" placeholder="ROOM CODE" id="roomCodeInput" maxLength={6} />
                             <button className="btn btn-small" onClick={() => {
                                 const code = document.getElementById('roomCodeInput').value;
-                                if (code) onJoinRoom(code, playerName);
+                                if (code) onJoinRoom(code, playerName, user?.email);
                             }}>JOIN</button>
                         </div>
 

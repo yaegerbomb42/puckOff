@@ -325,7 +325,7 @@ io.on('connection', (socket) => {
     console.log(`Player connected: ${socket.id} `);
 
     // Create a new room
-    socket.on('createRoom', (callback) => {
+    socket.on('createRoom', ({ playerName, userEmail }, callback) => {
         const roomCode = generateRoomCode();
         rooms.set(roomCode, {
             players: new Map(),
@@ -334,11 +334,11 @@ io.on('connection', (socket) => {
             hostId: socket.id,
         });
 
-        joinRoom(socket, roomCode, callback);
+        joinRoom(socket, roomCode, playerName, userEmail, callback);
     });
 
     // Join existing room
-    socket.on('joinRoom', ({ roomCode }, callback) => {
+    socket.on('joinRoom', ({ roomCode, playerName, userEmail }, callback) => {
         const code = roomCode.toUpperCase();
         if (!rooms.has(code)) {
             callback({ success: false, error: 'Room not found' });
@@ -351,11 +351,11 @@ io.on('connection', (socket) => {
             return;
         }
 
-        joinRoom(socket, code, callback);
+        joinRoom(socket, code, playerName, userEmail, callback);
     });
 
     // Quick join - find or create room
-    socket.on('quickJoin', (callback) => {
+    socket.on('quickJoin', ({ playerName, userEmail }, callback) => {
         let roomCode = null;
 
         // Find room with space
@@ -378,7 +378,7 @@ io.on('connection', (socket) => {
             });
         }
 
-        joinRoom(socket, roomCode, playerName, callback);
+        joinRoom(socket, roomCode, playerName, userEmail, callback);
     });
 
     // Handle player ready
@@ -489,6 +489,9 @@ io.on('connection', (socket) => {
                 scores: getScoresObject(room),
             });
             room.gameState = 'ended';
+
+            // Award packs/credits to all players
+            awardGameRewards(room, socket.id);
         }
     });
 
@@ -527,12 +530,14 @@ io.on('connection', (socket) => {
     });
 
     // Helper: Join room
-    function joinRoom(socket, roomCode, callback) {
+    function joinRoom(socket, roomCode, playerName, userEmail, callback) {
         const room = rooms.get(roomCode);
         const playerIndex = room.players.size;
 
         const player = {
             id: socket.id,
+            name: playerName || `Player ${playerIndex + 1}`,
+            email: userEmail || null, // Store email for rewards
             color: PLAYER_COLORS[playerIndex],
             position: getSpawnPosition(playerIndex),
             velocity: [0, 0, 0],
@@ -629,6 +634,63 @@ io.on('connection', (socket) => {
             scores[id] = player.score || 0;
         }
         return scores;
+    }
+
+    // Helper: Award Game Rewards (1 Pack for Winner, 0.5 Credit for others)
+    async function awardGameRewards(room, winnerId) {
+        console.log('🏆 Awarding game rewards...');
+
+        for (const [playerId, player] of room.players) {
+            if (!player.email) {
+                console.log(`⚠️ Player ${player.name} has no email, skipping reward.`);
+                continue;
+            }
+
+            try {
+                // Determine reward
+                const isWinner = playerId === winnerId;
+                const creditEarned = isWinner ? 1.0 : 0.5;
+
+                // Get user doc
+                const userQuery = await admin.auth().getUserByEmail(player.email).catch(() => null);
+                if (!userQuery) continue;
+
+                const userRef = db.collection('users').doc(userQuery.uid);
+
+                await db.runTransaction(async (t) => {
+                    const doc = await t.get(userRef);
+                    if (!doc.exists) return; // Should exist if they logged in
+
+                    const data = doc.data();
+                    let currentCredits = (data.packCredits || 0) + creditEarned;
+                    let packsEarned = 0;
+
+                    // Convert credits to packs (every 1.0 credit = 1 pack)
+                    if (currentCredits >= 1) {
+                        const newPacks = Math.floor(currentCredits);
+                        currentCredits -= newPacks;
+                        packsEarned = newPacks;
+                    }
+
+                    t.update(userRef, {
+                        packCredits: currentCredits,
+                        freePacks: (data.freePacks || 0) + packsEarned
+                    });
+
+                    console.log(`🎁 ${player.email}: +${creditEarned} credit -> ${packsEarned} packs earned.`);
+
+                    // Notify client of reward
+                    io.to(playerId).emit('rewardEarned', {
+                        packs: packsEarned,
+                        credits: creditEarned,
+                        isWinner
+                    });
+                });
+
+            } catch (error) {
+                console.error(`❌ Error awarding reward to ${player.email}:`, error);
+            }
+        }
     }
 });
 

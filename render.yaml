@@ -1,9 +1,8 @@
 services:
-  # Game Frontend (Static Site)
+  # Game Frontend (Static Site) - Static sites are always free on Render
   - type: web
     name: puck-battle-arena-frontend
     runtime: static
-    plan: free
     buildCommand: npm install && npm run build
     staticPublishPath: ./build
     envVars:
@@ -18,7 +17,6 @@ services:
     name: puck-battle-arena-server
     rootDir: server
     runtime: node
-    plan: free
     buildCommand: npm install
     startCommand: node index.js
     envVars:

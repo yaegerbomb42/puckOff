@@ -495,7 +495,7 @@ io.on('connection', (socket) => {
         }
     });
 
-    // Power-up collected
+    // Power-up collected (Server-Authoritative)
     socket.on('powerupCollected', ({ powerupId }) => {
         const roomCode = playerRooms.get(socket.id);
         if (!roomCode) return;
@@ -503,9 +503,19 @@ io.on('connection', (socket) => {
         const room = rooms.get(roomCode);
         if (!room) return;
 
-        // Remove powerup and broadcast
-        room.powerups = room.powerups.filter(p => p.id !== powerupId);
+        // Validate powerup still exists (prevent race condition)
+        const powerupIndex = room.powerups.findIndex(p => p.id === powerupId);
+        if (powerupIndex === -1) {
+            // Powerup already collected by another player
+            socket.emit('powerupRejected', { powerupId });
+            console.log(`⚠️ Powerup ${powerupId} already collected`);
+            return;
+        }
+
+        // Remove powerup and broadcast to all clients
+        room.powerups.splice(powerupIndex, 1);
         io.to(roomCode).emit('powerupRemoved', { powerupId, collectorId: socket.id });
+        console.log(`✅ Player ${socket.id} collected powerup ${powerupId}`);
     });
 
     // Disconnect

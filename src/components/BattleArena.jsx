@@ -258,6 +258,10 @@ export default function BattleArena() {
             },
             onDamageUpdate: (id, damage) => { // New handler
                 setPlayerDamage(prev => ({ ...prev, [id]: damage }));
+            },
+            onPowerupRejected: (powerupId) => {
+                console.log(`❌ Failed to collect powerup ${powerupId} - already taken`);
+                // Powerup will be removed from UI via powerupRemoved event from winner
             }
         });
     }, [multiplayer]);

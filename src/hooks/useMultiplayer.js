@@ -88,6 +88,11 @@ export function useMultiplayer() {
             setServerPowerups(prev => prev.filter(p => p.id !== powerupId));
         });
 
+        newSocket.on('powerupRejected', ({ powerupId }) => {
+            console.log(`⚠️ Powerup ${powerupId} collection rejected (already taken)`);
+            handlersRef.current.onPowerupRejected?.(powerupId);
+        });
+
         return () => {
             newSocket.disconnect();
         };

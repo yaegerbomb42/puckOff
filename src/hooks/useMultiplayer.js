@@ -19,7 +19,8 @@ export function useMultiplayer() {
     const [scores, setScores] = useState({});
     const [serverPowerups, setServerPowerups] = useState([]);
     const [winner, setWinner] = useState(null);
-    const [selectedMap, setSelectedMap] = useState('SAWBLADE CITY'); // NEW state
+    const [selectedMap, setSelectedMap] = useState('SAWBLADE CITY');
+    const [seed, setSeed] = useState(null); // New state for procedural generation
 
     // Event handlers ref to avoid stale closures
     const handlersRef = useRef({});
@@ -54,10 +55,11 @@ export function useMultiplayer() {
             console.log('Player left:', playerId);
         });
 
-        newSocket.on('gameStart', ({ players, selectedMap }) => {
+        newSocket.on('gameStart', ({ players, selectedMap, seed }) => {
             setGameState('playing');
             if (players) setPlayers(players);
-            if (selectedMap) setSelectedMap(selectedMap); // Set map
+            if (selectedMap) setSelectedMap(selectedMap);
+            if (seed) setSeed(seed); // New seed state
             setScores({});
         });
 

@@ -402,9 +402,12 @@ io.on('connection', (socket) => {
 
             if (allReady && room.players.size >= 1) { // Allow 1 player start for testing
                 room.gameState = 'playing';
+                const seed = Math.floor(Math.random() * 1000000); // Generate seed
+                room.currentSeed = seed; // Store seed in room
                 io.to(roomCode).emit('gameStart', {
                     players: playersList,
-                    selectedMap: room.selectedMap || 'SAWBLADE CITY' // Default map
+                    selectedMap: room.selectedMap || 'SAWBLADE CITY',
+                    seed: seed // Send seed to clients
                 });
             }
         }
@@ -601,6 +604,8 @@ io.on('connection', (socket) => {
 
         io.to(roomCode).emit('gameStart', {
             players: getPlayersArray(room),
+            selectedMap: room.selectedMap,
+            seed: room.currentSeed || Math.floor(Math.random() * 1000000)
         });
 
         // Start powerup spawning

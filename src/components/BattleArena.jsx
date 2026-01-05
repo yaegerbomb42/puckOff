@@ -1,4 +1,4 @@
-import React, { useState, useCallback, Suspense, useRef, useEffect } from 'react';
+import React, { useState, useCallback, Suspense, useRef, useEffect, useMemo } from 'react';
 import { Canvas, useFrame, useThree } from '@react-three/fiber';
 import { Physics } from '@react-three/cannon';
 import { Stars, Environment } from '@react-three/drei';
@@ -17,6 +17,8 @@ import { useMultiplayer } from '../hooks/useMultiplayer';
 import { PHYSICS_CONFIG, MATERIALS, getRandomPowerupPosition, getRandomPowerupType, getSpawnPosition } from '../utils/physics';
 
 import { getPowerupInfo, POWERUP_REGISTRY } from '../utils/powerups';
+import ProceduralArena from './ProceduralArena';
+import { generateMap } from '../utils/mapGenerator';
 
 const DEFAULT_LOADOUT = ['speed_boost', 'rocket', 'shield'];
 
@@ -47,8 +49,17 @@ function GameScene({
     onCollision,
     onImpact,
     isPaused,
-    screenShake
+    screenShake,
+    seed // New prop
 }) {
+    // Generate map if procedural
+    const proceduralMapData = useMemo(() => {
+        if (mapType === 'PROCEDURAL' && seed) {
+            return generateMap(seed);
+        }
+        return null;
+    }, [mapType, seed]);
+
     return (
         <>
             {/* Environment - Optimized */}
@@ -59,8 +70,12 @@ function GameScene({
             {/* Dynamic camera */}
             <DynamicCamera playerPositions={playerPositions} shake={screenShake} />
 
-            {/* Chaos Arena */}
-            <ArenaChaos mapType={mapType} />
+            {/* Arena */}
+            {mapType === 'PROCEDURAL' ? (
+                <ProceduralArena mapData={proceduralMapData} />
+            ) : (
+                <ArenaChaos mapType={mapType} />
+            )}
 
             {/* All players */}
             {players.map((player, index) => (
@@ -429,6 +444,7 @@ export default function BattleArena() {
                                     onImpact={handleImpact}
                                     isPaused={isPaused}
                                     screenShake={screenShake}
+                                    seed={multiplayer.seed}
                                 />
                                 <ProjectileSystem projectiles={projectiles} onProjectileHit={handleProjectileHit} />
                             </>

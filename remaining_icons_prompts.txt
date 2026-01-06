@@ -1,0 +1,196 @@
+# Icon Vault Tracker (150 Items)
+
+**Total Status**: 7/150 Complete
+
+## 🎨 Global Stylesheet (Updated)
+**Strict Constraint**: All icons MUST be contained within a **perfect 2D circular boundary**.
+**View**: Isometric or Top-Down Texture Map.
+**Style**: High-fidelity 3D game asset, grounded in pixel-perfect circular geometry.
+**Output Constraints**:
+1.  **Circular Mask**: Design the asset to fit a perfect circle.
+2.  **No Background**: Transparent PNG.
+3.  **Overdrift**: Allowed only if it enhances the 3D effect but keeps the *core* mass circular.
+
+---
+
+## 🔴 INCOMPLETE (143 Items)
+
+### Tier 1: Common (Textured Materials)
+1. [ ] **Vantablack Sphere**: Isometric 3D render of a glossy black sphere constrained to a perfect circle. Single pixel-thin purple rim light. **[Fit to Circle, Isometric, No Background]**
+2. [ ] **Brushed Steel**: Top-down texture of a circular steel button with glowing blue center. Beveled edges define the circular border. **[Fit to Circle, Isometric, No Background]**
+3. [ ] **Graffiti Block**: Circular concrete texture patch. Pink and green paint splatter contained within the round stone shape. **[Fit to Circle, Isometric, No Background]**
+4. [ ] **Burnt Map**: Round parchment paper texture. Edges are charred and glowing but define a clear circle. **[Fit to Circle, Isometric, No Background]**
+5. [ ] **Neon Burlap**: Circular burlap fabric swatch. Neon blue stitching forms a cross. Round shape defined by fraying edges. **[Fit to Circle, Isometric, No Background]**
+6. [ ] **Rust Glow**: Rusted metal circle texture. Magma cracks glowing from within, bounded by the iron edge. **[Fit to Circle, Isometric, No Background]**
+7. [ ] **Hazard Hype**: Glossy yellow/black hazard stripe button. Perfect circular shape with plastic shine. **[Fit to Circle, Isometric, No Background]**
+8. [ ] **Carbon Hex**: Dark grey carbon fiber circle. Red glowing hexagon pattern overlay. **[Fit to Circle, Isometric, No Background]**
+9. [ ] **Denim Pin**: Blue jean fabric circle. Gold safety pin goes through it, slightly breaking the edge but keeping the round silhouette. **[Fit to Circle, Isometric, No Background]**
+10. [ ] **Leather Brand**: Worn leather circle texture with burned magic symbol in center. **[Fit to Circle, Isometric, No Background]**
+11. [ ] **Magma Cracks**: Circular dried mud texture with lava glowing in cracks. **[Fit to Circle, Isometric, No Background]**
+12. [ ] **Moss Crystal**: Grey rock circle coverd in neon green moss. **[Fit to Circle, Isometric, No Background]**
+13. [ ] **Hyper Droplet**: Perfect water sphere containing a city reflection. **[Fit to Circle, Isometric, No Background]**
+14. [ ] **Ember Heart**: Circular ash pile with glowing heart coal in center. **[Fit to Circle, Isometric, No Background]**
+15. [ ] **Cyber Ice**: Round ice cube with internal blue LED. **[Fit to Circle, Isometric, No Background]**
+16. [ ] **Toxic Slime**: Green slime puddle constrained to a perfect circle. Purple bubbles. **[Fit to Circle, Isometric, No Background]**
+17. [ ] **Holo Oil**: Circular oil slick with rainbow holographic sheen. **[Fit to Circle, Isometric, No Background]**
+18. [ ] **Chalk Crown**: Black circular slate with white chalk crown drawing. **[Fit to Circle, Isometric, No Background]**
+19. [ ] **Spray Drip**: Red spray paint dot forming a circle, with one drip at the bottom. **[Fit to Circle, Isometric, No Background]**
+20. [ ] **Glitch Noise**: Static noise texture circle with RGB edge artifacting. **[Fit to Circle, Isometric, No Background]**
+21. [ ] **Glass Shard**: Circular glass lens reflecting a red laser. **[Fit to Circle, Isometric, No Background]**
+22. [ ] **Copper Coil**: Tightly wound copper wire ball forming a circle. **[Fit to Circle, Isometric, No Background]**
+23. [ ] **Neon Bolt**: Top-down view of a hexagonal bolt head with blue plasma center. **[Fit to Circle, Isometric, No Background]**
+24. [ ] **Steam Gear**: Rusty metal gear viewed top-down. Steam jets contained near the teeth. **[Fit to Circle, Isometric, No Background]**
+25. [ ] **Chain Glow**: Ball of glowing red-hot chains forming a sphere. **[Fit to Circle, Isometric, No Background]**
+26. [ ] **Rope Fuse**: Coiled rope circle with a burning spark. **[Fit to Circle, Isometric, No Background]**
+27. [ ] **Medi Wrap**: Top-down white circular bandage roll with green cross projection. **[Fit to Circle, Isometric, No Background]**
+28. [ ] **Chrome Tape**: Ball of chrome tape reflecting the world. **[Fit to Circle, Isometric, No Background]**
+29. [ ] **Cardboard Bot**: Circular cardboard cutout with drawn robot eyes. **[Fit to Circle, Isometric, No Background]**
+30. [ ] **Charred Rune**: Round burnt wood slice with blue magic rune. **[Fit to Circle, Isometric, No Background]**
+31. [ ] **Ash Phoenix**: Circular ash pile with subtle bird shape in the dust. **[Fit to Circle, Isometric, No Background]**
+32. [ ] **Sand Gold**: Circle of desert sand with gold dust sparkles. **[Fit to Circle, Isometric, No Background]**
+33. [ ] **Zen Stack**: Top-down view of three stacked stones forming a circle. **[Fit to Circle, Isometric, No Background]**
+34. [ ] **Leaf Cyber**: Circular leaf skeleton with gold circuit veins. **[Fit to Circle, Isometric, No Background]**
+35. [ ] **Pinecone Grenade**: Green pinecone grenade stored as a round icon. **[Fit to Circle, Isometric, No Background]**
+36. [ ] **Acorn Gem**: Acorn with a round ruby gem nut. **[Fit to Circle, Isometric, No Background]**
+37. [ ] **Shroom Glow**: Top-down blue glowing mushroom cap. **[Fit to Circle, Isometric, No Background]**
+38. [ ] **Hook Blood**: Coiled fishing line circle with hook and blood drop. **[Fit to Circle, Isometric, No Background]**
+39. [ ] **Anchor Neon**: Neon tube bent into a circular anchor logo. **[Fit to Circle, Isometric, No Background]**
+40. [ ] **Compass Holo**: Circular vintage map with holo compass needle. **[Fit to Circle, Isometric, No Background]**
+
+### Tier 2: Uncommon (Clean Objects)
+41. [ ] **Winking Face**: 3D yellow plastic coin with winking face. **[Fit to Circle, Isometric, No Background]**
+42. [ ] **Snake Eyes**: Red dice inside a clear glass sphere. **[Fit to Circle, Isometric, No Background]**
+43. [ ] **Lucky Chip**: blurry spinning poker chip forming a solid circle. **[Fit to Circle, Isometric, No Background]**
+44. [ ] **Cursed Coin**: Gold coin with glowing green skull emboss. **[Fit to Circle, Isometric, No Background]**
+45. [ ] **Silver Bar**: Round silver coin with thumbprint smudge. **[Fit to Circle, Isometric, No Background]**
+46. [ ] **Bronze Star**: Circular bronze medal with star symbol. **[Fit to Circle, Isometric, No Background]**
+47. [ ] **Lock Pick**: Round padlock with glowing blue pick. **[Fit to Circle, Isometric, No Background]**
+48. [ ] **Key Glitch**: Round antique key head glitching into pixels. **[Fit to Circle, Isometric, No Background]**
+49. [ ] **TNT Bundle**: Red dynamite sticks bundled into a tight circle/cylinder. **[Fit to Circle, Isometric, No Background]**
+50. [ ] **Frag Pin**: Top-down view of a grenade. **[Fit to Circle, Isometric, No Background]**
+51. [ ] **Kunai Spin**: Spinning blade blur forming a grey circle. **[Fit to Circle, Isometric, No Background]**
+52. [ ] **Ninja Star**: Shuriken embedded in a round metal plate. **[Fit to Circle, Isometric, No Background]**
+53. [ ] **Gold Knuckles**: Circular gold brass knuckles with diamonds. **[Fit to Circle, Isometric, No Background]**
+54. [ ] **Bat Spikes**: Head-on view of spiked baseball bat (circular profile). **[Fit to Circle, Isometric, No Background]**
+55. [ ] **Skate Bearing**: Spinning skateboard bearing with smoke. **[Fit to Circle, Isometric, No Background]**
+56. [ ] **Graf Can**: Top-down spray can nozzle with pink mist circle. **[Fit to Circle, Isometric, No Background]**
+57. [ ] **Mixtape Fire**: Burning cassette tape reel. **[Fit to Circle, Isometric, No Background]**
+58. [ ] **Floppy Save**: Round coaster with floppy disk save icon. **[Fit to Circle, Isometric, No Background]**
+59. [ ] **VHS Horror**: Tangled VHS tape forming a scary face circle. **[Fit to Circle, Isometric, No Background]**
+60. [ ] **Cart Glitch**: Top-down game cartridge with dust cloud. **[Fit to Circle, Isometric, No Background]**
+61. [ ] **Joy Stick**: Top-down red arcade stick ball. **[Fit to Circle, Isometric, No Background]**
+62. [ ] **D Pad Gamer**: Round button with D-pad texture. **[Fit to Circle, Isometric, No Background]**
+63. [ ] **Cursor Click**: Pixel hand cursor inside a white circle. **[Fit to Circle, Isometric, No Background]**
+64. [ ] **Time Sand**: Top-down view of hourglass sand vortex. **[Fit to Circle, Isometric, No Background]**
+65. [ ] **Speed Run**: Cracked stopwatch face. **[Fit to Circle, Isometric, No Background]**
+66. [ ] **True North**: Compass face with spinning needle. **[Fit to Circle, Isometric, No Background]**
+67. [ ] **Spy Glass**: Circular lens revealing matrix code. **[Fit to Circle, Isometric, No Background]**
+68. [ ] **Idea Bulb**: Round lightbulb with lightning filament. **[Fit to Circle, Isometric, No Background]**
+69. [ ] **Power Cell**: Top-down battery with green ring light. **[Fit to Circle, Isometric, No Background]**
+70. [ ] **Spark Life**: Spark plug tip with circular electric arc. **[Fit to Circle, Isometric, No Background]**
+
+### Tier 3: Rare (VFX & Energy)
+71. [ ] **Neon Love**: Pink neon tube bent into heart circle. **[Fit to Circle, Isometric, No Background]**
+72. [ ] **Nuke Glow**: Round barrel top dripping green ooze. **[Fit to Circle, Isometric, No Background]**
+73. [ ] **Bio Hazard**: Round black metal with red pulsing biohazard symbol. **[Fit to Circle, Isometric, No Background]**
+74. [ ] **Zeus Bolt**: Circular storm cloud with yellow bolt. **[Fit to Circle, Isometric, No Background]**
+75. [ ] **Fire Emoji**: 3D spherical flame emoji with sunglasses. **[Fit to Circle, Isometric, No Background]**
+76. [ ] **Ice Shard**: Floating ice crystals arranged in a circle. **[Fit to Circle, Isometric, No Background]**
+77. [ ] **Acid Skull**: Top-down skull melting into green circle puddle. **[Fit to Circle, Isometric, No Background]**
+78. [ ] **Tesla Orb**: Glass plasma ball with purple lightning. **[Fit to Circle, Isometric, No Background]**
+79. [ ] **Sniper Dot**: Metal circle with red laser center. **[Fit to Circle, Isometric, No Background]**
+80. [ ] **HUD Lock**: Red sci-fi targeting circle "LOCKED". **[Fit to Circle, Isometric, No Background]**
+81. [ ] **Radar Blip**: Green radar screen circle with blip. **[Fit to Circle, Isometric, No Background]**
+82. [ ] **Sonar Wave**: Blue sonar ripple circle. **[Fit to Circle, Isometric, No Background]**
+83. [ ] **Wifi Max**: Gold WiFi symbol on round black button. **[Fit to Circle, Isometric, No Background]**
+84. [ ] **Blue Tooth**: Floating blue rune circle. **[Fit to Circle, Isometric, No Background]**
+85. [ ] **NFC Chip**: Round microchip with gold antenna spiral. **[Fit to Circle, Isometric, No Background]**
+86. [ ] **QR Error**: Round QR code glitching red. **[Fit to Circle, Isometric, No Background]**
+87. [ ] **Laser Scan**: round barcode with red laser line. **[Fit to Circle, Isometric, No Background]**
+88. [ ] **Matrix Code**: Green code numbers spiral tunnel. **[Fit to Circle, Isometric, No Background]**
+89. [ ] **Pixel Flame**: 8-bit fireball sprite in a circle. **[Fit to Circle, Isometric, No Background]**
+90. [ ] **Poly Skull**: Low-poly spherical skull with blue eye glow. **[Fit to Circle, Isometric, No Background]**
+
+### Tier 4: Epic (Aesthetic Gear)
+91. [ ] **Vapor Sun**: 80s retro sun circle (pink/orange). **[Fit to Circle, Isometric, No Background]**
+92. [ ] **Oni Cyber**: Round white demon mask with neon eyes. **[Fit to Circle, Isometric, No Background]**
+93. [ ] **Night Ops**: Green circular night-vision view. **[Fit to Circle, Isometric, No Background]**
+94. [ ] **Toxic Mask**: Round gas mask filter with reflection. **[Fit to Circle, Isometric, No Background]**
+95. [ ] **Crow Mask**: Steampunk mask in gear circle. **[Fit to Circle, Isometric, No Background]**
+96. [ ] **Viking Rage**: Round viking shield with glowing helmet. **[Fit to Circle, Isometric, No Background]**
+97. [ ] **Cyber Shades**: Spherical chrome reflection of neon city. **[Fit to Circle, Isometric, No Background]**
+98. [ ] **Ray Gun**: Head-on view of raygun barrel (circular). **[Fit to Circle, Isometric, No Background]**
+99. [ ] **Magnum Gold**: Revolver cylinder viewed from front (circular). **[Fit to Circle, Isometric, No Background]**
+100. [ ] **Katana Soul**: Round sword handguard (tsuba) with blue wisp. **[Fit to Circle, Isometric, No Background]**
+101. [ ] **Beam Saber**: Top-down lightsaber hilt emitter. **[Fit to Circle, Isometric, No Background]**
+102. [ ] **Hover Tech**: Round blue hover turbine fan. **[Fit to Circle, Isometric, No Background]**
+103. [ ] **Rocket Pack**: Rocket exhaust flame circle. **[Fit to Circle, Isometric, No Background]**
+104. [ ] **Iron Fist**: Punching robot fist (head-on circle view). **[Fit to Circle, Isometric, No Background]**
+105. [ ] **Bionic Eye**: Red robotic camera lens circle. **[Fit to Circle, Isometric, No Background]**
+
+### Tier 5: Ultra Epic (Power Fantasy)
+106. [ ] **Dragon Maw**: Dragon throat view (circular fire tunnel). **[Fit to Circle, Isometric, No Background]**
+107. [ ] **Phoenix Rise**: Fire bird curled into perfect circle. **[Fit to Circle, Isometric, No Background]**
+108. [ ] **Kraken Grip**: Round porthole with octopus eye. **[Fit to Circle, Isometric, No Background]**
+109. [ ] **Crystal Smash**: Blue crystal fist smashing glass circle. **[Fit to Circle, Isometric, No Background]**
+110. [ ] **Wizard Focus**: Crystal orb with galaxy swirl. **[Fit to Circle, Isometric, No Background]**
+111. [ ] **Death Totem**: Round skull totem with purple smoke. **[Fit to Circle, Isometric, No Background]**
+112. [ ] **Thor Hammer**: Top-down hammer impact lightning circle. **[Fit to Circle, Isometric, No Background]**
+113. [ ] **Force Field**: Blue hexagon energy shield circle. **[Fit to Circle, Isometric, No Background]**
+114. [ ] **Grav Well**: Purple singularity black hole orb. **[Fit to Circle, Isometric, No Background]**
+115. [ ] **Portal Loop**: Blue and orange portals forming a loop circle. **[Fit to Circle, Isometric, No Background]**
+116. [ ] **Time Gear**: Spinning gold clock gear. **[Fit to Circle, Isometric, No Background]**
+117. [ ] **Void Box**: Black hole contained in a cube (isometric). **[Fit to Circle, Isometric, No Background]**
+118. [ ] **Ion Cannon**: Red orbital laser filling the circle. **[Fit to Circle, Isometric, No Background]**
+119. [ ] **Mech Damage**: Damaged robot head circle with sparks. **[Fit to Circle, Isometric, No Background]**
+120. [ ] **Alien Relic**: Glowing alien cube isometric. **[Fit to Circle, Isometric, No Background]**
+
+### Tier 6: Legendary (Luxury Materials)
+121. [ ] **Diamond Skull**: Isometric clear diamond skull. **[Fit to Circle, Isometric, No Background]**
+122. [ ] **Gold Splash**: Liquid gold sphere splashing. **[Fit to Circle, Isometric, No Background]**
+123. [ ] **Chrome Sphere**: Perfect mirror sphere reflection. **[Fit to Circle, Isometric, No Background]**
+124. [ ] **Prism Light**: Glass prism in circle with rainbow. **[Fit to Circle, Isometric, No Background]**
+125. [ ] **Vanta Void**: 2D Flat Black hole sphere (void). **[Fit to Circle, Isometric, No Background]**
+126. [ ] **Deep Jelly**: Round bioluminescent jellyfish top view. **[Fit to Circle, Isometric, No Background]**
+127. [ ] **Cosmic Clock**: Star constellation clock face. **[Fit to Circle, Isometric, No Background]**
+128. [ ] **Magma Rock**: Floating molten rock sphere. **[Fit to Circle, Isometric, No Background]**
+129. [ ] **King Crown**: Top-down gold crown with ruby. **[Fit to Circle, Isometric, No Background]**
+
+### Tier 7: Mythic (Abstract & Metaphysical)
+132. [ ] **Hyper Cube**: Glowing 4D wireframe tesseract orb. **[Fit to Circle, Isometric, No Background]**
+133. [ ] **Galaxy Jar**: Top-down jar lid with galaxy inside. **[Fit to Circle, Isometric, No Background]**
+134. [ ] **Quantum Ent**: Two atoms connected by lightning in a circle. **[Fit to Circle, Isometric, No Background]**
+135. [ ] **Soul Keeper**: Top-down lantern with ghost inside. **[Fit to Circle, Isometric, No Background]**
+139. [ ] **Anti Matter**: Inverted color sphere. **[Fit to Circle, Isometric, No Background]**
+140. [ ] **Time Rift**: Circular rip in sky showing gears. **[Fit to Circle, Isometric, No Background]**
+
+### Tier 8: Celestial (Cosmic Horror)
+141. [ ] **God Eye**: Giant realistic eye in nebula circle. **[Fit to Circle, Isometric, No Background]**
+142. [ ] **Bible Angel**: Wheels within wheels with eyes (circular). **[Fit to Circle, Isometric, No Background]**
+143. [ ] **Gold Spiral**: Golden particle Fibonacci spiral. **[Fit to Circle, Isometric, No Background]**
+144. [ ] **Bottled Aurora**: Top-down bottle with aurora. **[Fit to Circle, Isometric, No Background]**
+145. [ ] **Star Death**: Supernova blast ring. **[Fit to Circle, Isometric, No Background]**
+
+### Tier 9: Cosmic (Meta)
+146. [ ] **Schrod Cat**: Top-down box with glowing cat eyes. **[Fit to Circle, Isometric, No Background]**
+148. [ ] **Hand God**: Stone hand holding solar system. **[Fit to Circle, Isometric, No Background]**
+
+---
+
+## 🟢 COMPLETED (7 Items)
+
+### Tier 6: Legendary
+130. [x] **Angel Halo**: A ring of pure white light. Floating white feathers drift down from it.
+
+### Tier 7: Mythic
+131. [x] **Singularity**: A single point of blinding white light. Space around it creates a lensing distortion effect.
+136. [x] **Pixel Decay**: A beautiful landscape circle that is dissolving into digital pixel dust on the right side.
+137. [x] **Ascend God**: A human silhouette in a circle. The body is turning into pure golden light rays.
+138. [x] **Zero Point**: An explosion of white energy frozen in time. Debris floats motionless.
+
+### Tier 9: Cosmic
+147. [x] **Dark Matter**: A swirling cloud of purple and black smoke that looks heavy and oily.
+
+### Tier 10: Divine
+149. [x] **Dev Grail**: A golden chalice overflowing not with wine, but with glowing green binary code digits.
+150. [x] **Ban Hammer**: A judge's gavel made of pure lightning. It is striking a digital block, creating sparks.

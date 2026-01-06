@@ -70,7 +70,7 @@ function LavaTile({ position, color }) {
     );
 }
 
-function RampTile({ position, rotation = 0 }) {
+function RampTile({ position, rotation = 0, color }) {
     const [ref] = useBox(() => ({
         type: 'Static',
         position: [position.x, 0, position.z],
@@ -82,7 +82,7 @@ function RampTile({ position, rotation = 0 }) {
     return (
         <mesh ref={ref} receiveShadow>
             <boxGeometry args={[TILE_SIZE, TILE_HEIGHT, TILE_SIZE * 1.2]} />
-            <meshStandardMaterial color="#ffaa00" metalness={0.3} roughness={0.6} />
+            <meshStandardMaterial color={color || "#ffaa00"} metalness={0.3} roughness={0.6} />
         </mesh>
     );
 }
@@ -117,7 +117,7 @@ function BumperTile({ position, color }) {
     );
 }
 
-function WallTile({ position }) {
+function WallTile({ position, color }) {
     const [ref] = useBox(() => ({
         type: 'Static',
         position: [position.x, TILE_HEIGHT * 2, position.z],
@@ -128,7 +128,7 @@ function WallTile({ position }) {
     return (
         <mesh ref={ref} castShadow receiveShadow>
             <boxGeometry args={[TILE_SIZE, TILE_HEIGHT * 4, TILE_SIZE]} />
-            <meshStandardMaterial color="#333344" metalness={0.2} roughness={0.9} />
+            <meshStandardMaterial color={color ? color : "#eeeeee"} metalness={0.1} roughness={0.9} />
         </mesh>
     );
 }
@@ -161,17 +161,17 @@ function PowerupZoneTile({ position }) {
             {/* Floor base */}
             <mesh receiveShadow>
                 <boxGeometry args={[TILE_SIZE, TILE_HEIGHT, TILE_SIZE]} />
-                <meshStandardMaterial color="#2a1a3a" metalness={0.1} roughness={0.8} />
+                <meshStandardMaterial color="#eeeeee" metalness={0.1} roughness={0.8} />
             </mesh>
             {/* Glowing platform */}
             <mesh position={[0, 0.3, 0]}>
                 <cylinderGeometry args={[1, 1, 0.1, 32]} />
                 <meshStandardMaterial
-                    color="#ffff00"
-                    emissive="#ffff00"
-                    emissiveIntensity={0.8}
+                    color="#ffd700"
+                    emissive="#ffd700"
+                    emissiveIntensity={0.5}
                     transparent
-                    opacity={0.7}
+                    opacity={0.6}
                 />
             </mesh>
         </group>
@@ -203,13 +203,13 @@ export default function ProceduralArena({ mapData }) {
                         result.push(<LavaTile key={key} position={worldPos} color={biome.colors.hazard} />);
                         break;
                     case TILE_TYPES.RAMP:
-                        result.push(<RampTile key={key} position={worldPos} rotation={Math.random() * Math.PI * 2} />);
+                        result.push(<RampTile key={key} position={worldPos} rotation={Math.random() * Math.PI * 2} color={biome.colors.accent} />);
                         break;
                     case TILE_TYPES.BUMPER:
                         result.push(<BumperTile key={key} position={worldPos} color={biome.colors.accent} />);
                         break;
                     case TILE_TYPES.WALL:
-                        result.push(<WallTile key={key} position={worldPos} />);
+                        result.push(<WallTile key={key} position={worldPos} color={biome.colors.floor} />); // Use floor color but will darken in component
                         break;
                     case TILE_TYPES.SPAWN:
                         result.push(<SpawnTile key={key} position={worldPos} color={biome.colors.accent} />);

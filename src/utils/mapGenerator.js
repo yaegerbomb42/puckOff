@@ -17,32 +17,32 @@ export const TILE_TYPES = {
 
 // Biome definitions
 export const BIOMES = {
-    ICE_REALM: {
-        name: 'Ice Realm',
+    CRYSTAL_SUMMIT: {
+        name: 'Crystal Summit',
         primary: TILE_TYPES.ICE,
-        hazard: TILE_TYPES.LAVA,
-        colors: { floor: '#1a2a3a', accent: '#00d4ff', hazard: '#ff4500' },
+        hazard: TILE_TYPES.LAVA, // Represented as "Overcharge Energy"
+        colors: { floor: '#ffffff', accent: '#a6e4ff', hazard: '#ffcc00' }, // White/Ice/Gold
         weights: { floor: 0.4, ice: 0.35, lava: 0.05, ramp: 0.1, bumper: 0.1 }
     },
-    VOLCANO: {
-        name: 'Volcano',
+    SOLAR_FOUNDRY: {
+        name: 'Solar Foundry',
         primary: TILE_TYPES.FLOOR,
         hazard: TILE_TYPES.LAVA,
-        colors: { floor: '#2a1a1a', accent: '#ff6b00', hazard: '#ff0000' },
+        colors: { floor: '#f0f4f8', accent: '#ff9900', hazard: '#ff5500' }, // Silver/Solar Orange
         weights: { floor: 0.5, ice: 0.05, lava: 0.2, ramp: 0.15, bumper: 0.1 }
     },
-    NEON_CITY: {
-        name: 'Neon City',
+    CLOUD_METROPOLIS: {
+        name: 'Cloud Metropolis',
         primary: TILE_TYPES.FLOOR,
         hazard: TILE_TYPES.WALL,
-        colors: { floor: '#0a0a1a', accent: '#ff00ff', hazard: '#00ff87' },
+        colors: { floor: '#f5faff', accent: '#b39ddb', hazard: '#00ccff' }, // Cloud White/Soft Purple/Sky Blue
         weights: { floor: 0.5, ice: 0.1, lava: 0.05, ramp: 0.15, bumper: 0.2 }
     },
-    CHAOS: {
-        name: 'Chaos Arena',
+    ZEN_GARDEN: {
+        name: 'Zen Garden',
         primary: TILE_TYPES.FLOOR,
-        hazard: TILE_TYPES.LAVA,
-        colors: { floor: '#1a1a2a', accent: '#ffff00', hazard: '#ff0000' },
+        hazard: TILE_TYPES.LAVA, // Represented as "Water"
+        colors: { floor: '#e8f5e9', accent: '#81c784', hazard: '#29b6f6' }, // Sage Green/Soft Blue
         weights: { floor: 0.3, ice: 0.15, lava: 0.15, ramp: 0.2, bumper: 0.2 }
     }
 };

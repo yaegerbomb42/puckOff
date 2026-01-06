@@ -1,0 +1,961 @@
+
+> puck-battle-arena-new@0.1.0 start
+> react-scripts start
+
+[baseline-browser-mapping] The data in this module is over two months old.  To ensure accurate Baseline data, please update: `npm i baseline-browser-mapping@latest -D`
+(node:68988) [DEP_WEBPACK_DEV_SERVER_ON_AFTER_SETUP_MIDDLEWARE] DeprecationWarning: 'onAfterSetupMiddleware' option is deprecated. Please use the 'setupMiddlewares' option.
+(Use `node --trace-deprecation ...` to show where the warning was created)
+(node:68988) [DEP_WEBPACK_DEV_SERVER_ON_BEFORE_SETUP_MIDDLEWARE] DeprecationWarning: 'onBeforeSetupMiddleware' option is deprecated. Please use the 'setupMiddlewares' option.
+Starting the development server...
+
+Compiled with warnings.
+
+Failed to parse source map from '/Users/yaeger/Desktop/puck-battle-arena-new/node_modules/@mediapipe/tasks-vision/vision_bundle_mjs.js.map' file: Error: ENOENT: no such file or directory, open '/Users/yaeger/Desktop/puck-battle-arena-new/node_modules/@mediapipe/tasks-vision/vision_bundle_mjs.js.map'
+
+[eslint] 
+src/components/ArenaChaos.jsx
+  Line 1:25:  'useMemo' is defined but never used  no-unused-vars
+
+src/components/BattleArena.jsx
+  Line 2:18:    'useFrame' is defined but never used                    no-unused-vars
+  Line 2:28:    'useThree' is defined but never used                    no-unused-vars
+  Line 17:26:   'MATERIALS' is defined but never used                   no-unused-vars
+  Line 19:26:   'POWERUP_REGISTRY' is defined but never used            no-unused-vars
+  Line 125:12:  'players' is assigned a value but never used            no-unused-vars
+  Line 125:21:  'setPlayers' is assigned a value but never used         no-unused-vars
+  Line 127:28:  'setPlayerLoadouts' is assigned a value but never used  no-unused-vars
+  Line 145:9:   Expected a default case                                 default-case
+
+src/components/DynamicCamera.jsx
+  Line 1:8:   'React' is defined but never used      no-unused-vars
+  Line 1:25:  'useEffect' is defined but never used  no-unused-vars
+
+src/components/KnockoutEffects.jsx
+  Line 1:34:  'useEffect' is defined but never used  no-unused-vars
+
+src/components/PowerUps.jsx
+  Line 1:25:  'useEffect' is defined but never used  no-unused-vars
+
+src/components/ProceduralArena.jsx
+  Line 2:18:  'usePlane' is defined but never used  no-unused-vars
+
+src/components/ProjectileSystem.jsx
+  Line 1:17:  'useRef' is defined but never used        no-unused-vars
+  Line 1:25:  'useEffect' is defined but never used     no-unused-vars
+  Line 1:36:  'useState' is defined but never used      no-unused-vars
+  Line 3:21:  'useBox' is defined but never used        no-unused-vars
+  Line 4:13:  'THREE' is defined but never used         no-unused-vars
+  Line 8:17:  'api' is assigned a value but never used  no-unused-vars
+
+src/components/Puck.jsx
+  Line 74:11:  'effectiveMaxVelocity' is assigned a value but never used  no-unused-vars
+
+src/components/UI/AdminDashboard.jsx
+  Line 1:27:  'useEffect' is defined but never used               no-unused-vars
+  Line 9:41:  'saveInventory' is assigned a value but never used  no-unused-vars
+
+src/components/UI/Lobby.jsx
+  Line 135:49:  The href attribute is required for an anchor to be keyboard accessible. Provide a valid, navigable address as the href value. If you cannot provide an href, but still need the element to resemble a link, use a button and change it with appropriate styles. Learn more: https://github.com/jsx-eslint/eslint-plugin-jsx-a11y/blob/HEAD/docs/rules/anchor-is-valid.md  jsx-a11y/anchor-is-valid
+  Line 137:56:  The href attribute is required for an anchor to be keyboard accessible. Provide a valid, navigable address as the href value. If you cannot provide an href, but still need the element to resemble a link, use a button and change it with appropriate styles. Learn more: https://github.com/jsx-eslint/eslint-plugin-jsx-a11y/blob/HEAD/docs/rules/anchor-is-valid.md  jsx-a11y/anchor-is-valid
+
+src/components/UI/PackOpener.jsx
+  Line 4:30:  'Float' is defined but never used  no-unused-vars
+
+src/components/UI/Store.jsx
+  Line 1:17:  'useState' is defined but never used     no-unused-vars
+  Line 3:17:  'PACK_PRICES' is defined but never used  no-unused-vars
+  Line 3:30:  'TOTAL_ICONS' is defined but never used  no-unused-vars
+
+src/hooks/useMultiplayer.js
+  Line 23:12:   'seed' is assigned a value but never used          no-unused-vars
+  Line 181:11:  'reportDamage' is assigned a value but never used  no-unused-vars
+
+src/utils/powerups.js
+  Line 1:8:  'React' is defined but never used  no-unused-vars
+
+Search for the keywords to learn more about each warning.
+To ignore, add // eslint-disable-next-line to the line before.
+
+WARNING in ./node_modules/@mediapipe/tasks-vision/vision_bundle.mjs
+Module Warning (from ./node_modules/source-map-loader/dist/cjs.js):
+Failed to parse source map from '/Users/yaeger/Desktop/puck-battle-arena-new/node_modules/@mediapipe/tasks-vision/vision_bundle_mjs.js.map' file: Error: ENOENT: no such file or directory, open '/Users/yaeger/Desktop/puck-battle-arena-new/node_modules/@mediapipe/tasks-vision/vision_bundle_mjs.js.map'
+
+WARNING in [eslint] 
+src/components/ArenaChaos.jsx
+  Line 1:25:  'useMemo' is defined but never used  no-unused-vars
+
+src/components/BattleArena.jsx
+  Line 2:18:    'useFrame' is defined but never used                    no-unused-vars
+  Line 2:28:    'useThree' is defined but never used                    no-unused-vars
+  Line 17:26:   'MATERIALS' is defined but never used                   no-unused-vars
+  Line 19:26:   'POWERUP_REGISTRY' is defined but never used            no-unused-vars
+  Line 125:12:  'players' is assigned a value but never used            no-unused-vars
+  Line 125:21:  'setPlayers' is assigned a value but never used         no-unused-vars
+  Line 127:28:  'setPlayerLoadouts' is assigned a value but never used  no-unused-vars
+  Line 145:9:   Expected a default case                                 default-case
+
+src/components/DynamicCamera.jsx
+  Line 1:8:   'React' is defined but never used      no-unused-vars
+  Line 1:25:  'useEffect' is defined but never used  no-unused-vars
+
+src/components/KnockoutEffects.jsx
+  Line 1:34:  'useEffect' is defined but never used  no-unused-vars
+
+src/components/PowerUps.jsx
+  Line 1:25:  'useEffect' is defined but never used  no-unused-vars
+
+src/components/ProceduralArena.jsx
+  Line 2:18:  'usePlane' is defined but never used  no-unused-vars
+
+src/components/ProjectileSystem.jsx
+  Line 1:17:  'useRef' is defined but never used        no-unused-vars
+  Line 1:25:  'useEffect' is defined but never used     no-unused-vars
+  Line 1:36:  'useState' is defined but never used      no-unused-vars
+  Line 3:21:  'useBox' is defined but never used        no-unused-vars
+  Line 4:13:  'THREE' is defined but never used         no-unused-vars
+  Line 8:17:  'api' is assigned a value but never used  no-unused-vars
+
+src/components/Puck.jsx
+  Line 74:11:  'effectiveMaxVelocity' is assigned a value but never used  no-unused-vars
+
+src/components/UI/AdminDashboard.jsx
+  Line 1:27:  'useEffect' is defined but never used               no-unused-vars
+  Line 9:41:  'saveInventory' is assigned a value but never used  no-unused-vars
+
+src/components/UI/Lobby.jsx
+  Line 135:49:  The href attribute is required for an anchor to be keyboard accessible. Provide a valid, navigable address as the href value. If you cannot provide an href, but still need the element to resemble a link, use a button and change it with appropriate styles. Learn more: https://github.com/jsx-eslint/eslint-plugin-jsx-a11y/blob/HEAD/docs/rules/anchor-is-valid.md  jsx-a11y/anchor-is-valid
+  Line 137:56:  The href attribute is required for an anchor to be keyboard accessible. Provide a valid, navigable address as the href value. If you cannot provide an href, but still need the element to resemble a link, use a button and change it with appropriate styles. Learn more: https://github.com/jsx-eslint/eslint-plugin-jsx-a11y/blob/HEAD/docs/rules/anchor-is-valid.md  jsx-a11y/anchor-is-valid
+
+src/components/UI/PackOpener.jsx
+  Line 4:30:  'Float' is defined but never used  no-unused-vars
+
+src/components/UI/Store.jsx
+  Line 1:17:  'useState' is defined but never used     no-unused-vars
+  Line 3:17:  'PACK_PRICES' is defined but never used  no-unused-vars
+  Line 3:30:  'TOTAL_ICONS' is defined but never used  no-unused-vars
+
+src/hooks/useMultiplayer.js
+  Line 23:12:   'seed' is assigned a value but never used          no-unused-vars
+  Line 181:11:  'reportDamage' is assigned a value but never used  no-unused-vars
+
+src/utils/powerups.js
+  Line 1:8:  'React' is defined but never used  no-unused-vars
+
+webpack compiled with 2 warnings
+Compiling...
+Compiled with warnings.
+
+Failed to parse source map from '/Users/yaeger/Desktop/puck-battle-arena-new/node_modules/@mediapipe/tasks-vision/vision_bundle_mjs.js.map' file: Error: ENOENT: no such file or directory, open '/Users/yaeger/Desktop/puck-battle-arena-new/node_modules/@mediapipe/tasks-vision/vision_bundle_mjs.js.map'
+
+[eslint] 
+src/components/ArenaChaos.jsx
+  Line 1:25:  'useMemo' is defined but never used  no-unused-vars
+
+src/components/BattleArena.jsx
+  Line 2:18:    'useFrame' is defined but never used                    no-unused-vars
+  Line 2:28:    'useThree' is defined but never used                    no-unused-vars
+  Line 17:26:   'MATERIALS' is defined but never used                   no-unused-vars
+  Line 19:26:   'POWERUP_REGISTRY' is defined but never used            no-unused-vars
+  Line 125:12:  'players' is assigned a value but never used            no-unused-vars
+  Line 125:21:  'setPlayers' is assigned a value but never used         no-unused-vars
+  Line 127:28:  'setPlayerLoadouts' is assigned a value but never used  no-unused-vars
+  Line 145:9:   Expected a default case                                 default-case
+
+src/components/DynamicCamera.jsx
+  Line 1:8:   'React' is defined but never used      no-unused-vars
+  Line 1:25:  'useEffect' is defined but never used  no-unused-vars
+
+src/components/KnockoutEffects.jsx
+  Line 1:34:  'useEffect' is defined but never used  no-unused-vars
+
+src/components/PowerUps.jsx
+  Line 1:25:  'useEffect' is defined but never used  no-unused-vars
+
+src/components/ProceduralArena.jsx
+  Line 2:18:  'usePlane' is defined but never used  no-unused-vars
+
+src/components/ProjectileSystem.jsx
+  Line 1:17:  'useRef' is defined but never used        no-unused-vars
+  Line 1:25:  'useEffect' is defined but never used     no-unused-vars
+  Line 1:36:  'useState' is defined but never used      no-unused-vars
+  Line 3:21:  'useBox' is defined but never used        no-unused-vars
+  Line 4:13:  'THREE' is defined but never used         no-unused-vars
+  Line 8:17:  'api' is assigned a value but never used  no-unused-vars
+
+src/components/Puck.jsx
+  Line 74:11:  'effectiveMaxVelocity' is assigned a value but never used  no-unused-vars
+
+src/components/UI/AdminDashboard.jsx
+  Line 1:27:  'useEffect' is defined but never used               no-unused-vars
+  Line 9:41:  'saveInventory' is assigned a value but never used  no-unused-vars
+
+src/components/UI/Lobby.jsx
+  Line 135:49:  The href attribute is required for an anchor to be keyboard accessible. Provide a valid, navigable address as the href value. If you cannot provide an href, but still need the element to resemble a link, use a button and change it with appropriate styles. Learn more: https://github.com/jsx-eslint/eslint-plugin-jsx-a11y/blob/HEAD/docs/rules/anchor-is-valid.md  jsx-a11y/anchor-is-valid
+  Line 137:56:  The href attribute is required for an anchor to be keyboard accessible. Provide a valid, navigable address as the href value. If you cannot provide an href, but still need the element to resemble a link, use a button and change it with appropriate styles. Learn more: https://github.com/jsx-eslint/eslint-plugin-jsx-a11y/blob/HEAD/docs/rules/anchor-is-valid.md  jsx-a11y/anchor-is-valid
+
+src/components/UI/PackOpener.jsx
+  Line 4:30:  'Float' is defined but never used  no-unused-vars
+
+src/components/UI/Store.jsx
+  Line 1:17:  'useState' is defined but never used     no-unused-vars
+  Line 3:17:  'PACK_PRICES' is defined but never used  no-unused-vars
+  Line 3:30:  'TOTAL_ICONS' is defined but never used  no-unused-vars
+
+src/hooks/useMultiplayer.js
+  Line 23:12:   'seed' is assigned a value but never used          no-unused-vars
+  Line 181:11:  'reportDamage' is assigned a value but never used  no-unused-vars
+
+src/utils/powerups.js
+  Line 1:8:  'React' is defined but never used  no-unused-vars
+
+Search for the keywords to learn more about each warning.
+To ignore, add // eslint-disable-next-line to the line before.
+
+WARNING in ./node_modules/@mediapipe/tasks-vision/vision_bundle.mjs
+Module Warning (from ./node_modules/source-map-loader/dist/cjs.js):
+Failed to parse source map from '/Users/yaeger/Desktop/puck-battle-arena-new/node_modules/@mediapipe/tasks-vision/vision_bundle_mjs.js.map' file: Error: ENOENT: no such file or directory, open '/Users/yaeger/Desktop/puck-battle-arena-new/node_modules/@mediapipe/tasks-vision/vision_bundle_mjs.js.map'
+
+WARNING in [eslint] 
+src/components/ArenaChaos.jsx
+  Line 1:25:  'useMemo' is defined but never used  no-unused-vars
+
+src/components/BattleArena.jsx
+  Line 2:18:    'useFrame' is defined but never used                    no-unused-vars
+  Line 2:28:    'useThree' is defined but never used                    no-unused-vars
+  Line 17:26:   'MATERIALS' is defined but never used                   no-unused-vars
+  Line 19:26:   'POWERUP_REGISTRY' is defined but never used            no-unused-vars
+  Line 125:12:  'players' is assigned a value but never used            no-unused-vars
+  Line 125:21:  'setPlayers' is assigned a value but never used         no-unused-vars
+  Line 127:28:  'setPlayerLoadouts' is assigned a value but never used  no-unused-vars
+  Line 145:9:   Expected a default case                                 default-case
+
+src/components/DynamicCamera.jsx
+  Line 1:8:   'React' is defined but never used      no-unused-vars
+  Line 1:25:  'useEffect' is defined but never used  no-unused-vars
+
+src/components/KnockoutEffects.jsx
+  Line 1:34:  'useEffect' is defined but never used  no-unused-vars
+
+src/components/PowerUps.jsx
+  Line 1:25:  'useEffect' is defined but never used  no-unused-vars
+
+src/components/ProceduralArena.jsx
+  Line 2:18:  'usePlane' is defined but never used  no-unused-vars
+
+src/components/ProjectileSystem.jsx
+  Line 1:17:  'useRef' is defined but never used        no-unused-vars
+  Line 1:25:  'useEffect' is defined but never used     no-unused-vars
+  Line 1:36:  'useState' is defined but never used      no-unused-vars
+  Line 3:21:  'useBox' is defined but never used        no-unused-vars
+  Line 4:13:  'THREE' is defined but never used         no-unused-vars
+  Line 8:17:  'api' is assigned a value but never used  no-unused-vars
+
+src/components/Puck.jsx
+  Line 74:11:  'effectiveMaxVelocity' is assigned a value but never used  no-unused-vars
+
+src/components/UI/AdminDashboard.jsx
+  Line 1:27:  'useEffect' is defined but never used               no-unused-vars
+  Line 9:41:  'saveInventory' is assigned a value but never used  no-unused-vars
+
+src/components/UI/Lobby.jsx
+  Line 135:49:  The href attribute is required for an anchor to be keyboard accessible. Provide a valid, navigable address as the href value. If you cannot provide an href, but still need the element to resemble a link, use a button and change it with appropriate styles. Learn more: https://github.com/jsx-eslint/eslint-plugin-jsx-a11y/blob/HEAD/docs/rules/anchor-is-valid.md  jsx-a11y/anchor-is-valid
+  Line 137:56:  The href attribute is required for an anchor to be keyboard accessible. Provide a valid, navigable address as the href value. If you cannot provide an href, but still need the element to resemble a link, use a button and change it with appropriate styles. Learn more: https://github.com/jsx-eslint/eslint-plugin-jsx-a11y/blob/HEAD/docs/rules/anchor-is-valid.md  jsx-a11y/anchor-is-valid
+
+src/components/UI/PackOpener.jsx
+  Line 4:30:  'Float' is defined but never used  no-unused-vars
+
+src/components/UI/Store.jsx
+  Line 1:17:  'useState' is defined but never used     no-unused-vars
+  Line 3:17:  'PACK_PRICES' is defined but never used  no-unused-vars
+  Line 3:30:  'TOTAL_ICONS' is defined but never used  no-unused-vars
+
+src/hooks/useMultiplayer.js
+  Line 23:12:   'seed' is assigned a value but never used          no-unused-vars
+  Line 181:11:  'reportDamage' is assigned a value but never used  no-unused-vars
+
+src/utils/powerups.js
+  Line 1:8:  'React' is defined but never used  no-unused-vars
+
+webpack compiled with 2 warnings
+Compiling...
+Compiled with warnings.
+
+Failed to parse source map from '/Users/yaeger/Desktop/puck-battle-arena-new/node_modules/@mediapipe/tasks-vision/vision_bundle_mjs.js.map' file: Error: ENOENT: no such file or directory, open '/Users/yaeger/Desktop/puck-battle-arena-new/node_modules/@mediapipe/tasks-vision/vision_bundle_mjs.js.map'
+
+[eslint] 
+src/components/ArenaChaos.jsx
+  Line 1:25:  'useMemo' is defined but never used  no-unused-vars
+
+src/components/BattleArena.jsx
+  Line 2:18:    'useFrame' is defined but never used                    no-unused-vars
+  Line 2:28:    'useThree' is defined but never used                    no-unused-vars
+  Line 17:26:   'MATERIALS' is defined but never used                   no-unused-vars
+  Line 19:26:   'POWERUP_REGISTRY' is defined but never used            no-unused-vars
+  Line 126:12:  'players' is assigned a value but never used            no-unused-vars
+  Line 126:21:  'setPlayers' is assigned a value but never used         no-unused-vars
+  Line 128:28:  'setPlayerLoadouts' is assigned a value but never used  no-unused-vars
+  Line 146:9:   Expected a default case                                 default-case
+
+src/components/DynamicCamera.jsx
+  Line 1:8:   'React' is defined but never used      no-unused-vars
+  Line 1:25:  'useEffect' is defined but never used  no-unused-vars
+
+src/components/KnockoutEffects.jsx
+  Line 1:34:  'useEffect' is defined but never used  no-unused-vars
+
+src/components/PowerUps.jsx
+  Line 1:25:  'useEffect' is defined but never used  no-unused-vars
+
+src/components/ProceduralArena.jsx
+  Line 2:18:  'usePlane' is defined but never used  no-unused-vars
+
+src/components/ProjectileSystem.jsx
+  Line 1:17:  'useRef' is defined but never used        no-unused-vars
+  Line 1:25:  'useEffect' is defined but never used     no-unused-vars
+  Line 1:36:  'useState' is defined but never used      no-unused-vars
+  Line 3:21:  'useBox' is defined but never used        no-unused-vars
+  Line 4:13:  'THREE' is defined but never used         no-unused-vars
+  Line 8:17:  'api' is assigned a value but never used  no-unused-vars
+
+src/components/Puck.jsx
+  Line 74:11:  'effectiveMaxVelocity' is assigned a value but never used  no-unused-vars
+
+src/components/UI/AdminDashboard.jsx
+  Line 1:27:  'useEffect' is defined but never used               no-unused-vars
+  Line 9:41:  'saveInventory' is assigned a value but never used  no-unused-vars
+
+src/components/UI/Lobby.jsx
+  Line 135:49:  The href attribute is required for an anchor to be keyboard accessible. Provide a valid, navigable address as the href value. If you cannot provide an href, but still need the element to resemble a link, use a button and change it with appropriate styles. Learn more: https://github.com/jsx-eslint/eslint-plugin-jsx-a11y/blob/HEAD/docs/rules/anchor-is-valid.md  jsx-a11y/anchor-is-valid
+  Line 137:56:  The href attribute is required for an anchor to be keyboard accessible. Provide a valid, navigable address as the href value. If you cannot provide an href, but still need the element to resemble a link, use a button and change it with appropriate styles. Learn more: https://github.com/jsx-eslint/eslint-plugin-jsx-a11y/blob/HEAD/docs/rules/anchor-is-valid.md  jsx-a11y/anchor-is-valid
+
+src/components/UI/PackOpener.jsx
+  Line 4:30:  'Float' is defined but never used  no-unused-vars
+
+src/components/UI/Store.jsx
+  Line 1:17:  'useState' is defined but never used     no-unused-vars
+  Line 3:17:  'PACK_PRICES' is defined but never used  no-unused-vars
+  Line 3:30:  'TOTAL_ICONS' is defined but never used  no-unused-vars
+
+src/hooks/useMultiplayer.js
+  Line 23:12:   'seed' is assigned a value but never used          no-unused-vars
+  Line 181:11:  'reportDamage' is assigned a value but never used  no-unused-vars
+
+src/utils/powerups.js
+  Line 1:8:  'React' is defined but never used  no-unused-vars
+
+Search for the keywords to learn more about each warning.
+To ignore, add // eslint-disable-next-line to the line before.
+
+WARNING in ./node_modules/@mediapipe/tasks-vision/vision_bundle.mjs
+Module Warning (from ./node_modules/source-map-loader/dist/cjs.js):
+Failed to parse source map from '/Users/yaeger/Desktop/puck-battle-arena-new/node_modules/@mediapipe/tasks-vision/vision_bundle_mjs.js.map' file: Error: ENOENT: no such file or directory, open '/Users/yaeger/Desktop/puck-battle-arena-new/node_modules/@mediapipe/tasks-vision/vision_bundle_mjs.js.map'
+
+WARNING in [eslint] 
+src/components/ArenaChaos.jsx
+  Line 1:25:  'useMemo' is defined but never used  no-unused-vars
+
+src/components/BattleArena.jsx
+  Line 2:18:    'useFrame' is defined but never used                    no-unused-vars
+  Line 2:28:    'useThree' is defined but never used                    no-unused-vars
+  Line 17:26:   'MATERIALS' is defined but never used                   no-unused-vars
+  Line 19:26:   'POWERUP_REGISTRY' is defined but never used            no-unused-vars
+  Line 126:12:  'players' is assigned a value but never used            no-unused-vars
+  Line 126:21:  'setPlayers' is assigned a value but never used         no-unused-vars
+  Line 128:28:  'setPlayerLoadouts' is assigned a value but never used  no-unused-vars
+  Line 146:9:   Expected a default case                                 default-case
+
+src/components/DynamicCamera.jsx
+  Line 1:8:   'React' is defined but never used      no-unused-vars
+  Line 1:25:  'useEffect' is defined but never used  no-unused-vars
+
+src/components/KnockoutEffects.jsx
+  Line 1:34:  'useEffect' is defined but never used  no-unused-vars
+
+src/components/PowerUps.jsx
+  Line 1:25:  'useEffect' is defined but never used  no-unused-vars
+
+src/components/ProceduralArena.jsx
+  Line 2:18:  'usePlane' is defined but never used  no-unused-vars
+
+src/components/ProjectileSystem.jsx
+  Line 1:17:  'useRef' is defined but never used        no-unused-vars
+  Line 1:25:  'useEffect' is defined but never used     no-unused-vars
+  Line 1:36:  'useState' is defined but never used      no-unused-vars
+  Line 3:21:  'useBox' is defined but never used        no-unused-vars
+  Line 4:13:  'THREE' is defined but never used         no-unused-vars
+  Line 8:17:  'api' is assigned a value but never used  no-unused-vars
+
+src/components/Puck.jsx
+  Line 74:11:  'effectiveMaxVelocity' is assigned a value but never used  no-unused-vars
+
+src/components/UI/AdminDashboard.jsx
+  Line 1:27:  'useEffect' is defined but never used               no-unused-vars
+  Line 9:41:  'saveInventory' is assigned a value but never used  no-unused-vars
+
+src/components/UI/Lobby.jsx
+  Line 135:49:  The href attribute is required for an anchor to be keyboard accessible. Provide a valid, navigable address as the href value. If you cannot provide an href, but still need the element to resemble a link, use a button and change it with appropriate styles. Learn more: https://github.com/jsx-eslint/eslint-plugin-jsx-a11y/blob/HEAD/docs/rules/anchor-is-valid.md  jsx-a11y/anchor-is-valid
+  Line 137:56:  The href attribute is required for an anchor to be keyboard accessible. Provide a valid, navigable address as the href value. If you cannot provide an href, but still need the element to resemble a link, use a button and change it with appropriate styles. Learn more: https://github.com/jsx-eslint/eslint-plugin-jsx-a11y/blob/HEAD/docs/rules/anchor-is-valid.md  jsx-a11y/anchor-is-valid
+
+src/components/UI/PackOpener.jsx
+  Line 4:30:  'Float' is defined but never used  no-unused-vars
+
+src/components/UI/Store.jsx
+  Line 1:17:  'useState' is defined but never used     no-unused-vars
+  Line 3:17:  'PACK_PRICES' is defined but never used  no-unused-vars
+  Line 3:30:  'TOTAL_ICONS' is defined but never used  no-unused-vars
+
+src/hooks/useMultiplayer.js
+  Line 23:12:   'seed' is assigned a value but never used          no-unused-vars
+  Line 181:11:  'reportDamage' is assigned a value but never used  no-unused-vars
+
+src/utils/powerups.js
+  Line 1:8:  'React' is defined but never used  no-unused-vars
+
+webpack compiled with 2 warnings
+Compiling...
+Compiled with warnings.
+
+Failed to parse source map from '/Users/yaeger/Desktop/puck-battle-arena-new/node_modules/@mediapipe/tasks-vision/vision_bundle_mjs.js.map' file: Error: ENOENT: no such file or directory, open '/Users/yaeger/Desktop/puck-battle-arena-new/node_modules/@mediapipe/tasks-vision/vision_bundle_mjs.js.map'
+
+[eslint] 
+src/components/ArenaChaos.jsx
+  Line 1:25:  'useMemo' is defined but never used  no-unused-vars
+
+src/components/BattleArena.jsx
+  Line 2:18:    'useFrame' is defined but never used                    no-unused-vars
+  Line 2:28:    'useThree' is defined but never used                    no-unused-vars
+  Line 17:26:   'MATERIALS' is defined but never used                   no-unused-vars
+  Line 19:26:   'POWERUP_REGISTRY' is defined but never used            no-unused-vars
+  Line 126:12:  'players' is assigned a value but never used            no-unused-vars
+  Line 126:21:  'setPlayers' is assigned a value but never used         no-unused-vars
+  Line 128:28:  'setPlayerLoadouts' is assigned a value but never used  no-unused-vars
+  Line 146:9:   Expected a default case                                 default-case
+
+src/components/DynamicCamera.jsx
+  Line 1:8:   'React' is defined but never used      no-unused-vars
+  Line 1:25:  'useEffect' is defined but never used  no-unused-vars
+
+src/components/KnockoutEffects.jsx
+  Line 1:34:  'useEffect' is defined but never used  no-unused-vars
+
+src/components/PowerUps.jsx
+  Line 1:25:  'useEffect' is defined but never used  no-unused-vars
+
+src/components/ProceduralArena.jsx
+  Line 2:18:  'usePlane' is defined but never used  no-unused-vars
+
+src/components/ProjectileSystem.jsx
+  Line 1:17:  'useRef' is defined but never used        no-unused-vars
+  Line 1:25:  'useEffect' is defined but never used     no-unused-vars
+  Line 1:36:  'useState' is defined but never used      no-unused-vars
+  Line 3:21:  'useBox' is defined but never used        no-unused-vars
+  Line 4:13:  'THREE' is defined but never used         no-unused-vars
+  Line 8:17:  'api' is assigned a value but never used  no-unused-vars
+
+src/components/Puck.jsx
+  Line 74:11:  'effectiveMaxVelocity' is assigned a value but never used  no-unused-vars
+
+src/components/UI/AdminDashboard.jsx
+  Line 1:27:  'useEffect' is defined but never used               no-unused-vars
+  Line 9:41:  'saveInventory' is assigned a value but never used  no-unused-vars
+
+src/components/UI/Lobby.jsx
+  Line 135:49:  The href attribute is required for an anchor to be keyboard accessible. Provide a valid, navigable address as the href value. If you cannot provide an href, but still need the element to resemble a link, use a button and change it with appropriate styles. Learn more: https://github.com/jsx-eslint/eslint-plugin-jsx-a11y/blob/HEAD/docs/rules/anchor-is-valid.md  jsx-a11y/anchor-is-valid
+  Line 137:56:  The href attribute is required for an anchor to be keyboard accessible. Provide a valid, navigable address as the href value. If you cannot provide an href, but still need the element to resemble a link, use a button and change it with appropriate styles. Learn more: https://github.com/jsx-eslint/eslint-plugin-jsx-a11y/blob/HEAD/docs/rules/anchor-is-valid.md  jsx-a11y/anchor-is-valid
+
+src/components/UI/PackOpener.jsx
+  Line 4:30:  'Float' is defined but never used  no-unused-vars
+
+src/components/UI/Store.jsx
+  Line 1:17:  'useState' is defined but never used     no-unused-vars
+  Line 3:17:  'PACK_PRICES' is defined but never used  no-unused-vars
+  Line 3:30:  'TOTAL_ICONS' is defined but never used  no-unused-vars
+
+src/hooks/useMultiplayer.js
+  Line 23:12:   'seed' is assigned a value but never used          no-unused-vars
+  Line 181:11:  'reportDamage' is assigned a value but never used  no-unused-vars
+
+src/utils/powerups.js
+  Line 1:8:  'React' is defined but never used  no-unused-vars
+
+Search for the keywords to learn more about each warning.
+To ignore, add // eslint-disable-next-line to the line before.
+
+WARNING in ./node_modules/@mediapipe/tasks-vision/vision_bundle.mjs
+Module Warning (from ./node_modules/source-map-loader/dist/cjs.js):
+Failed to parse source map from '/Users/yaeger/Desktop/puck-battle-arena-new/node_modules/@mediapipe/tasks-vision/vision_bundle_mjs.js.map' file: Error: ENOENT: no such file or directory, open '/Users/yaeger/Desktop/puck-battle-arena-new/node_modules/@mediapipe/tasks-vision/vision_bundle_mjs.js.map'
+
+WARNING in [eslint] 
+src/components/ArenaChaos.jsx
+  Line 1:25:  'useMemo' is defined but never used  no-unused-vars
+
+src/components/BattleArena.jsx
+  Line 2:18:    'useFrame' is defined but never used                    no-unused-vars
+  Line 2:28:    'useThree' is defined but never used                    no-unused-vars
+  Line 17:26:   'MATERIALS' is defined but never used                   no-unused-vars
+  Line 19:26:   'POWERUP_REGISTRY' is defined but never used            no-unused-vars
+  Line 126:12:  'players' is assigned a value but never used            no-unused-vars
+  Line 126:21:  'setPlayers' is assigned a value but never used         no-unused-vars
+  Line 128:28:  'setPlayerLoadouts' is assigned a value but never used  no-unused-vars
+  Line 146:9:   Expected a default case                                 default-case
+
+src/components/DynamicCamera.jsx
+  Line 1:8:   'React' is defined but never used      no-unused-vars
+  Line 1:25:  'useEffect' is defined but never used  no-unused-vars
+
+src/components/KnockoutEffects.jsx
+  Line 1:34:  'useEffect' is defined but never used  no-unused-vars
+
+src/components/PowerUps.jsx
+  Line 1:25:  'useEffect' is defined but never used  no-unused-vars
+
+src/components/ProceduralArena.jsx
+  Line 2:18:  'usePlane' is defined but never used  no-unused-vars
+
+src/components/ProjectileSystem.jsx
+  Line 1:17:  'useRef' is defined but never used        no-unused-vars
+  Line 1:25:  'useEffect' is defined but never used     no-unused-vars
+  Line 1:36:  'useState' is defined but never used      no-unused-vars
+  Line 3:21:  'useBox' is defined but never used        no-unused-vars
+  Line 4:13:  'THREE' is defined but never used         no-unused-vars
+  Line 8:17:  'api' is assigned a value but never used  no-unused-vars
+
+src/components/Puck.jsx
+  Line 74:11:  'effectiveMaxVelocity' is assigned a value but never used  no-unused-vars
+
+src/components/UI/AdminDashboard.jsx
+  Line 1:27:  'useEffect' is defined but never used               no-unused-vars
+  Line 9:41:  'saveInventory' is assigned a value but never used  no-unused-vars
+
+src/components/UI/Lobby.jsx
+  Line 135:49:  The href attribute is required for an anchor to be keyboard accessible. Provide a valid, navigable address as the href value. If you cannot provide an href, but still need the element to resemble a link, use a button and change it with appropriate styles. Learn more: https://github.com/jsx-eslint/eslint-plugin-jsx-a11y/blob/HEAD/docs/rules/anchor-is-valid.md  jsx-a11y/anchor-is-valid
+  Line 137:56:  The href attribute is required for an anchor to be keyboard accessible. Provide a valid, navigable address as the href value. If you cannot provide an href, but still need the element to resemble a link, use a button and change it with appropriate styles. Learn more: https://github.com/jsx-eslint/eslint-plugin-jsx-a11y/blob/HEAD/docs/rules/anchor-is-valid.md  jsx-a11y/anchor-is-valid
+
+src/components/UI/PackOpener.jsx
+  Line 4:30:  'Float' is defined but never used  no-unused-vars
+
+src/components/UI/Store.jsx
+  Line 1:17:  'useState' is defined but never used     no-unused-vars
+  Line 3:17:  'PACK_PRICES' is defined but never used  no-unused-vars
+  Line 3:30:  'TOTAL_ICONS' is defined but never used  no-unused-vars
+
+src/hooks/useMultiplayer.js
+  Line 23:12:   'seed' is assigned a value but never used          no-unused-vars
+  Line 181:11:  'reportDamage' is assigned a value but never used  no-unused-vars
+
+src/utils/powerups.js
+  Line 1:8:  'React' is defined but never used  no-unused-vars
+
+webpack compiled with 2 warnings
+Compiling...
+Compiled with warnings.
+
+Failed to parse source map from '/Users/yaeger/Desktop/puck-battle-arena-new/node_modules/@mediapipe/tasks-vision/vision_bundle_mjs.js.map' file: Error: ENOENT: no such file or directory, open '/Users/yaeger/Desktop/puck-battle-arena-new/node_modules/@mediapipe/tasks-vision/vision_bundle_mjs.js.map'
+
+[eslint] 
+src/components/ArenaChaos.jsx
+  Line 1:25:  'useMemo' is defined but never used  no-unused-vars
+
+src/components/BattleArena.jsx
+  Line 2:18:    'useFrame' is defined but never used                    no-unused-vars
+  Line 2:28:    'useThree' is defined but never used                    no-unused-vars
+  Line 17:26:   'MATERIALS' is defined but never used                   no-unused-vars
+  Line 19:26:   'POWERUP_REGISTRY' is defined but never used            no-unused-vars
+  Line 126:12:  'players' is assigned a value but never used            no-unused-vars
+  Line 126:21:  'setPlayers' is assigned a value but never used         no-unused-vars
+  Line 128:28:  'setPlayerLoadouts' is assigned a value but never used  no-unused-vars
+  Line 146:9:   Expected a default case                                 default-case
+
+src/components/DynamicCamera.jsx
+  Line 1:8:   'React' is defined but never used      no-unused-vars
+  Line 1:25:  'useEffect' is defined but never used  no-unused-vars
+
+src/components/KnockoutEffects.jsx
+  Line 1:34:  'useEffect' is defined but never used  no-unused-vars
+
+src/components/PowerUps.jsx
+  Line 1:25:  'useEffect' is defined but never used  no-unused-vars
+
+src/components/ProceduralArena.jsx
+  Line 2:18:  'usePlane' is defined but never used  no-unused-vars
+
+src/components/ProjectileSystem.jsx
+  Line 1:17:  'useRef' is defined but never used        no-unused-vars
+  Line 1:25:  'useEffect' is defined but never used     no-unused-vars
+  Line 1:36:  'useState' is defined but never used      no-unused-vars
+  Line 3:21:  'useBox' is defined but never used        no-unused-vars
+  Line 4:13:  'THREE' is defined but never used         no-unused-vars
+  Line 8:17:  'api' is assigned a value but never used  no-unused-vars
+
+src/components/Puck.jsx
+  Line 74:11:   'effectiveMaxVelocity' is assigned a value but never used  no-unused-vars
+  Line 119:24:  'setIsFlashing' is assigned a value but never used         no-unused-vars
+
+src/components/UI/AdminDashboard.jsx
+  Line 1:27:  'useEffect' is defined but never used               no-unused-vars
+  Line 9:41:  'saveInventory' is assigned a value but never used  no-unused-vars
+
+src/components/UI/Lobby.jsx
+  Line 135:49:  The href attribute is required for an anchor to be keyboard accessible. Provide a valid, navigable address as the href value. If you cannot provide an href, but still need the element to resemble a link, use a button and change it with appropriate styles. Learn more: https://github.com/jsx-eslint/eslint-plugin-jsx-a11y/blob/HEAD/docs/rules/anchor-is-valid.md  jsx-a11y/anchor-is-valid
+  Line 137:56:  The href attribute is required for an anchor to be keyboard accessible. Provide a valid, navigable address as the href value. If you cannot provide an href, but still need the element to resemble a link, use a button and change it with appropriate styles. Learn more: https://github.com/jsx-eslint/eslint-plugin-jsx-a11y/blob/HEAD/docs/rules/anchor-is-valid.md  jsx-a11y/anchor-is-valid
+
+src/components/UI/PackOpener.jsx
+  Line 4:30:  'Float' is defined but never used  no-unused-vars
+
+src/components/UI/Store.jsx
+  Line 1:17:  'useState' is defined but never used     no-unused-vars
+  Line 3:17:  'PACK_PRICES' is defined but never used  no-unused-vars
+  Line 3:30:  'TOTAL_ICONS' is defined but never used  no-unused-vars
+
+src/hooks/useMultiplayer.js
+  Line 23:12:   'seed' is assigned a value but never used          no-unused-vars
+  Line 181:11:  'reportDamage' is assigned a value but never used  no-unused-vars
+
+src/utils/powerups.js
+  Line 1:8:  'React' is defined but never used  no-unused-vars
+
+Search for the keywords to learn more about each warning.
+To ignore, add // eslint-disable-next-line to the line before.
+
+WARNING in ./node_modules/@mediapipe/tasks-vision/vision_bundle.mjs
+Module Warning (from ./node_modules/source-map-loader/dist/cjs.js):
+Failed to parse source map from '/Users/yaeger/Desktop/puck-battle-arena-new/node_modules/@mediapipe/tasks-vision/vision_bundle_mjs.js.map' file: Error: ENOENT: no such file or directory, open '/Users/yaeger/Desktop/puck-battle-arena-new/node_modules/@mediapipe/tasks-vision/vision_bundle_mjs.js.map'
+
+WARNING in [eslint] 
+src/components/ArenaChaos.jsx
+  Line 1:25:  'useMemo' is defined but never used  no-unused-vars
+
+src/components/BattleArena.jsx
+  Line 2:18:    'useFrame' is defined but never used                    no-unused-vars
+  Line 2:28:    'useThree' is defined but never used                    no-unused-vars
+  Line 17:26:   'MATERIALS' is defined but never used                   no-unused-vars
+  Line 19:26:   'POWERUP_REGISTRY' is defined but never used            no-unused-vars
+  Line 126:12:  'players' is assigned a value but never used            no-unused-vars
+  Line 126:21:  'setPlayers' is assigned a value but never used         no-unused-vars
+  Line 128:28:  'setPlayerLoadouts' is assigned a value but never used  no-unused-vars
+  Line 146:9:   Expected a default case                                 default-case
+
+src/components/DynamicCamera.jsx
+  Line 1:8:   'React' is defined but never used      no-unused-vars
+  Line 1:25:  'useEffect' is defined but never used  no-unused-vars
+
+src/components/KnockoutEffects.jsx
+  Line 1:34:  'useEffect' is defined but never used  no-unused-vars
+
+src/components/PowerUps.jsx
+  Line 1:25:  'useEffect' is defined but never used  no-unused-vars
+
+src/components/ProceduralArena.jsx
+  Line 2:18:  'usePlane' is defined but never used  no-unused-vars
+
+src/components/ProjectileSystem.jsx
+  Line 1:17:  'useRef' is defined but never used        no-unused-vars
+  Line 1:25:  'useEffect' is defined but never used     no-unused-vars
+  Line 1:36:  'useState' is defined but never used      no-unused-vars
+  Line 3:21:  'useBox' is defined but never used        no-unused-vars
+  Line 4:13:  'THREE' is defined but never used         no-unused-vars
+  Line 8:17:  'api' is assigned a value but never used  no-unused-vars
+
+src/components/Puck.jsx
+  Line 74:11:   'effectiveMaxVelocity' is assigned a value but never used  no-unused-vars
+  Line 119:24:  'setIsFlashing' is assigned a value but never used         no-unused-vars
+
+src/components/UI/AdminDashboard.jsx
+  Line 1:27:  'useEffect' is defined but never used               no-unused-vars
+  Line 9:41:  'saveInventory' is assigned a value but never used  no-unused-vars
+
+src/components/UI/Lobby.jsx
+  Line 135:49:  The href attribute is required for an anchor to be keyboard accessible. Provide a valid, navigable address as the href value. If you cannot provide an href, but still need the element to resemble a link, use a button and change it with appropriate styles. Learn more: https://github.com/jsx-eslint/eslint-plugin-jsx-a11y/blob/HEAD/docs/rules/anchor-is-valid.md  jsx-a11y/anchor-is-valid
+  Line 137:56:  The href attribute is required for an anchor to be keyboard accessible. Provide a valid, navigable address as the href value. If you cannot provide an href, but still need the element to resemble a link, use a button and change it with appropriate styles. Learn more: https://github.com/jsx-eslint/eslint-plugin-jsx-a11y/blob/HEAD/docs/rules/anchor-is-valid.md  jsx-a11y/anchor-is-valid
+
+src/components/UI/PackOpener.jsx
+  Line 4:30:  'Float' is defined but never used  no-unused-vars
+
+src/components/UI/Store.jsx
+  Line 1:17:  'useState' is defined but never used     no-unused-vars
+  Line 3:17:  'PACK_PRICES' is defined but never used  no-unused-vars
+  Line 3:30:  'TOTAL_ICONS' is defined but never used  no-unused-vars
+
+src/hooks/useMultiplayer.js
+  Line 23:12:   'seed' is assigned a value but never used          no-unused-vars
+  Line 181:11:  'reportDamage' is assigned a value but never used  no-unused-vars
+
+src/utils/powerups.js
+  Line 1:8:  'React' is defined but never used  no-unused-vars
+
+webpack compiled with 2 warnings
+Compiling...
+Compiled with warnings.
+
+Failed to parse source map from '/Users/yaeger/Desktop/puck-battle-arena-new/node_modules/@mediapipe/tasks-vision/vision_bundle_mjs.js.map' file: Error: ENOENT: no such file or directory, open '/Users/yaeger/Desktop/puck-battle-arena-new/node_modules/@mediapipe/tasks-vision/vision_bundle_mjs.js.map'
+
+[eslint] 
+src/components/ArenaChaos.jsx
+  Line 1:25:  'useMemo' is defined but never used  no-unused-vars
+
+src/components/BattleArena.jsx
+  Line 2:18:    'useFrame' is defined but never used                    no-unused-vars
+  Line 2:28:    'useThree' is defined but never used                    no-unused-vars
+  Line 17:26:   'MATERIALS' is defined but never used                   no-unused-vars
+  Line 19:26:   'POWERUP_REGISTRY' is defined but never used            no-unused-vars
+  Line 126:12:  'players' is assigned a value but never used            no-unused-vars
+  Line 126:21:  'setPlayers' is assigned a value but never used         no-unused-vars
+  Line 128:28:  'setPlayerLoadouts' is assigned a value but never used  no-unused-vars
+  Line 146:9:   Expected a default case                                 default-case
+
+src/components/DynamicCamera.jsx
+  Line 1:8:   'React' is defined but never used      no-unused-vars
+  Line 1:25:  'useEffect' is defined but never used  no-unused-vars
+
+src/components/KnockoutEffects.jsx
+  Line 1:34:  'useEffect' is defined but never used  no-unused-vars
+
+src/components/PowerUps.jsx
+  Line 1:25:  'useEffect' is defined but never used  no-unused-vars
+
+src/components/ProceduralArena.jsx
+  Line 2:18:  'usePlane' is defined but never used  no-unused-vars
+
+src/components/ProjectileSystem.jsx
+  Line 1:17:  'useRef' is defined but never used        no-unused-vars
+  Line 1:25:  'useEffect' is defined but never used     no-unused-vars
+  Line 1:36:  'useState' is defined but never used      no-unused-vars
+  Line 3:21:  'useBox' is defined but never used        no-unused-vars
+  Line 4:13:  'THREE' is defined but never used         no-unused-vars
+  Line 8:17:  'api' is assigned a value but never used  no-unused-vars
+
+src/components/Puck.jsx
+  Line 74:11:   'effectiveMaxVelocity' is assigned a value but never used  no-unused-vars
+  Line 119:24:  'setIsFlashing' is assigned a value but never used         no-unused-vars
+
+src/components/UI/AdminDashboard.jsx
+  Line 1:27:  'useEffect' is defined but never used               no-unused-vars
+  Line 9:41:  'saveInventory' is assigned a value but never used  no-unused-vars
+
+src/components/UI/Lobby.jsx
+  Line 135:49:  The href attribute is required for an anchor to be keyboard accessible. Provide a valid, navigable address as the href value. If you cannot provide an href, but still need the element to resemble a link, use a button and change it with appropriate styles. Learn more: https://github.com/jsx-eslint/eslint-plugin-jsx-a11y/blob/HEAD/docs/rules/anchor-is-valid.md  jsx-a11y/anchor-is-valid
+  Line 137:56:  The href attribute is required for an anchor to be keyboard accessible. Provide a valid, navigable address as the href value. If you cannot provide an href, but still need the element to resemble a link, use a button and change it with appropriate styles. Learn more: https://github.com/jsx-eslint/eslint-plugin-jsx-a11y/blob/HEAD/docs/rules/anchor-is-valid.md  jsx-a11y/anchor-is-valid
+
+src/components/UI/PackOpener.jsx
+  Line 4:30:  'Float' is defined but never used  no-unused-vars
+
+src/components/UI/Store.jsx
+  Line 1:17:  'useState' is defined but never used     no-unused-vars
+  Line 3:17:  'PACK_PRICES' is defined but never used  no-unused-vars
+  Line 3:30:  'TOTAL_ICONS' is defined but never used  no-unused-vars
+
+src/hooks/useMultiplayer.js
+  Line 23:12:   'seed' is assigned a value but never used          no-unused-vars
+  Line 181:11:  'reportDamage' is assigned a value but never used  no-unused-vars
+
+src/utils/powerups.js
+  Line 1:8:  'React' is defined but never used  no-unused-vars
+
+Search for the keywords to learn more about each warning.
+To ignore, add // eslint-disable-next-line to the line before.
+
+WARNING in ./node_modules/@mediapipe/tasks-vision/vision_bundle.mjs
+Module Warning (from ./node_modules/source-map-loader/dist/cjs.js):
+Failed to parse source map from '/Users/yaeger/Desktop/puck-battle-arena-new/node_modules/@mediapipe/tasks-vision/vision_bundle_mjs.js.map' file: Error: ENOENT: no such file or directory, open '/Users/yaeger/Desktop/puck-battle-arena-new/node_modules/@mediapipe/tasks-vision/vision_bundle_mjs.js.map'
+
+WARNING in [eslint] 
+src/components/ArenaChaos.jsx
+  Line 1:25:  'useMemo' is defined but never used  no-unused-vars
+
+src/components/BattleArena.jsx
+  Line 2:18:    'useFrame' is defined but never used                    no-unused-vars
+  Line 2:28:    'useThree' is defined but never used                    no-unused-vars
+  Line 17:26:   'MATERIALS' is defined but never used                   no-unused-vars
+  Line 19:26:   'POWERUP_REGISTRY' is defined but never used            no-unused-vars
+  Line 126:12:  'players' is assigned a value but never used            no-unused-vars
+  Line 126:21:  'setPlayers' is assigned a value but never used         no-unused-vars
+  Line 128:28:  'setPlayerLoadouts' is assigned a value but never used  no-unused-vars
+  Line 146:9:   Expected a default case                                 default-case
+
+src/components/DynamicCamera.jsx
+  Line 1:8:   'React' is defined but never used      no-unused-vars
+  Line 1:25:  'useEffect' is defined but never used  no-unused-vars
+
+src/components/KnockoutEffects.jsx
+  Line 1:34:  'useEffect' is defined but never used  no-unused-vars
+
+src/components/PowerUps.jsx
+  Line 1:25:  'useEffect' is defined but never used  no-unused-vars
+
+src/components/ProceduralArena.jsx
+  Line 2:18:  'usePlane' is defined but never used  no-unused-vars
+
+src/components/ProjectileSystem.jsx
+  Line 1:17:  'useRef' is defined but never used        no-unused-vars
+  Line 1:25:  'useEffect' is defined but never used     no-unused-vars
+  Line 1:36:  'useState' is defined but never used      no-unused-vars
+  Line 3:21:  'useBox' is defined but never used        no-unused-vars
+  Line 4:13:  'THREE' is defined but never used         no-unused-vars
+  Line 8:17:  'api' is assigned a value but never used  no-unused-vars
+
+src/components/Puck.jsx
+  Line 74:11:   'effectiveMaxVelocity' is assigned a value but never used  no-unused-vars
+  Line 119:24:  'setIsFlashing' is assigned a value but never used         no-unused-vars
+
+src/components/UI/AdminDashboard.jsx
+  Line 1:27:  'useEffect' is defined but never used               no-unused-vars
+  Line 9:41:  'saveInventory' is assigned a value but never used  no-unused-vars
+
+src/components/UI/Lobby.jsx
+  Line 135:49:  The href attribute is required for an anchor to be keyboard accessible. Provide a valid, navigable address as the href value. If you cannot provide an href, but still need the element to resemble a link, use a button and change it with appropriate styles. Learn more: https://github.com/jsx-eslint/eslint-plugin-jsx-a11y/blob/HEAD/docs/rules/anchor-is-valid.md  jsx-a11y/anchor-is-valid
+  Line 137:56:  The href attribute is required for an anchor to be keyboard accessible. Provide a valid, navigable address as the href value. If you cannot provide an href, but still need the element to resemble a link, use a button and change it with appropriate styles. Learn more: https://github.com/jsx-eslint/eslint-plugin-jsx-a11y/blob/HEAD/docs/rules/anchor-is-valid.md  jsx-a11y/anchor-is-valid
+
+src/components/UI/PackOpener.jsx
+  Line 4:30:  'Float' is defined but never used  no-unused-vars
+
+src/components/UI/Store.jsx
+  Line 1:17:  'useState' is defined but never used     no-unused-vars
+  Line 3:17:  'PACK_PRICES' is defined but never used  no-unused-vars
+  Line 3:30:  'TOTAL_ICONS' is defined but never used  no-unused-vars
+
+src/hooks/useMultiplayer.js
+  Line 23:12:   'seed' is assigned a value but never used          no-unused-vars
+  Line 181:11:  'reportDamage' is assigned a value but never used  no-unused-vars
+
+src/utils/powerups.js
+  Line 1:8:  'React' is defined but never used  no-unused-vars
+
+webpack compiled with 2 warnings
+Compiling...
+Compiled with warnings.
+
+Failed to parse source map from '/Users/yaeger/Desktop/puck-battle-arena-new/node_modules/@mediapipe/tasks-vision/vision_bundle_mjs.js.map' file: Error: ENOENT: no such file or directory, open '/Users/yaeger/Desktop/puck-battle-arena-new/node_modules/@mediapipe/tasks-vision/vision_bundle_mjs.js.map'
+
+[eslint] 
+src/components/ArenaChaos.jsx
+  Line 1:25:  'useMemo' is defined but never used  no-unused-vars
+
+src/components/BattleArena.jsx
+  Line 2:18:    'useFrame' is defined but never used                    no-unused-vars
+  Line 2:28:    'useThree' is defined but never used                    no-unused-vars
+  Line 17:26:   'MATERIALS' is defined but never used                   no-unused-vars
+  Line 19:26:   'POWERUP_REGISTRY' is defined but never used            no-unused-vars
+  Line 126:12:  'players' is assigned a value but never used            no-unused-vars
+  Line 126:21:  'setPlayers' is assigned a value but never used         no-unused-vars
+  Line 128:28:  'setPlayerLoadouts' is assigned a value but never used  no-unused-vars
+  Line 146:9:   Expected a default case                                 default-case
+
+src/components/DynamicCamera.jsx
+  Line 1:8:   'React' is defined but never used      no-unused-vars
+  Line 1:25:  'useEffect' is defined but never used  no-unused-vars
+
+src/components/KnockoutEffects.jsx
+  Line 1:34:  'useEffect' is defined but never used  no-unused-vars
+
+src/components/PowerUps.jsx
+  Line 1:25:  'useEffect' is defined but never used  no-unused-vars
+
+src/components/ProceduralArena.jsx
+  Line 2:18:  'usePlane' is defined but never used  no-unused-vars
+
+src/components/ProjectileSystem.jsx
+  Line 1:17:  'useRef' is defined but never used        no-unused-vars
+  Line 1:25:  'useEffect' is defined but never used     no-unused-vars
+  Line 1:36:  'useState' is defined but never used      no-unused-vars
+  Line 3:21:  'useBox' is defined but never used        no-unused-vars
+  Line 4:13:  'THREE' is defined but never used         no-unused-vars
+  Line 8:17:  'api' is assigned a value but never used  no-unused-vars
+
+src/components/Puck.jsx
+  Line 74:11:   'effectiveMaxVelocity' is assigned a value but never used  no-unused-vars
+  Line 119:24:  'setIsFlashing' is assigned a value but never used         no-unused-vars
+
+src/components/UI/AdminDashboard.jsx
+  Line 1:27:  'useEffect' is defined but never used               no-unused-vars
+  Line 9:41:  'saveInventory' is assigned a value but never used  no-unused-vars
+
+src/components/UI/Lobby.jsx
+  Line 135:49:  The href attribute is required for an anchor to be keyboard accessible. Provide a valid, navigable address as the href value. If you cannot provide an href, but still need the element to resemble a link, use a button and change it with appropriate styles. Learn more: https://github.com/jsx-eslint/eslint-plugin-jsx-a11y/blob/HEAD/docs/rules/anchor-is-valid.md  jsx-a11y/anchor-is-valid
+  Line 137:56:  The href attribute is required for an anchor to be keyboard accessible. Provide a valid, navigable address as the href value. If you cannot provide an href, but still need the element to resemble a link, use a button and change it with appropriate styles. Learn more: https://github.com/jsx-eslint/eslint-plugin-jsx-a11y/blob/HEAD/docs/rules/anchor-is-valid.md  jsx-a11y/anchor-is-valid
+
+src/components/UI/PackOpener.jsx
+  Line 4:30:  'Float' is defined but never used  no-unused-vars
+
+src/components/UI/Store.jsx
+  Line 1:17:  'useState' is defined but never used     no-unused-vars
+  Line 3:17:  'PACK_PRICES' is defined but never used  no-unused-vars
+  Line 3:30:  'TOTAL_ICONS' is defined but never used  no-unused-vars
+
+src/hooks/useMultiplayer.js
+  Line 23:12:   'seed' is assigned a value but never used          no-unused-vars
+  Line 181:11:  'reportDamage' is assigned a value but never used  no-unused-vars
+
+src/utils/powerups.js
+  Line 1:8:  'React' is defined but never used  no-unused-vars
+
+Search for the keywords to learn more about each warning.
+To ignore, add // eslint-disable-next-line to the line before.
+
+WARNING in ./node_modules/@mediapipe/tasks-vision/vision_bundle.mjs
+Module Warning (from ./node_modules/source-map-loader/dist/cjs.js):
+Failed to parse source map from '/Users/yaeger/Desktop/puck-battle-arena-new/node_modules/@mediapipe/tasks-vision/vision_bundle_mjs.js.map' file: Error: ENOENT: no such file or directory, open '/Users/yaeger/Desktop/puck-battle-arena-new/node_modules/@mediapipe/tasks-vision/vision_bundle_mjs.js.map'
+
+WARNING in [eslint] 
+src/components/ArenaChaos.jsx
+  Line 1:25:  'useMemo' is defined but never used  no-unused-vars
+
+src/components/BattleArena.jsx
+  Line 2:18:    'useFrame' is defined but never used                    no-unused-vars
+  Line 2:28:    'useThree' is defined but never used                    no-unused-vars
+  Line 17:26:   'MATERIALS' is defined but never used                   no-unused-vars
+  Line 19:26:   'POWERUP_REGISTRY' is defined but never used            no-unused-vars
+  Line 126:12:  'players' is assigned a value but never used            no-unused-vars
+  Line 126:21:  'setPlayers' is assigned a value but never used         no-unused-vars
+  Line 128:28:  'setPlayerLoadouts' is assigned a value but never used  no-unused-vars
+  Line 146:9:   Expected a default case                                 default-case
+
+src/components/DynamicCamera.jsx
+  Line 1:8:   'React' is defined but never used      no-unused-vars
+  Line 1:25:  'useEffect' is defined but never used  no-unused-vars
+
+src/components/KnockoutEffects.jsx
+  Line 1:34:  'useEffect' is defined but never used  no-unused-vars
+
+src/components/PowerUps.jsx
+  Line 1:25:  'useEffect' is defined but never used  no-unused-vars
+
+src/components/ProceduralArena.jsx
+  Line 2:18:  'usePlane' is defined but never used  no-unused-vars
+
+src/components/ProjectileSystem.jsx
+  Line 1:17:  'useRef' is defined but never used        no-unused-vars
+  Line 1:25:  'useEffect' is defined but never used     no-unused-vars
+  Line 1:36:  'useState' is defined but never used      no-unused-vars
+  Line 3:21:  'useBox' is defined but never used        no-unused-vars
+  Line 4:13:  'THREE' is defined but never used         no-unused-vars
+  Line 8:17:  'api' is assigned a value but never used  no-unused-vars
+
+src/components/Puck.jsx
+  Line 74:11:   'effectiveMaxVelocity' is assigned a value but never used  no-unused-vars
+  Line 119:24:  'setIsFlashing' is assigned a value but never used         no-unused-vars
+
+src/components/UI/AdminDashboard.jsx
+  Line 1:27:  'useEffect' is defined but never used               no-unused-vars
+  Line 9:41:  'saveInventory' is assigned a value but never used  no-unused-vars
+
+src/components/UI/Lobby.jsx
+  Line 135:49:  The href attribute is required for an anchor to be keyboard accessible. Provide a valid, navigable address as the href value. If you cannot provide an href, but still need the element to resemble a link, use a button and change it with appropriate styles. Learn more: https://github.com/jsx-eslint/eslint-plugin-jsx-a11y/blob/HEAD/docs/rules/anchor-is-valid.md  jsx-a11y/anchor-is-valid
+  Line 137:56:  The href attribute is required for an anchor to be keyboard accessible. Provide a valid, navigable address as the href value. If you cannot provide an href, but still need the element to resemble a link, use a button and change it with appropriate styles. Learn more: https://github.com/jsx-eslint/eslint-plugin-jsx-a11y/blob/HEAD/docs/rules/anchor-is-valid.md  jsx-a11y/anchor-is-valid
+
+src/components/UI/PackOpener.jsx
+  Line 4:30:  'Float' is defined but never used  no-unused-vars
+
+src/components/UI/Store.jsx
+  Line 1:17:  'useState' is defined but never used     no-unused-vars
+  Line 3:17:  'PACK_PRICES' is defined but never used  no-unused-vars
+  Line 3:30:  'TOTAL_ICONS' is defined but never used  no-unused-vars
+
+src/hooks/useMultiplayer.js
+  Line 23:12:   'seed' is assigned a value but never used          no-unused-vars
+  Line 181:11:  'reportDamage' is assigned a value but never used  no-unused-vars
+
+src/utils/powerups.js
+  Line 1:8:  'React' is defined but never used  no-unused-vars
+
+webpack compiled with 2 warnings
+The build failed because the process exited too early. This probably means the system ran out of memory or someone called `kill -9` on the process.

@@ -107,8 +107,9 @@ export default function Puck({
                     // Trigger hitstop/impact frames on heavy hits
                     if (impactVelocity > 5) {
                         onImpact?.(impactVelocity);
-                        setIsFlashing(true);
-                        setTimeout(() => setIsFlashing(false), 50); // Hard flash
+                        onImpact?.(impactVelocity);
+                        // setIsFlashing(true); // Disabled for less jarring visual
+                        // setTimeout(() => setIsFlashing(false), 50);
                     }
                 }
             }

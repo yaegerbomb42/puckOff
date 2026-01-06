@@ -1,6 +1,8 @@
 import React, { useRef, useEffect } from 'react';
 import { useFrame } from '@react-three/fiber';
+import { Billboard, Text, useTexture } from '@react-three/drei';
 import { PHYSICS_CONFIG, POWERUP_TYPES, distance3D } from '../utils/physics';
+import { getPowerupInfo } from '../utils/powerups';
 
 // Individual power-up component with distance-based pickup
 export function PowerUp({ powerup, playerPositions, onCollect }) {
@@ -13,9 +15,8 @@ export function PowerUp({ powerup, playerPositions, onCollect }) {
     useFrame((state) => {
         const time = state.clock.elapsedTime;
 
-        // Animate
+        // Animate floating
         if (meshRef.current) {
-            meshRef.current.rotation.y = time * 2;
             meshRef.current.position.y = position[1] + Math.sin(time * 3) * 0.2;
         }
 
@@ -40,18 +41,17 @@ export function PowerUp({ powerup, playerPositions, onCollect }) {
     if (collected.current) return null;
 
     // Get type data
-    const typeData = POWERUP_TYPES[type.toUpperCase?.()] || type;
-    const color = typeData.color || '#ffffff';
-    const typeId = typeData.id || type;
+    const info = getPowerupInfo(powerup.id) || POWERUP_TYPES[type.toUpperCase?.()] || type;
+    const color = info.color || '#ffffff';
+    const imagePath = info.imagePath || '/images/powerups/speed_boost.png';
 
     return (
         <group position={position}>
-            {/* Visual power-up */}
+            {/* Visual power-up Icon */}
             <group ref={meshRef}>
-                {typeId === 'speed' && <SpeedPowerupMesh color={color} />}
-                {typeId === 'damage' && <DamagePowerupMesh color={color} />}
-                {typeId === 'shield' && <ShieldPowerupMesh color={color} />}
-                {typeId === 'superboost' && <SuperBoostPowerupMesh color={color} />}
+                <Billboard follow={true} lockX={false} lockY={false} lockZ={false}>
+                    <PowerupIcon texturePath={imagePath} color={color} />
+                </Billboard>
             </group>
 
             {/* Glow sphere */}
@@ -75,77 +75,13 @@ export function PowerUp({ powerup, playerPositions, onCollect }) {
     );
 }
 
-// Speed power-up: Octahedron
-function SpeedPowerupMesh({ color }) {
+function PowerupIcon({ texturePath, color }) {
+    const texture = useTexture(texturePath);
     return (
         <mesh>
-            <octahedronGeometry args={[0.3, 0]} />
-            <meshStandardMaterial
-                color={color}
-                emissive={color}
-                emissiveIntensity={0.8}
-                metalness={0.5}
-                roughness={0.2}
-            />
+            <planeGeometry args={[1, 1]} />
+            <meshStandardMaterial map={texture} transparent alphaTest={0.5} emissive={color} emissiveIntensity={0.5} />
         </mesh>
-    );
-}
-
-// Damage power-up: Dodecahedron
-function DamagePowerupMesh({ color }) {
-    return (
-        <mesh>
-            <dodecahedronGeometry args={[0.3, 0]} />
-            <meshStandardMaterial
-                color={color}
-                emissive={color}
-                emissiveIntensity={0.8}
-                metalness={0.5}
-                roughness={0.2}
-            />
-        </mesh>
-    );
-}
-
-// Shield power-up: Icosahedron
-function ShieldPowerupMesh({ color }) {
-    return (
-        <mesh>
-            <icosahedronGeometry args={[0.3, 1]} />
-            <meshStandardMaterial
-                color={color}
-                emissive={color}
-                emissiveIntensity={0.6}
-                metalness={0.8}
-                roughness={0.1}
-            />
-        </mesh>
-    );
-}
-
-// Super boost power-up: Torus + octahedron
-function SuperBoostPowerupMesh({ color }) {
-    return (
-        <group>
-            <mesh rotation={[Math.PI / 2, 0, 0]}>
-                <torusGeometry args={[0.25, 0.1, 8, 16]} />
-                <meshStandardMaterial
-                    color={color}
-                    emissive={color}
-                    emissiveIntensity={1}
-                    metalness={0.5}
-                    roughness={0.2}
-                />
-            </mesh>
-            <mesh scale={[0.5, 0.5, 0.5]}>
-                <octahedronGeometry args={[0.3, 0]} />
-                <meshStandardMaterial
-                    color={color}
-                    emissive={color}
-                    emissiveIntensity={0.8}
-                />
-            </mesh>
-        </group>
     );
 }
 

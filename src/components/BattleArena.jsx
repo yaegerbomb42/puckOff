@@ -62,10 +62,11 @@ function GameScene({
 
     return (
         <>
-            {/* Environment - Optimized */}
-            <Stars radius={100} depth={50} count={500} factor={4} saturation={0} fade speed={1} />
-            <Environment preset="night" />
-            <fog attach="fog" args={['#0a0a1a', 25, 70]} />
+            {/* Environment - Solar Punk Day */}
+            <Environment preset="sunset" />
+            <ambientLight intensity={0.7} />
+            <directionalLight position={[10, 20, 10]} intensity={1.5} castShadow />
+            <fog attach="fog" args={['#d6e4ff', 20, 90]} />
 
             {/* Dynamic camera */}
             <DynamicCamera playerPositions={playerPositions} shake={screenShake} />
@@ -173,7 +174,7 @@ export default function BattleArena() {
     // Handle Impact (Hitstop + Screen Shake)
     const handleImpact = useCallback((intensity) => {
         setIsPaused(true);
-        setScreenShake(Math.min(intensity * 0.05, 0.5));
+        setScreenShake(Math.min(intensity * 0.02, 0.2));
 
         // Brief freeze
         setTimeout(() => {
@@ -193,11 +194,23 @@ export default function BattleArena() {
     }, []);
 
     // Projectile Hit Handler
-    const handleProjectileHit = (projId, targetId) => {
+    const handleProjectileHit = (projId, targetId, type) => {
         // Apply effect (Damage, Slow, Knockback)
+        let damage = 20;
+
+        if (type === 'rocket') damage = 35;
+        if (type === 'bomb_throw') damage = 50;
+
+        // Special Effects
+        if (type === 'glue_gun') {
+            // Apply Slow (Implementation depends on how player stats are handled, effectively just damage for now + console log)
+            console.log("Applied GLUE to " + targetId);
+            // TODO: actual slowing logic would go into player state
+        }
+
         setPlayerDamage(prev => ({
             ...prev,
-            [targetId]: (prev[targetId] || 0) + 20 // Flat damage for now
+            [targetId]: (prev[targetId] || 0) + damage
         }));
         // Remove projectile
         setProjectiles(prev => prev.filter(p => p.id !== projId));
@@ -446,7 +459,11 @@ export default function BattleArena() {
                                     screenShake={screenShake}
                                     seed={multiplayer.seed}
                                 />
-                                <ProjectileSystem projectiles={projectiles} onProjectileHit={handleProjectileHit} />
+                                <ProjectileSystem
+                                    projectiles={projectiles}
+                                    onProjectileHit={handleProjectileHit}
+                                    playerPositions={playerPositions}
+                                />
                             </>
                         )}
 

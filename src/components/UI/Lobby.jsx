@@ -265,6 +265,14 @@ export default function Lobby({
                         <div className="lobby-hint">Game starts when all players are ready!</div>
                     </div>
                 )}
+
+                {/* OpenArt Attribution */}
+                <div className="openart-credit">
+                    <span>🎨 Game icons created with </span>
+                    <a href="https://openart.ai/home/?via=cloudCompute" target="_blank" rel="noopener noreferrer">
+                        OpenArt.ai
+                    </a>
+                </div>
             </div>
 
             <style jsx>{`
@@ -458,6 +466,28 @@ export default function Lobby({
                 .btn-danger { background: transparent; border: 2px solid #ff006e; color: #ff006e; }
 
                 .lobby-hint { color: #555; font-size: 0.8rem; margin-top: 1rem; }
+
+                /* OpenArt Attribution */
+                .openart-credit {
+                    position: fixed;
+                    bottom: 1rem;
+                    left: 50%;
+                    transform: translateX(-50%);
+                    font-size: 0.75rem;
+                    color: #666;
+                    display: flex;
+                    align-items: center;
+                    gap: 0.25rem;
+                }
+                .openart-credit a {
+                    color: #00d4ff;
+                    text-decoration: none;
+                    transition: color 0.2s;
+                }
+                .openart-credit a:hover {
+                    color: #00ff87;
+                    text-decoration: underline;
+                }
             `}</style>
         </div>
     );

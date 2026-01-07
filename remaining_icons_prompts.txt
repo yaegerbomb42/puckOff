@@ -1,195 +1,515 @@
 # Icon Vault Tracker (150 Items)
 
-**Total Status**: 7/150 Complete
+**Total Status**: 30/150 Complete
 
-## 🎨 Global Stylesheet (Updated)
-**Strict Constraint**: All icons MUST be contained within a **perfect 2D circular boundary**.
-**View**: Isometric or Top-Down Texture Map.
-**Style**: High-fidelity 3D game asset, grounded in pixel-perfect circular geometry.
-**Output Constraints**:
-1.  **Circular Mask**: Design the asset to fit a perfect circle.
-2.  **No Background**: Transparent PNG.
-3.  **Overdrift**: Allowed only if it enhances the 3D effect but keeps the *core* mass circular.
+---
+
+## 🎨 MASTER PROMPT TEMPLATE
+
+### Required Prefix (Use for ALL icons):
+```
+Game asset icon, centered composition, single object, perfect circular frame, 
+isometric 3D render, transparent PNG background, high-detail game collectible,
+clean edges, no cropping, object fully contained within circle boundary.
+```
+
+### Required Suffix (Use for ALL icons):
+```
+Style: Polished mobile game icon, AAA quality, sharp details, vibrant colors,
+professional game asset. Lighting: Soft rim light, subtle ambient occlusion.
+Format: Square 512x512, object centered, 10% padding from edges, transparent background.
+```
+
+---
+
+## ⚙️ GENERATION RULES
+
+1. **CIRCULAR CONTAINMENT**: The main subject MUST fit entirely inside an invisible circular boundary
+2. **NO BACKGROUND**: Output must have transparent/alpha background - no floors, walls, or environments
+3. **CENTERED**: Object placed dead-center with equal spacing on all sides
+4. **ISOMETRIC ANGLE**: Camera at ~30° from top-down, showing slight 3D depth
+5. **SINGLE OBJECT**: One clear focal point, no floating debris or extra elements
+6. **GAME ASSET STYLE**: Clean, readable at small sizes, vibrant but not garish
 
 ---
 
 ## 🔴 INCOMPLETE (143 Items)
 
-### Tier 1: Common (Textured Materials)
-1. [ ] **Vantablack Sphere**: Isometric 3D render of a glossy black sphere constrained to a perfect circle. Single pixel-thin purple rim light. **[Fit to Circle, Isometric, No Background]**
-2. [ ] **Brushed Steel**: Top-down texture of a circular steel button with glowing blue center. Beveled edges define the circular border. **[Fit to Circle, Isometric, No Background]**
-3. [ ] **Graffiti Block**: Circular concrete texture patch. Pink and green paint splatter contained within the round stone shape. **[Fit to Circle, Isometric, No Background]**
-4. [ ] **Burnt Map**: Round parchment paper texture. Edges are charred and glowing but define a clear circle. **[Fit to Circle, Isometric, No Background]**
-5. [ ] **Neon Burlap**: Circular burlap fabric swatch. Neon blue stitching forms a cross. Round shape defined by fraying edges. **[Fit to Circle, Isometric, No Background]**
-6. [ ] **Rust Glow**: Rusted metal circle texture. Magma cracks glowing from within, bounded by the iron edge. **[Fit to Circle, Isometric, No Background]**
-7. [ ] **Hazard Hype**: Glossy yellow/black hazard stripe button. Perfect circular shape with plastic shine. **[Fit to Circle, Isometric, No Background]**
-8. [ ] **Carbon Hex**: Dark grey carbon fiber circle. Red glowing hexagon pattern overlay. **[Fit to Circle, Isometric, No Background]**
-9. [ ] **Denim Pin**: Blue jean fabric circle. Gold safety pin goes through it, slightly breaking the edge but keeping the round silhouette. **[Fit to Circle, Isometric, No Background]**
-10. [ ] **Leather Brand**: Worn leather circle texture with burned magic symbol in center. **[Fit to Circle, Isometric, No Background]**
-11. [ ] **Magma Cracks**: Circular dried mud texture with lava glowing in cracks. **[Fit to Circle, Isometric, No Background]**
-12. [ ] **Moss Crystal**: Grey rock circle coverd in neon green moss. **[Fit to Circle, Isometric, No Background]**
-13. [ ] **Hyper Droplet**: Perfect water sphere containing a city reflection. **[Fit to Circle, Isometric, No Background]**
-14. [ ] **Ember Heart**: Circular ash pile with glowing heart coal in center. **[Fit to Circle, Isometric, No Background]**
-15. [ ] **Cyber Ice**: Round ice cube with internal blue LED. **[Fit to Circle, Isometric, No Background]**
-16. [ ] **Toxic Slime**: Green slime puddle constrained to a perfect circle. Purple bubbles. **[Fit to Circle, Isometric, No Background]**
-17. [ ] **Holo Oil**: Circular oil slick with rainbow holographic sheen. **[Fit to Circle, Isometric, No Background]**
-18. [ ] **Chalk Crown**: Black circular slate with white chalk crown drawing. **[Fit to Circle, Isometric, No Background]**
-19. [ ] **Spray Drip**: Red spray paint dot forming a circle, with one drip at the bottom. **[Fit to Circle, Isometric, No Background]**
-20. [ ] **Glitch Noise**: Static noise texture circle with RGB edge artifacting. **[Fit to Circle, Isometric, No Background]**
-21. [ ] **Glass Shard**: Circular glass lens reflecting a red laser. **[Fit to Circle, Isometric, No Background]**
-22. [ ] **Copper Coil**: Tightly wound copper wire ball forming a circle. **[Fit to Circle, Isometric, No Background]**
-23. [ ] **Neon Bolt**: Top-down view of a hexagonal bolt head with blue plasma center. **[Fit to Circle, Isometric, No Background]**
-24. [ ] **Steam Gear**: Rusty metal gear viewed top-down. Steam jets contained near the teeth. **[Fit to Circle, Isometric, No Background]**
-25. [ ] **Chain Glow**: Ball of glowing red-hot chains forming a sphere. **[Fit to Circle, Isometric, No Background]**
-26. [ ] **Rope Fuse**: Coiled rope circle with a burning spark. **[Fit to Circle, Isometric, No Background]**
-27. [ ] **Medi Wrap**: Top-down white circular bandage roll with green cross projection. **[Fit to Circle, Isometric, No Background]**
-28. [ ] **Chrome Tape**: Ball of chrome tape reflecting the world. **[Fit to Circle, Isometric, No Background]**
-29. [ ] **Cardboard Bot**: Circular cardboard cutout with drawn robot eyes. **[Fit to Circle, Isometric, No Background]**
-30. [ ] **Charred Rune**: Round burnt wood slice with blue magic rune. **[Fit to Circle, Isometric, No Background]**
-31. [ ] **Ash Phoenix**: Circular ash pile with subtle bird shape in the dust. **[Fit to Circle, Isometric, No Background]**
-32. [ ] **Sand Gold**: Circle of desert sand with gold dust sparkles. **[Fit to Circle, Isometric, No Background]**
-33. [ ] **Zen Stack**: Top-down view of three stacked stones forming a circle. **[Fit to Circle, Isometric, No Background]**
-34. [ ] **Leaf Cyber**: Circular leaf skeleton with gold circuit veins. **[Fit to Circle, Isometric, No Background]**
-35. [ ] **Pinecone Grenade**: Green pinecone grenade stored as a round icon. **[Fit to Circle, Isometric, No Background]**
-36. [ ] **Acorn Gem**: Acorn with a round ruby gem nut. **[Fit to Circle, Isometric, No Background]**
-37. [ ] **Shroom Glow**: Top-down blue glowing mushroom cap. **[Fit to Circle, Isometric, No Background]**
-38. [ ] **Hook Blood**: Coiled fishing line circle with hook and blood drop. **[Fit to Circle, Isometric, No Background]**
-39. [ ] **Anchor Neon**: Neon tube bent into a circular anchor logo. **[Fit to Circle, Isometric, No Background]**
-40. [ ] **Compass Holo**: Circular vintage map with holo compass needle. **[Fit to Circle, Isometric, No Background]**
+### Tier 1: Common (Textured Materials) — 40 Items
 
-### Tier 2: Uncommon (Clean Objects)
-41. [ ] **Winking Face**: 3D yellow plastic coin with winking face. **[Fit to Circle, Isometric, No Background]**
-42. [ ] **Snake Eyes**: Red dice inside a clear glass sphere. **[Fit to Circle, Isometric, No Background]**
-43. [ ] **Lucky Chip**: blurry spinning poker chip forming a solid circle. **[Fit to Circle, Isometric, No Background]**
-44. [ ] **Cursed Coin**: Gold coin with glowing green skull emboss. **[Fit to Circle, Isometric, No Background]**
-45. [ ] **Silver Bar**: Round silver coin with thumbprint smudge. **[Fit to Circle, Isometric, No Background]**
-46. [ ] **Bronze Star**: Circular bronze medal with star symbol. **[Fit to Circle, Isometric, No Background]**
-47. [ ] **Lock Pick**: Round padlock with glowing blue pick. **[Fit to Circle, Isometric, No Background]**
-48. [ ] **Key Glitch**: Round antique key head glitching into pixels. **[Fit to Circle, Isometric, No Background]**
-49. [ ] **TNT Bundle**: Red dynamite sticks bundled into a tight circle/cylinder. **[Fit to Circle, Isometric, No Background]**
-50. [ ] **Frag Pin**: Top-down view of a grenade. **[Fit to Circle, Isometric, No Background]**
-51. [ ] **Kunai Spin**: Spinning blade blur forming a grey circle. **[Fit to Circle, Isometric, No Background]**
-52. [ ] **Ninja Star**: Shuriken embedded in a round metal plate. **[Fit to Circle, Isometric, No Background]**
-53. [ ] **Gold Knuckles**: Circular gold brass knuckles with diamonds. **[Fit to Circle, Isometric, No Background]**
-54. [ ] **Bat Spikes**: Head-on view of spiked baseball bat (circular profile). **[Fit to Circle, Isometric, No Background]**
-55. [ ] **Skate Bearing**: Spinning skateboard bearing with smoke. **[Fit to Circle, Isometric, No Background]**
-56. [ ] **Graf Can**: Top-down spray can nozzle with pink mist circle. **[Fit to Circle, Isometric, No Background]**
-57. [ ] **Mixtape Fire**: Burning cassette tape reel. **[Fit to Circle, Isometric, No Background]**
-58. [ ] **Floppy Save**: Round coaster with floppy disk save icon. **[Fit to Circle, Isometric, No Background]**
-59. [ ] **VHS Horror**: Tangled VHS tape forming a scary face circle. **[Fit to Circle, Isometric, No Background]**
-60. [ ] **Cart Glitch**: Top-down game cartridge with dust cloud. **[Fit to Circle, Isometric, No Background]**
-61. [ ] **Joy Stick**: Top-down red arcade stick ball. **[Fit to Circle, Isometric, No Background]**
-62. [ ] **D Pad Gamer**: Round button with D-pad texture. **[Fit to Circle, Isometric, No Background]**
-63. [ ] **Cursor Click**: Pixel hand cursor inside a white circle. **[Fit to Circle, Isometric, No Background]**
-64. [ ] **Time Sand**: Top-down view of hourglass sand vortex. **[Fit to Circle, Isometric, No Background]**
-65. [ ] **Speed Run**: Cracked stopwatch face. **[Fit to Circle, Isometric, No Background]**
-66. [ ] **True North**: Compass face with spinning needle. **[Fit to Circle, Isometric, No Background]**
-67. [ ] **Spy Glass**: Circular lens revealing matrix code. **[Fit to Circle, Isometric, No Background]**
-68. [ ] **Idea Bulb**: Round lightbulb with lightning filament. **[Fit to Circle, Isometric, No Background]**
-69. [ ] **Power Cell**: Top-down battery with green ring light. **[Fit to Circle, Isometric, No Background]**
-70. [ ] **Spark Life**: Spark plug tip with circular electric arc. **[Fit to Circle, Isometric, No Background]**
+1. [x] **Vantablack Sphere**
+Game asset icon, centered composition, single object, perfect circular frame, isometric 3D render, transparent PNG background. A glossy jet-black sphere with an ultra-matte vantablack surface. Single thin purple rim light defines the edge. The sphere sits centered, reflecting nothing. Style: Polished mobile game icon, AAA quality. Format: 512x512, object centered, transparent background.
 
-### Tier 3: Rare (VFX & Energy)
-71. [ ] **Neon Love**: Pink neon tube bent into heart circle. **[Fit to Circle, Isometric, No Background]**
-72. [ ] **Nuke Glow**: Round barrel top dripping green ooze. **[Fit to Circle, Isometric, No Background]**
-73. [ ] **Bio Hazard**: Round black metal with red pulsing biohazard symbol. **[Fit to Circle, Isometric, No Background]**
-74. [ ] **Zeus Bolt**: Circular storm cloud with yellow bolt. **[Fit to Circle, Isometric, No Background]**
-75. [ ] **Fire Emoji**: 3D spherical flame emoji with sunglasses. **[Fit to Circle, Isometric, No Background]**
-76. [ ] **Ice Shard**: Floating ice crystals arranged in a circle. **[Fit to Circle, Isometric, No Background]**
-77. [ ] **Acid Skull**: Top-down skull melting into green circle puddle. **[Fit to Circle, Isometric, No Background]**
-78. [ ] **Tesla Orb**: Glass plasma ball with purple lightning. **[Fit to Circle, Isometric, No Background]**
-79. [ ] **Sniper Dot**: Metal circle with red laser center. **[Fit to Circle, Isometric, No Background]**
-80. [ ] **HUD Lock**: Red sci-fi targeting circle "LOCKED". **[Fit to Circle, Isometric, No Background]**
-81. [ ] **Radar Blip**: Green radar screen circle with blip. **[Fit to Circle, Isometric, No Background]**
-82. [ ] **Sonar Wave**: Blue sonar ripple circle. **[Fit to Circle, Isometric, No Background]**
-83. [ ] **Wifi Max**: Gold WiFi symbol on round black button. **[Fit to Circle, Isometric, No Background]**
-84. [ ] **Blue Tooth**: Floating blue rune circle. **[Fit to Circle, Isometric, No Background]**
-85. [ ] **NFC Chip**: Round microchip with gold antenna spiral. **[Fit to Circle, Isometric, No Background]**
-86. [ ] **QR Error**: Round QR code glitching red. **[Fit to Circle, Isometric, No Background]**
-87. [ ] **Laser Scan**: round barcode with red laser line. **[Fit to Circle, Isometric, No Background]**
-88. [ ] **Matrix Code**: Green code numbers spiral tunnel. **[Fit to Circle, Isometric, No Background]**
-89. [ ] **Pixel Flame**: 8-bit fireball sprite in a circle. **[Fit to Circle, Isometric, No Background]**
-90. [ ] **Poly Skull**: Low-poly spherical skull with blue eye glow. **[Fit to Circle, Isometric, No Background]**
+2. [x] **Brushed Steel**
+Game asset icon, centered composition, single object, perfect circular frame, isometric 3D render, transparent PNG background. A circular brushed steel button with a glowing blue LED center. Beveled metallic edges catch light. Industrial sci-fi look. Style: Polished mobile game icon, AAA quality. Format: 512x512, object centered, transparent background.
 
-### Tier 4: Epic (Aesthetic Gear)
-91. [ ] **Vapor Sun**: 80s retro sun circle (pink/orange). **[Fit to Circle, Isometric, No Background]**
-92. [ ] **Oni Cyber**: Round white demon mask with neon eyes. **[Fit to Circle, Isometric, No Background]**
-93. [ ] **Night Ops**: Green circular night-vision view. **[Fit to Circle, Isometric, No Background]**
-94. [ ] **Toxic Mask**: Round gas mask filter with reflection. **[Fit to Circle, Isometric, No Background]**
-95. [ ] **Crow Mask**: Steampunk mask in gear circle. **[Fit to Circle, Isometric, No Background]**
-96. [ ] **Viking Rage**: Round viking shield with glowing helmet. **[Fit to Circle, Isometric, No Background]**
-97. [ ] **Cyber Shades**: Spherical chrome reflection of neon city. **[Fit to Circle, Isometric, No Background]**
-98. [ ] **Ray Gun**: Head-on view of raygun barrel (circular). **[Fit to Circle, Isometric, No Background]**
-99. [ ] **Magnum Gold**: Revolver cylinder viewed from front (circular). **[Fit to Circle, Isometric, No Background]**
-100. [ ] **Katana Soul**: Round sword handguard (tsuba) with blue wisp. **[Fit to Circle, Isometric, No Background]**
-101. [ ] **Beam Saber**: Top-down lightsaber hilt emitter. **[Fit to Circle, Isometric, No Background]**
-102. [ ] **Hover Tech**: Round blue hover turbine fan. **[Fit to Circle, Isometric, No Background]**
-103. [ ] **Rocket Pack**: Rocket exhaust flame circle. **[Fit to Circle, Isometric, No Background]**
-104. [ ] **Iron Fist**: Punching robot fist (head-on circle view). **[Fit to Circle, Isometric, No Background]**
-105. [ ] **Bionic Eye**: Red robotic camera lens circle. **[Fit to Circle, Isometric, No Background]**
+3. [x] **Graffiti Block**
+Game asset icon, centered composition, single object, perfect circular frame, isometric 3D render, transparent PNG background. A circular concrete disc with urban graffiti. Hot pink and neon green spray paint splatters contained within the round stone shape. Rough texture. Style: Polished mobile game icon, AAA quality. Format: 512x512, object centered, transparent background.
 
-### Tier 5: Ultra Epic (Power Fantasy)
-106. [ ] **Dragon Maw**: Dragon throat view (circular fire tunnel). **[Fit to Circle, Isometric, No Background]**
-107. [ ] **Phoenix Rise**: Fire bird curled into perfect circle. **[Fit to Circle, Isometric, No Background]**
-108. [ ] **Kraken Grip**: Round porthole with octopus eye. **[Fit to Circle, Isometric, No Background]**
-109. [ ] **Crystal Smash**: Blue crystal fist smashing glass circle. **[Fit to Circle, Isometric, No Background]**
-110. [ ] **Wizard Focus**: Crystal orb with galaxy swirl. **[Fit to Circle, Isometric, No Background]**
-111. [ ] **Death Totem**: Round skull totem with purple smoke. **[Fit to Circle, Isometric, No Background]**
-112. [ ] **Thor Hammer**: Top-down hammer impact lightning circle. **[Fit to Circle, Isometric, No Background]**
-113. [ ] **Force Field**: Blue hexagon energy shield circle. **[Fit to Circle, Isometric, No Background]**
-114. [ ] **Grav Well**: Purple singularity black hole orb. **[Fit to Circle, Isometric, No Background]**
-115. [ ] **Portal Loop**: Blue and orange portals forming a loop circle. **[Fit to Circle, Isometric, No Background]**
-116. [ ] **Time Gear**: Spinning gold clock gear. **[Fit to Circle, Isometric, No Background]**
-117. [ ] **Void Box**: Black hole contained in a cube (isometric). **[Fit to Circle, Isometric, No Background]**
-118. [ ] **Ion Cannon**: Red orbital laser filling the circle. **[Fit to Circle, Isometric, No Background]**
-119. [ ] **Mech Damage**: Damaged robot head circle with sparks. **[Fit to Circle, Isometric, No Background]**
-120. [ ] **Alien Relic**: Glowing alien cube isometric. **[Fit to Circle, Isometric, No Background]**
+4. [x] **Burnt Map**
+Game asset icon, centered composition, single object, perfect circular frame, isometric 3D render, transparent PNG background. A perfectly round piece of aged parchment paper. Edges are charred black with subtle orange ember glow. Ancient treasure map texture visible. Style: Polished mobile game icon, AAA quality. Format: 512x512, object centered, transparent background.
 
-### Tier 6: Legendary (Luxury Materials)
-121. [ ] **Diamond Skull**: Isometric clear diamond skull. **[Fit to Circle, Isometric, No Background]**
-122. [ ] **Gold Splash**: Liquid gold sphere splashing. **[Fit to Circle, Isometric, No Background]**
-123. [ ] **Chrome Sphere**: Perfect mirror sphere reflection. **[Fit to Circle, Isometric, No Background]**
-124. [ ] **Prism Light**: Glass prism in circle with rainbow. **[Fit to Circle, Isometric, No Background]**
-125. [ ] **Vanta Void**: 2D Flat Black hole sphere (void). **[Fit to Circle, Isometric, No Background]**
-126. [ ] **Deep Jelly**: Round bioluminescent jellyfish top view. **[Fit to Circle, Isometric, No Background]**
-127. [ ] **Cosmic Clock**: Star constellation clock face. **[Fit to Circle, Isometric, No Background]**
-128. [ ] **Magma Rock**: Floating molten rock sphere. **[Fit to Circle, Isometric, No Background]**
-129. [ ] **King Crown**: Top-down gold crown with ruby. **[Fit to Circle, Isometric, No Background]**
+5. [x] **Neon Burlap**
+Game asset icon, centered composition, single object, perfect circular frame, isometric 3D render, transparent PNG background. A circular burlap fabric patch. Neon blue glowing thread stitched in an X pattern across the center. Frayed edges define the round shape. Style: Polished mobile game icon, AAA quality. Format: 512x512, object centered, transparent background.
 
-### Tier 7: Mythic (Abstract & Metaphysical)
-132. [ ] **Hyper Cube**: Glowing 4D wireframe tesseract orb. **[Fit to Circle, Isometric, No Background]**
-133. [ ] **Galaxy Jar**: Top-down jar lid with galaxy inside. **[Fit to Circle, Isometric, No Background]**
-134. [ ] **Quantum Ent**: Two atoms connected by lightning in a circle. **[Fit to Circle, Isometric, No Background]**
-135. [ ] **Soul Keeper**: Top-down lantern with ghost inside. **[Fit to Circle, Isometric, No Background]**
-139. [ ] **Anti Matter**: Inverted color sphere. **[Fit to Circle, Isometric, No Background]**
-140. [ ] **Time Rift**: Circular rip in sky showing gears. **[Fit to Circle, Isometric, No Background]**
+6. [x] **Rust Glow**
+Game asset icon, centered composition, single object, perfect circular frame, isometric 3D render, transparent PNG background. A circular rusted iron disc. Deep cracks reveal glowing orange magma underneath. Oxidized red-brown metal surface. Style: Polished mobile game icon, AAA quality. Format: 512x512, object centered, transparent background.
 
-### Tier 8: Celestial (Cosmic Horror)
-141. [ ] **God Eye**: Giant realistic eye in nebula circle. **[Fit to Circle, Isometric, No Background]**
-142. [ ] **Bible Angel**: Wheels within wheels with eyes (circular). **[Fit to Circle, Isometric, No Background]**
-143. [ ] **Gold Spiral**: Golden particle Fibonacci spiral. **[Fit to Circle, Isometric, No Background]**
-144. [ ] **Bottled Aurora**: Top-down bottle with aurora. **[Fit to Circle, Isometric, No Background]**
-145. [ ] **Star Death**: Supernova blast ring. **[Fit to Circle, Isometric, No Background]**
+7. [x] **Hazard Hype**
+Game asset icon, centered composition, single object, perfect circular frame, isometric 3D render, transparent PNG background. A glossy plastic button with yellow and black hazard stripes in a chevron pattern. Shiny reflective surface. Warning sign aesthetic. Style: Polished mobile game icon, AAA quality. Format: 512x512, object centered, transparent background.
 
-### Tier 9: Cosmic (Meta)
-146. [ ] **Schrod Cat**: Top-down box with glowing cat eyes. **[Fit to Circle, Isometric, No Background]**
-148. [ ] **Hand God**: Stone hand holding solar system. **[Fit to Circle, Isometric, No Background]**
+8. [x] **Carbon Hex**
+Game asset icon, centered composition, single object, perfect circular frame, isometric 3D render, transparent PNG background. A dark grey carbon fiber circular disc. Red glowing hexagonal pattern overlaid on the weave texture. High-tech racing aesthetic. Style: Polished mobile game icon, AAA quality. Format: 512x512, object centered, transparent background.
+
+9. [x] **Denim Pin**
+Game asset icon, centered composition, single object, perfect circular frame, isometric 3D render, transparent PNG background. A circular blue denim fabric patch. A shiny gold safety pin pierces through it diagonally. Worn jean texture with slight fraying. Style: Polished mobile game icon, AAA quality. Format: 512x512, object centered, transparent background.
+
+10. [x] **Leather Brand**
+Game asset icon, centered composition, single object, perfect circular frame, isometric 3D render, transparent PNG background. A circular piece of worn brown leather. A glowing blue magic rune symbol is branded/burned into the center. Aged cracks in leather. Style: Polished mobile game icon, AAA quality. Format: 512x512, object centered, transparent background.
+
+11. [x] **Magma Cracks**
+Game asset icon, centered composition, single object, perfect circular frame, isometric 3D render, transparent PNG background. A circular disc of dried volcanic earth. Deep cracks reveal bright orange lava glowing beneath the dark crust. Style: Polished mobile game icon, AAA quality. Format: 512x512, object centered, transparent background.
+
+12. [x] **Moss Crystal**
+Game asset icon, centered composition, single object, perfect circular frame, isometric 3D render, transparent PNG background. A round grey stone covered in vibrant neon green bioluminescent moss. Small purple crystals poke through the moss. Forest magic aesthetic. Style: Polished mobile game icon, AAA quality. Format: 512x512, object centered, transparent background.
+
+13. [x] **Hyper Droplet**
+Game asset icon, centered composition, single object, perfect circular frame, isometric 3D render, transparent PNG background. A perfect spherical water droplet. Inside the droplet, a reflected cityscape is visible, distorted by the curved surface. Crystal clear liquid. Style: Polished mobile game icon, AAA quality. Format: 512x512, object centered, transparent background.
+
+14. [x] **Ember Heart**
+Game asset icon, centered composition, single object, perfect circular frame, isometric 3D render, transparent PNG background. A circular pile of grey ash. In the center, a heart-shaped coal glows bright orange-red with inner fire. Smoke wisps rise subtly. Style: Polished mobile game icon, AAA quality. Format: 512x512, object centered, transparent background.
+
+15. [x] **Cyber Ice**
+Game asset icon, centered composition, single object, perfect circular frame, isometric 3D render, transparent PNG background. A round ice cube sphere with a glowing blue LED embedded in the center. Frozen condensation on surface. Cold vapor effect. Style: Polished mobile game icon, AAA quality. Format: 512x512, object centered, transparent background.
+
+16. [x] **Toxic Slime**
+Game asset icon, centered composition, single object, perfect circular frame, isometric 3D render, transparent PNG background. A perfectly circular puddle of bright green toxic slime. Purple bubbles float on top. Glossy, thick, gelatinous texture. Style: Polished mobile game icon, AAA quality. Format: 512x512, object centered, transparent background.
+
+17. [x] **Holo Oil**
+Game asset icon, centered composition, single object, perfect circular frame, isometric 3D render, transparent PNG background. A circular oil slick with iridescent rainbow holographic sheen. Swirling patterns of pink, blue, and gold. Liquid surface reflection. Style: Polished mobile game icon, AAA quality. Format: 512x512, object centered, transparent background.
+
+18. [x] **Chalk Crown**
+Game asset icon, centered composition, single object, perfect circular frame, isometric 3D render, transparent PNG background. A round black slate disc. A white chalk drawing of a simple crown is sketched in the center. Dusty chalk texture. Style: Polished mobile game icon, AAA quality. Format: 512x512, object centered, transparent background.
+
+19. [x] **Spray Drip**
+Game asset icon, centered composition, single object, perfect circular frame, isometric 3D render, transparent PNG background. A circular blob of bright red spray paint viewed from above. One paint drip extends slightly at the bottom. Wet glossy paint texture. Style: Polished mobile game icon, AAA quality. Format: 512x512, object centered, transparent background.
+
+20. [x] **Glitch Noise**
+Game asset icon, centered composition, single object, perfect circular frame, isometric 3D render, transparent PNG background. A circular disc of TV static noise texture. RGB color separation artifacts along the edges. VHS corruption aesthetic. Style: Polished mobile game icon, AAA quality. Format: 512x512, object centered, transparent background.
+
+21. [x] **Glass Shard**
+Game asset icon, centered composition, single object, perfect circular frame, isometric 3D render, transparent PNG background. A circular glass lens or disc. A red laser beam reflects and refracts through the glass center. Prismatic light effects. Style: Polished mobile game icon, AAA quality. Format: 512x512, object centered, transparent background.
+
+22. [x] **Copper Coil**
+Game asset icon, centered composition, single object, perfect circular frame, isometric 3D render, transparent PNG background. A tightly wound ball of copper wire forming a perfect sphere. Shiny orange-gold metallic surface. Electrical component aesthetic. Style: Polished mobile game icon, AAA quality. Format: 512x512, object centered, transparent background.
+
+23. [ ] **Neon Bolt**
+Game asset icon, centered composition, single object, perfect circular frame, isometric 3D render, transparent PNG background. Top-down view of a hexagonal metal bolt head. Bright blue plasma energy glows from the center hole. Industrial sci-fi. Style: Polished mobile game icon, AAA quality. Format: 512x512, object centered, transparent background.
+
+24. [x] **Steam Gear**
+Game asset icon, centered composition, single object, perfect circular frame, isometric 3D render, transparent PNG background. Top-down view of a rusty bronze steampunk gear. Small steam jets spray from between the teeth. Victorian industrial aesthetic. Style: Polished mobile game icon, AAA quality. Format: 512x512, object centered, transparent background.
+
+25. [ ] **Chain Glow**
+Game asset icon, centered composition, single object, perfect circular frame, isometric 3D render, transparent PNG background. A spherical ball of thick metal chains twisted together. The chains glow red-hot like they're fresh from a forge. Style: Polished mobile game icon, AAA quality. Format: 512x512, object centered, transparent background.
+
+26. [ ] **Rope Fuse**
+Game asset icon, centered composition, single object, perfect circular frame, isometric 3D render, transparent PNG background. A coil of brown rope arranged in a circular shape. One end has a burning spark/fuse traveling along it. Dynamite fuse aesthetic. Style: Polished mobile game icon, AAA quality. Format: 512x512, object centered, transparent background.
+
+27. [ ] **Medi Wrap**
+Game asset icon, centered composition, single object, perfect circular frame, isometric 3D render, transparent PNG background. Top-down view of a roll of white medical bandages. A glowing green holographic cross symbol projects above the center. Style: Polished mobile game icon, AAA quality. Format: 512x512, object centered, transparent background.
+
+28. [ ] **Chrome Tape**
+Game asset icon, centered composition, single object, perfect circular frame, isometric 3D render, transparent PNG background. A spherical ball of crumpled chrome/silver duct tape. Mirror-like reflective surface shows distorted world reflection. Style: Polished mobile game icon, AAA quality. Format: 512x512, object centered, transparent background.
+
+29. [ ] **Cardboard Bot**
+Game asset icon, centered composition, single object, perfect circular frame, isometric 3D render, transparent PNG background. A circular cardboard cutout disc. A cute robot face is drawn on it with marker - square eyes and antenna. DIY craft aesthetic. Style: Polished mobile game icon, AAA quality. Format: 512x512, object centered, transparent background.
+
+30. [ ] **Charred Rune**
+Game asset icon, centered composition, single object, perfect circular frame, isometric 3D render, transparent PNG background. A round slice of burnt wood (tree trunk cross-section). A glowing blue Norse rune is carved into the center. Charcoal texture. Style: Polished mobile game icon, AAA quality. Format: 512x512, object centered, transparent background.
+
+31. [ ] **Ash Phoenix**
+Game asset icon, centered composition, single object, perfect circular frame, isometric 3D render, transparent PNG background. A circular pile of fine grey ash. In the dust, a subtle bird/phoenix shape is visible like a shadow or imprint. Rebirth symbolism. Style: Polished mobile game icon, AAA quality. Format: 512x512, object centered, transparent background.
+
+32. [ ] **Sand Gold**
+Game asset icon, centered composition, single object, perfect circular frame, isometric 3D render, transparent PNG background. A perfect circle of golden desert sand. Scattered gold dust particles sparkle across the surface. Treasure hunter aesthetic. Style: Polished mobile game icon, AAA quality. Format: 512x512, object centered, transparent background.
+
+33. [ ] **Zen Stack**
+Game asset icon, centered composition, single object, perfect circular frame, isometric 3D render, transparent PNG background. Top-down view of three smooth river stones stacked in a cairn. The stones form a circular footprint together. Meditation aesthetic. Style: Polished mobile game icon, AAA quality. Format: 512x512, object centered, transparent background.
+
+34. [ ] **Leaf Cyber**
+Game asset icon, centered composition, single object, perfect circular frame, isometric 3D render, transparent PNG background. A circular dried leaf skeleton with the flesh gone, only veins remaining. The veins are made of gold circuit board traces with tiny LEDs. Style: Polished mobile game icon, AAA quality. Format: 512x512, object centered, transparent background.
+
+35. [ ] **Pinecone Grenade**
+Game asset icon, centered composition, single object, perfect circular frame, isometric 3D render, transparent PNG background. A green pinecone styled as a military grenade. It has a metal pin and lever attached. Nature meets warfare hybrid design. Style: Polished mobile game icon, AAA quality. Format: 512x512, object centered, transparent background.
+
+36. [ ] **Acorn Gem**
+Game asset icon, centered composition, single object, perfect circular frame, isometric 3D render, transparent PNG background. An acorn where the nut portion is replaced with a faceted red ruby gemstone. Gold acorn cap. Fantasy nature treasure. Style: Polished mobile game icon, AAA quality. Format: 512x512, object centered, transparent background.
+
+37. [ ] **Shroom Glow**
+Game asset icon, centered composition, single object, perfect circular frame, isometric 3D render, transparent PNG background. Top-down view of a bioluminescent mushroom cap. Glowing blue with white spots. Soft teal light radiates from underneath. Fantasy forest item. Style: Polished mobile game icon, AAA quality. Format: 512x512, object centered, transparent background.
+
+38. [ ] **Hook Blood**
+Game asset icon, centered composition, single object, perfect circular frame, isometric 3D render, transparent PNG background. A fishing line coiled into a circular shape. A sharp metal hook in the center with a single drop of blood. Dark fishing horror aesthetic. Style: Polished mobile game icon, AAA quality. Format: 512x512, object centered, transparent background.
+
+39. [ ] **Anchor Neon**
+Game asset icon, centered composition, single object, perfect circular frame, isometric 3D render, transparent PNG background. A neon light tube bent into a simplified anchor shape, contained within a circular composition. Bright teal glow. Nautical bar sign aesthetic. Style: Polished mobile game icon, AAA quality. Format: 512x512, object centered, transparent background.
+
+40. [ ] **Compass Holo**
+Game asset icon, centered composition, single object, perfect circular frame, isometric 3D render, transparent PNG background. A circular vintage parchment map texture. A holographic blue compass needle floats above the center, pointing north. Explorer navigation item. Style: Polished mobile game icon, AAA quality. Format: 512x512, object centered, transparent background.
+
+---
+
+### Tier 2: Uncommon (Clean Objects) — 30 Items
+
+41. [ ] **Winking Face**
+Game asset icon, centered composition, single object, perfect circular frame, isometric 3D render, transparent PNG background. A 3D yellow plastic coin with a cartoon winking smiley face embossed on it. One eye closed, tongue out. Playful emoji aesthetic. Style: Polished mobile game icon, AAA quality. Format: 512x512, object centered, transparent background.
+
+42. [ ] **Snake Eyes**
+Game asset icon, centered composition, single object, perfect circular frame, isometric 3D render, transparent PNG background. Two red casino dice showing snake eyes (both 1s) enclosed inside a clear glass sphere. Floating in center. Gambling luck item. Style: Polished mobile game icon, AAA quality. Format: 512x512, object centered, transparent background.
+
+43. [ ] **Lucky Chip**
+Game asset icon, centered composition, single object, perfect circular frame, isometric 3D render, transparent PNG background. A casino poker chip spinning so fast it creates motion blur, forming a solid circular disc. Red and white colors blend. Style: Polished mobile game icon, AAA quality. Format: 512x512, object centered, transparent background.
+
+44. [ ] **Cursed Coin**
+Game asset icon, centered composition, single object, perfect circular frame, isometric 3D render, transparent PNG background. An ancient gold doubloon coin with a glowing green skull embossed in the center. Pirate curse artifact. Green mist emanates subtly. Style: Polished mobile game icon, AAA quality. Format: 512x512, object centered, transparent background.
+
+45. [ ] **Silver Bar**
+Game asset icon, centered composition, single object, perfect circular frame, isometric 3D render, transparent PNG background. A round silver coin with a visible thumbprint smudge on the polished surface. Pure precious metal. Mint condition aesthetic. Style: Polished mobile game icon, AAA quality. Format: 512x512, object centered, transparent background.
+
+46. [ ] **Bronze Star**
+Game asset icon, centered composition, single object, perfect circular frame, isometric 3D render, transparent PNG background. A circular bronze military medal with a raised star emblem in the center. Weathered patina. Honor and valor symbol. Style: Polished mobile game icon, AAA quality. Format: 512x512, object centered, transparent background.
+
+47. [ ] **Lock Pick**
+Game asset icon, centered composition, single object, perfect circular frame, isometric 3D render, transparent PNG background. A round brass padlock viewed from the front. A glowing blue lockpick tool is inserted in the keyhole. Thief/rogue item. Style: Polished mobile game icon, AAA quality. Format: 512x512, object centered, transparent background.
+
+48. [ ] **Key Glitch**
+Game asset icon, centered composition, single object, perfect circular frame, isometric 3D render, transparent PNG background. The round decorative head of an antique skeleton key. Half of it is dissolving into digital pixels and glitching. Corrupted data aesthetic. Style: Polished mobile game icon, AAA quality. Format: 512x512, object centered, transparent background.
+
+49. [ ] **TNT Bundle**
+Game asset icon, centered composition, single object, perfect circular frame, isometric 3D render, transparent PNG background. A bundle of red dynamite sticks tied together with rope, viewed from above forming a circular cross-section. Lit fuse sparking. Style: Polished mobile game icon, AAA quality. Format: 512x512, object centered, transparent background.
+
+50. [ ] **Frag Pin**
+Game asset icon, centered composition, single object, perfect circular frame, isometric 3D render, transparent PNG background. Top-down view of a military fragmentation grenade, showing the circular top with the pin and lever. Army green with clear markings. Style: Polished mobile game icon, AAA quality. Format: 512x512, object centered, transparent background.
+
+51. [ ] **Kunai Spin**
+Game asset icon, centered composition, single object, perfect circular frame, isometric 3D render, transparent PNG background. A ninja kunai blade spinning so fast it forms a grey circular blur. Motion lines indicate rotation. Assassin weapon. Style: Polished mobile game icon, AAA quality. Format: 512x512, object centered, transparent background.
+
+52. [ ] **Ninja Star**
+Game asset icon, centered composition, single object, perfect circular frame, isometric 3D render, transparent PNG background. A traditional metal shuriken (ninja throwing star) embedded in a round wooden target board. Clean deadly aesthetic. Style: Polished mobile game icon, AAA quality. Format: 512x512, object centered, transparent background.
+
+53. [ ] **Gold Knuckles**
+Game asset icon, centered composition, single object, perfect circular frame, isometric 3D render, transparent PNG background. Gold brass knuckles with small diamond studs, arranged in a circular composition. Bling gangster aesthetic. Shiny reflective gold. Style: Polished mobile game icon, AAA quality. Format: 512x512, object centered, transparent background.
+
+54. [ ] **Bat Spikes**
+Game asset icon, centered composition, single object, perfect circular frame, isometric 3D render, transparent PNG background. Head-on circular view looking down the barrel of a spiked baseball bat. Nails and screws protrude around the circular end. Brutal weapon. Style: Polished mobile game icon, AAA quality. Format: 512x512, object centered, transparent background.
+
+55. [ ] **Skate Bearing**
+Game asset icon, centered composition, single object, perfect circular frame, isometric 3D render, transparent PNG background. A skateboard wheel bearing spinning at high speed with motion blur and smoke wisps. Chrome metal with red rubber seal. Style: Polished mobile game icon, AAA quality. Format: 512x512, object centered, transparent background.
+
+56. [ ] **Graf Can**
+Game asset icon, centered composition, single object, perfect circular frame, isometric 3D render, transparent PNG background. Top-down view of a spray paint can nozzle. A circular cloud of hot pink paint mist sprays outward from center. Urban art tool. Style: Polished mobile game icon, AAA quality. Format: 512x512, object centered, transparent background.
+
+57. [ ] **Mixtape Fire**
+Game asset icon, centered composition, single object, perfect circular frame, isometric 3D render, transparent PNG background. A cassette tape reel on fire, viewed from above. The circular reel spins while flames engulf the magnetic tape. 80s retro fire. Style: Polished mobile game icon, AAA quality. Format: 512x512, object centered, transparent background.
+
+58. [ ] **Floppy Save**
+Game asset icon, centered composition, single object, perfect circular frame, isometric 3D render, transparent PNG background. A round drink coaster with a retro floppy disk "save icon" design embossed on top. Nostalgic tech aesthetic. Style: Polished mobile game icon, AAA quality. Format: 512x512, object centered, transparent background.
+
+59. [ ] **VHS Horror**
+Game asset icon, centered composition, single object, perfect circular frame, isometric 3D render, transparent PNG background. Tangled VHS tape ribbon twisted into a ball that forms a creepy face shape. Black tape with subtle red tint. Horror movie aesthetic. Style: Polished mobile game icon, AAA quality. Format: 512x512, object centered, transparent background.
+
+60. [ ] **Cart Glitch**
+Game asset icon, centered composition, single object, perfect circular frame, isometric 3D render, transparent PNG background. Top-down view of a retro video game cartridge with dust particles floating above it in a circular cloud. 8-bit nostalgia. Style: Polished mobile game icon, AAA quality. Format: 512x512, object centered, transparent background.
+
+61. [ ] **Joy Stick**
+Game asset icon, centered composition, single object, perfect circular frame, isometric 3D render, transparent PNG background. Top-down view of a classic red arcade joystick ball on its circular base plate. Shiny plastic with screws visible. Arcade aesthetic. Style: Polished mobile game icon, AAA quality. Format: 512x512, object centered, transparent background.
+
+62. [ ] **D Pad Gamer**
+Game asset icon, centered composition, single object, perfect circular frame, isometric 3D render, transparent PNG background. A round rubber button with a D-pad directional cross texture pressed into it. Grey controller plastic. Game controller part. Style: Polished mobile game icon, AAA quality. Format: 512x512, object centered, transparent background.
+
+63. [ ] **Cursor Click**
+Game asset icon, centered composition, single object, perfect circular frame, isometric 3D render, transparent PNG background. A pixelated white pointer hand cursor icon centered inside a circular white button. Click ripple effect around it. UI design element. Style: Polished mobile game icon, AAA quality. Format: 512x512, object centered, transparent background.
+
+64. [ ] **Time Sand**
+Game asset icon, centered composition, single object, perfect circular frame, isometric 3D render, transparent PNG background. Top-down view looking into an hourglass. Golden sand forms a vortex spiral pattern as it falls through the narrow center. Time magic item. Style: Polished mobile game icon, AAA quality. Format: 512x512, object centered, transparent background.
+
+65. [ ] **Speed Run**
+Game asset icon, centered composition, single object, perfect circular frame, isometric 3D render, transparent PNG background. A circular stopwatch face with cracked glass. The hands are a blur indicating extreme speed. Red and white dial. Racing against time. Style: Polished mobile game icon, AAA quality. Format: 512x512, object centered, transparent background.
+
+66. [ ] **True North**
+Game asset icon, centered composition, single object, perfect circular frame, isometric 3D render, transparent PNG background. A classic compass face with cardinal directions marked. The red and white needle spins with motion blur. Navigation exploration item. Style: Polished mobile game icon, AAA quality. Format: 512x512, object centered, transparent background.
+
+67. [ ] **Spy Glass**
+Game asset icon, centered composition, single object, perfect circular frame, isometric 3D render, transparent PNG background. A circular magnifying glass lens that reveals green Matrix-style falling code when you look through it. Spy/hacker tool. Style: Polished mobile game icon, AAA quality. Format: 512x512, object centered, transparent background.
+
+68. [ ] **Idea Bulb**
+Game asset icon, centered composition, single object, perfect circular frame, isometric 3D render, transparent PNG background. A round incandescent light bulb with a lightning bolt shaped filament glowing bright yellow inside. Eureka moment symbol. Style: Polished mobile game icon, AAA quality. Format: 512x512, object centered, transparent background.
+
+69. [ ] **Power Cell**
+Game asset icon, centered composition, single object, perfect circular frame, isometric 3D render, transparent PNG background. Top-down view of a cylindrical battery. A glowing green ring of light indicates full charge around the positive terminal. Energy item. Style: Polished mobile game icon, AAA quality. Format: 512x512, object centered, transparent background.
+
+70. [ ] **Spark Life**
+Game asset icon, centered composition, single object, perfect circular frame, isometric 3D render, transparent PNG background. A spark plug tip viewed head-on. A circular arc of blue electricity crackles around the electrode gap. Engine power symbol. Style: Polished mobile game icon, AAA quality. Format: 512x512, object centered, transparent background.
+
+---
+
+### Tier 3: Rare (VFX & Energy) — 20 Items
+
+71. [ ] **Neon Love**
+Game asset icon, centered composition, single object, perfect circular frame, isometric 3D render, transparent PNG background. A neon light tube bent into a heart shape, contained within a circular composition. Bright hot pink glow with soft bloom. Love power aesthetic. Style: Polished mobile game icon, AAA quality. Format: 512x512, object centered, transparent background.
+
+72. [ ] **Nuke Glow**
+Game asset icon, centered composition, single object, perfect circular frame, isometric 3D render, transparent PNG background. Top-down view of a nuclear waste barrel lid. Bright green radioactive ooze drips over the circular rim. Hazardous material. Style: Polished mobile game icon, AAA quality. Format: 512x512, object centered, transparent background.
+
+73. [ ] **Bio Hazard**
+Game asset icon, centered composition, single object, perfect circular frame, isometric 3D render, transparent PNG background. A round black metal plate with a pulsing red biohazard symbol that glows with inner light. Warning danger aesthetic. Style: Polished mobile game icon, AAA quality. Format: 512x512, object centered, transparent background.
+
+74. [ ] **Zeus Bolt**
+Game asset icon, centered composition, single object, perfect circular frame, isometric 3D render, transparent PNG background. A circular dark storm cloud viewed from above. A bright yellow lightning bolt strikes down through the center. God of thunder power. Style: Polished mobile game icon, AAA quality. Format: 512x512, object centered, transparent background.
+
+75. [ ] **Fire Emoji**
+Game asset icon, centered composition, single object, perfect circular frame, isometric 3D render, transparent PNG background. A 3D spherical flame emoji character wearing tiny sunglasses. Orange and yellow fire texture with a cool attitude. Lit meme aesthetic. Style: Polished mobile game icon, AAA quality. Format: 512x512, object centered, transparent background.
+
+76. [ ] **Ice Shard**
+Game asset icon, centered composition, single object, perfect circular frame, isometric 3D render, transparent PNG background. Multiple floating ice crystal shards arranged in a circular formation. Frozen blue translucent material with cold vapor. Ice magic spell. Style: Polished mobile game icon, AAA quality. Format: 512x512, object centered, transparent background.
+
+77. [ ] **Acid Skull**
+Game asset icon, centered composition, single object, perfect circular frame, isometric 3D render, transparent PNG background. Top-down view of a human skull melting into a circular puddle of bright green acid. Bone dissolving into toxic liquid. Horror poison. Style: Polished mobile game icon, AAA quality. Format: 512x512, object centered, transparent background.
+
+78. [ ] **Tesla Orb**
+Game asset icon, centered composition, single object, perfect circular frame, isometric 3D render, transparent PNG background. A glass plasma ball with purple and blue lightning bolts arcing inside. Classic Tesla coil aesthetic. Electricity science toy. Style: Polished mobile game icon, AAA quality. Format: 512x512, object centered, transparent background.
+
+79. [ ] **Sniper Dot**
+Game asset icon, centered composition, single object, perfect circular frame, isometric 3D render, transparent PNG background. A brushed metal circular plate with a bright red laser dot in the exact center. Sniper rifle targeting indicator. Deadly precision. Style: Polished mobile game icon, AAA quality. Format: 512x512, object centered, transparent background.
+
+80. [ ] **HUD Lock**
+Game asset icon, centered composition, single object, perfect circular frame, isometric 3D render, transparent PNG background. A red sci-fi holographic targeting reticle circle with "LOCKED" text. Military heads-up display aesthetic. Missile lock-on indicator. Style: Polished mobile game icon, AAA quality. Format: 512x512, object centered, transparent background.
+
+81. [ ] **Radar Blip**
+Game asset icon, centered composition, single object, perfect circular frame, isometric 3D render, transparent PNG background. A green circular radar screen with a sweeping line. A single bright blip dot appears on one edge. Military tracking display. Style: Polished mobile game icon, AAA quality. Format: 512x512, object centered, transparent background.
+
+82. [ ] **Sonar Wave**
+Game asset icon, centered composition, single object, perfect circular frame, isometric 3D render, transparent PNG background. Concentric blue circular sonar ripples expanding outward from a center point. Submarine ping effect. Underwater detection waves. Style: Polished mobile game icon, AAA quality. Format: 512x512, object centered, transparent background.
+
+83. [ ] **Wifi Max**
+Game asset icon, centered composition, single object, perfect circular frame, isometric 3D render, transparent PNG background. A round matte black button with a gold metallic WiFi signal symbol in the center, all bars full. Premium connectivity icon. Style: Polished mobile game icon, AAA quality. Format: 512x512, object centered, transparent background.
+
+84. [ ] **Blue Tooth**
+Game asset icon, centered composition, single object, perfect circular frame, isometric 3D render, transparent PNG background. A floating circular blue magic rune with the Bluetooth symbol integrated into an ancient mystical pattern. Tech meets magic. Style: Polished mobile game icon, AAA quality. Format: 512x512, object centered, transparent background.
+
+85. [ ] **NFC Chip**
+Game asset icon, centered composition, single object, perfect circular frame, isometric 3D render, transparent PNG background. A round microchip with a gold spiral antenna pattern on the surface. Contactless payment technology. Subtle blue glow. Style: Polished mobile game icon, AAA quality. Format: 512x512, object centered, transparent background.
+
+86. [ ] **QR Error**
+Game asset icon, centered composition, single object, perfect circular frame, isometric 3D render, transparent PNG background. A circular QR code that is glitching and corrupting with red error pixels. Scan failure aesthetic. Digital corruption. Style: Polished mobile game icon, AAA quality. Format: 512x512, object centered, transparent background.
+
+87. [ ] **Laser Scan**
+Game asset icon, centered composition, single object, perfect circular frame, isometric 3D render, transparent PNG background. A circular barcode wrapped around a cylinder, viewed from above. A red laser line scans across it. Retail checkout tech. Style: Polished mobile game icon, AAA quality. Format: 512x512, object centered, transparent background.
+
+88. [ ] **Matrix Code**
+Game asset icon, centered composition, single object, perfect circular frame, isometric 3D render, transparent PNG background. Green Matrix-style falling code numbers arranged in a spiral tunnel vortex pattern. Circular digital rain. Hacker aesthetic. Style: Polished mobile game icon, AAA quality. Format: 512x512, object centered, transparent background.
+
+89. [ ] **Pixel Flame**
+Game asset icon, centered composition, single object, perfect circular frame, isometric 3D render, transparent PNG background. A retro 8-bit pixelated fireball sprite, contained within a circular composition. Classic video game fire. Orange and yellow pixels. Style: Polished mobile game icon, AAA quality. Format: 512x512, object centered, transparent background.
+
+90. [ ] **Poly Skull**
+Game asset icon, centered composition, single object, perfect circular frame, isometric 3D render, transparent PNG background. A low-polygon geometric skull rendered as a sphere. Blue glowing eyes. Faceted triangular faces. Digital death aesthetic. Style: Polished mobile game icon, AAA quality. Format: 512x512, object centered, transparent background.
+
+---
+
+### Tier 4: Epic (Aesthetic Gear) — 15 Items
+
+91. [ ] **Vapor Sun**
+Game asset icon, centered composition, single object, perfect circular frame, isometric 3D render, transparent PNG background. An 80s retro synthwave sunset. Horizontal striped circle in pink, orange, and purple gradient. Vaporwave aesthetic palm silhouettes. Style: Polished mobile game icon, AAA quality. Format: 512x512, object centered, transparent background.
+
+92. [ ] **Oni Cyber**
+Game asset icon, centered composition, single object, perfect circular frame, isometric 3D render, transparent PNG background. A round white Japanese oni demon mask with neon pink and blue glowing eyes. Cyber-samurai aesthetic. Horns curve inward. Style: Polished mobile game icon, AAA quality. Format: 512x512, object centered, transparent background.
+
+93. [ ] **Night Ops**
+Game asset icon, centered composition, single object, perfect circular frame, isometric 3D render, transparent PNG background. A circular green night-vision goggle view with crosshairs. Grainy phosphor display. Military stealth operations aesthetic. Style: Polished mobile game icon, AAA quality. Format: 512x512, object centered, transparent background.
+
+94. [ ] **Toxic Mask**
+Game asset icon, centered composition, single object, perfect circular frame, isometric 3D render, transparent PNG background. Front view of a round gas mask filter canister. Reflective glass visor in center. Post-apocalyptic survival gear. Style: Polished mobile game icon, AAA quality. Format: 512x512, object centered, transparent background.
+
+95. [ ] **Crow Mask**
+Game asset icon, centered composition, single object, perfect circular frame, isometric 3D render, transparent PNG background. A steampunk plague doctor mask with a circular brass gear frame around it. Bronze rivets and leather. Victorian dark aesthetic. Style: Polished mobile game icon, AAA quality. Format: 512x512, object centered, transparent background.
+
+96. [ ] **Viking Rage**
+Game asset icon, centered composition, single object, perfect circular frame, isometric 3D render, transparent PNG background. A round wooden Viking shield with a glowing blue rune and horned helmet silhouette in the center. Battle-worn edges. Norse warrior. Style: Polished mobile game icon, AAA quality. Format: 512x512, object centered, transparent background.
+
+97. [ ] **Cyber Shades**
+Game asset icon, centered composition, single object, perfect circular frame, isometric 3D render, transparent PNG background. A perfect chrome sphere reflecting a neon cyberpunk city in its mirror surface. Teal and magenta lights. Future noir aesthetic. Style: Polished mobile game icon, AAA quality. Format: 512x512, object centered, transparent background.
+
+98. [ ] **Ray Gun**
+Game asset icon, centered composition, single object, perfect circular frame, isometric 3D render, transparent PNG background. Head-on view looking down the circular barrel of a retro 1950s ray gun. Green energy glows inside. Atomic age sci-fi. Style: Polished mobile game icon, AAA quality. Format: 512x512, object centered, transparent background.
+
+99. [ ] **Magnum Gold**
+Game asset icon, centered composition, single object, perfect circular frame, isometric 3D render, transparent PNG background. Front view of a golden revolver cylinder showing all six chambers in a circular pattern. One bullet visible. Luxury weapon. Style: Polished mobile game icon, AAA quality. Format: 512x512, object centered, transparent background.
+
+100. [ ] **Katana Soul**
+Game asset icon, centered composition, single object, perfect circular frame, isometric 3D render, transparent PNG background. A round Japanese sword handguard (tsuba) with intricate patterns. A blue spirit wisp floats through the center hole. Samurai honor. Style: Polished mobile game icon, AAA quality. Format: 512x512, object centered, transparent background.
+
+101. [ ] **Beam Saber**
+Game asset icon, centered composition, single object, perfect circular frame, isometric 3D render, transparent PNG background. Top-down view of a lightsaber hilt emitter end. Circular with the blade emitter hole in center glowing blue. Jedi weapon tech. Style: Polished mobile game icon, AAA quality. Format: 512x512, object centered, transparent background.
+
+102. [ ] **Hover Tech**
+Game asset icon, centered composition, single object, perfect circular frame, isometric 3D render, transparent PNG background. Top-down view of a circular blue hover turbine fan with spinning blades. Anti-gravity technology. Soft blue glow underneath. Style: Polished mobile game icon, AAA quality. Format: 512x512, object centered, transparent background.
+
+103. [ ] **Rocket Pack**
+Game asset icon, centered composition, single object, perfect circular frame, isometric 3D render, transparent PNG background. View looking down into a circular rocket exhaust nozzle. Orange and blue flame shoots outward. Jetpack thruster power. Style: Polished mobile game icon, AAA quality. Format: 512x512, object centered, transparent background.
+
+104. [ ] **Iron Fist**
+Game asset icon, centered composition, single object, perfect circular frame, isometric 3D render, transparent PNG background. Head-on circular view of a mech robot fist punching toward camera. Chrome metal knuckles. Hydraulic joints. Power punch impact. Style: Polished mobile game icon, AAA quality. Format: 512x512, object centered, transparent background.
+
+105. [ ] **Bionic Eye**
+Game asset icon, centered composition, single object, perfect circular frame, isometric 3D render, transparent PNG background. A robotic camera lens eye with red glowing iris. Mechanical aperture blades. Terminator cybernetic vision. Cold machine stare. Style: Polished mobile game icon, AAA quality. Format: 512x512, object centered, transparent background.
+
+---
+
+### Tier 5: Ultra Epic (Power Fantasy) — 15 Items
+
+106. [ ] **Dragon Maw**
+Game asset icon, centered composition, single object, perfect circular frame, isometric 3D render, transparent PNG background. View looking down a dragon's throat - circular tunnel of teeth, fire glowing deep inside. Scales around the mouth ring. Beast power. Style: Polished mobile game icon, AAA quality. Format: 512x512, object centered, transparent background.
+
+107. [ ] **Phoenix Rise**
+Game asset icon, centered composition, single object, perfect circular frame, isometric 3D render, transparent PNG background. A fire phoenix bird curled into a perfect circular shape, tail meeting head. Orange and gold flames. Rebirth immortality symbol. Style: Polished mobile game icon, AAA quality. Format: 512x512, object centered, transparent background.
+
+108. [ ] **Kraken Grip**
+Game asset icon, centered composition, single object, perfect circular frame, isometric 3D render, transparent PNG background. A round brass porthole window. A giant kraken's eye stares through from the dark depths. Tentacle sucker pressed against glass. Sea monster. Style: Polished mobile game icon, AAA quality. Format: 512x512, object centered, transparent background.
+
+109. [ ] **Crystal Smash**
+Game asset icon, centered composition, single object, perfect circular frame, isometric 3D render, transparent PNG background. A blue crystal fist punching through and shattering a circular glass pane. Shards explode outward. Power breakthrough. Style: Polished mobile game icon, AAA quality. Format: 512x512, object centered, transparent background.
+
+110. [ ] **Wizard Focus**
+Game asset icon, centered composition, single object, perfect circular frame, isometric 3D render, transparent PNG background. A crystal orb sphere containing a miniature swirling galaxy. Purple and blue cosmic dust. Magical divination tool. Wizard power. Style: Polished mobile game icon, AAA quality. Format: 512x512, object centered, transparent background.
+
+111. [ ] **Death Totem**
+Game asset icon, centered composition, single object, perfect circular frame, isometric 3D render, transparent PNG background. A round skull totem carved from bone. Purple spectral smoke wisps emanate from the eye sockets. Necromancer relic. Style: Polished mobile game icon, AAA quality. Format: 512x512, object centered, transparent background.
+
+112. [ ] **Thor Hammer**
+Game asset icon, centered composition, single object, perfect circular frame, isometric 3D render, transparent PNG background. Top-down view of Mjolnir hammer impact point. Circular lightning bolt pattern radiates outward. Thunder god power. Ground cracking. Style: Polished mobile game icon, AAA quality. Format: 512x512, object centered, transparent background.
+
+113. [ ] **Force Field**
+Game asset icon, centered composition, single object, perfect circular frame, isometric 3D render, transparent PNG background. A spherical blue hexagonal energy shield bubble. Hexagon pattern on translucent surface. Sci-fi defensive barrier. Subtle glow. Style: Polished mobile game icon, AAA quality. Format: 512x512, object centered, transparent background.
+
+114. [ ] **Grav Well**
+Game asset icon, centered composition, single object, perfect circular frame, isometric 3D render, transparent PNG background. A purple-black singularity black hole sphere. Gravity lensing distorts stars around the edge. Event horizon visible. Cosmic destruction. Style: Polished mobile game icon, AAA quality. Format: 512x512, object centered, transparent background.
+
+115. [ ] **Portal Loop**
+Game asset icon, centered composition, single object, perfect circular frame, isometric 3D render, transparent PNG background. Blue and orange portal rings interlinked forming a circular mobius loop. Spatial teleportation energy. Interdimensional travel. Style: Polished mobile game icon, AAA quality. Format: 512x512, object centered, transparent background.
+
+116. [ ] **Time Gear**
+Game asset icon, centered composition, single object, perfect circular frame, isometric 3D render, transparent PNG background. A large golden clock gear with roman numerals. Motion blur indicates spinning. Clock hands frozen at midnight. Time manipulation. Style: Polished mobile game icon, AAA quality. Format: 512x512, object centered, transparent background.
+
+117. [ ] **Void Box**
+Game asset icon, centered composition, single object, perfect circular frame, isometric 3D render, transparent PNG background. An isometric cube containing a black hole void inside. The cube edges glow white while the interior is pure darkness. Containment paradox. Style: Polished mobile game icon, AAA quality. Format: 512x512, object centered, transparent background.
+
+118. [ ] **Ion Cannon**
+Game asset icon, centered composition, single object, perfect circular frame, isometric 3D render, transparent PNG background. View looking up into a circular orbital laser cannon barrel. Red energy beam fills the circle. Space weapon. Devastating power. Style: Polished mobile game icon, AAA quality. Format: 512x512, object centered, transparent background.
+
+119. [ ] **Mech Damage**
+Game asset icon, centered composition, single object, perfect circular frame, isometric 3D render, transparent PNG background. A damaged robot head in circular composition. Sparks fly from exposed wires. One red eye still glows. Battle-worn mech veteran. Style: Polished mobile game icon, AAA quality. Format: 512x512, object centered, transparent background.
+
+120. [ ] **Alien Relic**
+Game asset icon, centered composition, single object, perfect circular frame, isometric 3D render, transparent PNG background. An isometric glowing alien cube artifact. Unknown symbols pulse with teal light. Extraterrestrial technology. Ancient power source. Style: Polished mobile game icon, AAA quality. Format: 512x512, object centered, transparent background.
+
+---
+
+### Tier 6: Legendary (Luxury Materials) — 9 Items
+
+121. [ ] **Diamond Skull**
+Game asset icon, centered composition, single object, perfect circular frame, isometric 3D render, transparent PNG background. A human skull carved entirely from clear diamond crystal. Light refracts through faceted surfaces. Rainbow prismatic highlights. Ultimate luxury death. Style: Polished mobile game icon, AAA quality. Format: 512x512, object centered, transparent background.
+
+122. [ ] **Gold Splash**
+Game asset icon, centered composition, single object, perfect circular frame, isometric 3D render, transparent PNG background. A sphere of liquid gold in mid-splash, frozen in time. Droplets suspended around it. Molten precious metal. Ultimate wealth symbol. Style: Polished mobile game icon, AAA quality. Format: 512x512, object centered, transparent background.
+
+123. [ ] **Chrome Sphere**
+Game asset icon, centered composition, single object, perfect circular frame, isometric 3D render, transparent PNG background. A perfect mirror-polished chrome ball reflecting a studio environment. Flawless spherical reflection. Minimalist perfection. Style: Polished mobile game icon, AAA quality. Format: 512x512, object centered, transparent background.
+
+124. [ ] **Prism Light**
+Game asset icon, centered composition, single object, perfect circular frame, isometric 3D render, transparent PNG background. A triangular glass prism centered in the composition with a rainbow light spectrum dispersing through it. Pink Floyd aesthetic. Light science. Style: Polished mobile game icon, AAA quality. Format: 512x512, object centered, transparent background.
+
+125. [ ] **Vanta Void**
+Game asset icon, centered composition, single object, perfect circular frame, isometric 3D render, transparent PNG background. A 2D flat perfect circle of absolute vantablack void. No depth, no reflection, just pure absence of light. The ultimate nothing. Style: Polished mobile game icon, AAA quality. Format: 512x512, object centered, transparent background.
+
+126. [ ] **Deep Jelly**
+Game asset icon, centered composition, single object, perfect circular frame, isometric 3D render, transparent PNG background. Top-down view of a bioluminescent jellyfish, umbrella forming a perfect circle. Teal and purple glow. Deep ocean creature. Ethereal beauty. Style: Polished mobile game icon, AAA quality. Format: 512x512, object centered, transparent background.
+
+127. [ ] **Cosmic Clock**
+Game asset icon, centered composition, single object, perfect circular frame, isometric 3D render, transparent PNG background. A clock face where the numbers are replaced by zodiac star constellations. Celestial purple and gold. Cosmic time measurement. Style: Polished mobile game icon, AAA quality. Format: 512x512, object centered, transparent background.
+
+128. [ ] **Magma Rock**
+Game asset icon, centered composition, single object, perfect circular frame, isometric 3D render, transparent PNG background. A floating spherical molten rock. Black volcanic stone exterior with glowing orange magma cracks. Intense heat radiates outward. Volcanic power. Style: Polished mobile game icon, AAA quality. Format: 512x512, object centered, transparent background.
+
+129. [ ] **King Crown**
+Game asset icon, centered composition, single object, perfect circular frame, isometric 3D render, transparent PNG background. Top-down view of a golden king's crown. Large red ruby in the center. Jeweled points visible around the circular rim. Royal authority symbol. Style: Polished mobile game icon, AAA quality. Format: 512x512, object centered, transparent background.
+
+---
+
+### Tier 7: Mythic (Abstract & Metaphysical) — 6 Items
+
+130. [ ] **Hyper Cube**
+Game asset icon, centered composition, single object, perfect circular frame, isometric 3D render, transparent PNG background. A glowing 4D wireframe tesseract hypercube rotating impossibly. Neon blue edges. Fourth dimension geometry. Mind-bending mathematics. Style: Polished mobile game icon, AAA quality. Format: 512x512, object centered, transparent background.
+
+131. [ ] **Galaxy Jar**
+Game asset icon, centered composition, single object, perfect circular frame, isometric 3D render, transparent PNG background. Top-down view of a glass jar lid. Inside the jar, a miniature spiral galaxy swirls with stars and nebulae. Bottled universe. Style: Polished mobile game icon, AAA quality. Format: 512x512, object centered, transparent background.
+
+132. [ ] **Quantum Ent**
+Game asset icon, centered composition, single object, perfect circular frame, isometric 3D render, transparent PNG background. Two glowing atoms connected by a beam of quantum entanglement lightning, arranged in a circular composition. Spooky action. Particle physics. Style: Polished mobile game icon, AAA quality. Format: 512x512, object centered, transparent background.
+
+133. [ ] **Soul Keeper**
+Game asset icon, centered composition, single object, perfect circular frame, isometric 3D render, transparent PNG background. Top-down view of an ornate lantern lid. A ghostly white spirit is trapped inside, visible through the glass. Spirit prison. Death capture. Style: Polished mobile game icon, AAA quality. Format: 512x512, object centered, transparent background.
+
+134. [ ] **Anti Matter**
+Game asset icon, centered composition, single object, perfect circular frame, isometric 3D render, transparent PNG background. A sphere with completely inverted colors - where shadows should be bright, where light should be dark. Reality negation. Opposite physics. Style: Polished mobile game icon, AAA quality. Format: 512x512, object centered, transparent background.
+
+135. [ ] **Time Rift**
+Game asset icon, centered composition, single object, perfect circular frame, isometric 3D render, transparent PNG background. A circular tear in the fabric of reality/sky. Through the rift, giant clockwork gears are visible. Temporal dimension breach. Time break. Style: Polished mobile game icon, AAA quality. Format: 512x512, object centered, transparent background.
+
+---
+
+### Tier 8: Celestial (Cosmic Horror) — 5 Items
+
+136. [ ] **God Eye**
+Game asset icon, centered composition, single object, perfect circular frame, isometric 3D render, transparent PNG background. A giant hyper-realistic human eye floating in a circular nebula cloud. The iris contains galaxies. All-seeing cosmic entity. Lovecraftian deity. Style: Polished mobile game icon, AAA quality. Format: 512x512, object centered, transparent background.
+
+137. [ ] **Bible Angel**
+Game asset icon, centered composition, single object, perfect circular frame, isometric 3D render, transparent PNG background. Biblical accurate angel - wheels within wheels covered in eyes, forming a circular composition. Golden rings. Burning with holy light. Terrifying divine. Style: Polished mobile game icon, AAA quality. Format: 512x512, object centered, transparent background.
+
+138. [ ] **Gold Spiral**
+Game asset icon, centered composition, single object, perfect circular frame, isometric 3D render, transparent PNG background. A golden Fibonacci spiral made of glowing particles. Perfect mathematical ratio. Sacred geometry. Divine proportion manifestation. Style: Polished mobile game icon, AAA quality. Format: 512x512, object centered, transparent background.
+
+139. [ ] **Bottled Aurora**
+Game asset icon, centered composition, single object, perfect circular frame, isometric 3D render, transparent PNG background. Top-down view of a glass bottle containing the northern lights. Aurora borealis swirls in green and purple inside. Captured natural wonder. Style: Polished mobile game icon, AAA quality. Format: 512x512, object centered, transparent background.
+
+140. [ ] **Star Death**
+Game asset icon, centered composition, single object, perfect circular frame, isometric 3D render, transparent PNG background. A supernova explosion ring captured mid-blast. Circular shockwave of stellar material expands outward. Star's dying breath. Cosmic cataclysm. Style: Polished mobile game icon, AAA quality. Format: 512x512, object centered, transparent background.
+
+---
+
+### Tier 9: Cosmic (Meta) — 2 Items
+
+141. [ ] **Schrod Cat**
+Game asset icon, centered composition, single object, perfect circular frame, isometric 3D render, transparent PNG background. Top-down view of a closed box. Two glowing cat eyes peek through a crack - simultaneously blue (alive) and red (dead). Quantum superposition. Schrodinger's paradox. Style: Polished mobile game icon, AAA quality. Format: 512x512, object centered, transparent background.
+
+142. [ ] **Hand God**
+Game asset icon, centered composition, single object, perfect circular frame, isometric 3D render, transparent PNG background. A giant stone hand (Michelangelo's Creation of Adam style) holding a tiny solar system with orbiting planets. Creator deity. Universal power. Style: Polished mobile game icon, AAA quality. Format: 512x512, object centered, transparent background.
 
 ---
 
 ## 🟢 COMPLETED (7 Items)
 
 ### Tier 6: Legendary
-130. [x] **Angel Halo**: A ring of pure white light. Floating white feathers drift down from it.
+143. [x] **Angel Halo**: A ring of pure white light. Floating white feathers drift down from it.
 
 ### Tier 7: Mythic
-131. [x] **Singularity**: A single point of blinding white light. Space around it creates a lensing distortion effect.
-136. [x] **Pixel Decay**: A beautiful landscape circle that is dissolving into digital pixel dust on the right side.
-137. [x] **Ascend God**: A human silhouette in a circle. The body is turning into pure golden light rays.
-138. [x] **Zero Point**: An explosion of white energy frozen in time. Debris floats motionless.
+144. [x] **Singularity**: A single point of blinding white light. Space around it creates a lensing distortion effect.
+145. [x] **Pixel Decay**: A beautiful landscape circle that is dissolving into digital pixel dust on the right side.
+146. [x] **Ascend God**: A human silhouette in a circle. The body is turning into pure golden light rays.
+147. [x] **Zero Point**: An explosion of white energy frozen in time. Debris floats motionless.
 
 ### Tier 9: Cosmic
-147. [x] **Dark Matter**: A swirling cloud of purple and black smoke that looks heavy and oily.
+148. [x] **Dark Matter**: A swirling cloud of purple and black smoke that looks heavy and oily.
 
 ### Tier 10: Divine
 149. [x] **Dev Grail**: A golden chalice overflowing not with wine, but with glowing green binary code digits.

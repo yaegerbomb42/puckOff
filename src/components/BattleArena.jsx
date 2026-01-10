@@ -16,6 +16,7 @@ import ProjectileSystem from './ProjectileSystem';
 import ProceduralArena from './ProceduralArena';
 import { useMultiplayer } from '../hooks/useMultiplayer';
 import { useAuth } from '../contexts/AuthContext';
+import DebugLogger, { logGame } from './DebugLogger';
 import {
     PHYSICS_CONFIG,
     getRandomPowerupPosition,
@@ -222,6 +223,7 @@ export default function BattleArena() {
     // ========== GAME INITIALIZATION ==========
     useEffect(() => {
         if (multiplayer.gameState === 'playing') {
+            logGame(`Game Started: ${gameMode} mode`);
             // Initialize player states
             const initialStocks = {};
             const initialScores = {};
@@ -428,6 +430,7 @@ export default function BattleArena() {
     // ========== STOMP HANDLER ==========
     const handleStomp = useCallback((targetId, stompData) => {
         const damage = calculateStompDamage(stompData.velocity || 10);
+        logGame(`Stomp! Target: ${targetId} Damage: ${damage}`, 'warn');
 
         setPlayerDamage(prev => ({
             ...prev,
@@ -454,6 +457,7 @@ export default function BattleArena() {
 
     // ========== KNOCKOUT HANDLER ==========
     const handleKnockout = useCallback((knockedOutPlayerId) => {
+        logGame(`Knockout: ${knockedOutPlayerId}`, 'error');
         const pos = playerPositions[knockedOutPlayerId] || [0, 0, 0];
         const player = multiplayer.players.find(p => p.id === knockedOutPlayerId);
         const color = player?.color || '#ffffff';
@@ -677,6 +681,8 @@ export default function BattleArena() {
                         multiplayer.selectMode?.(mode);
                     }}
                     onBack={multiplayer.leaveRoom}
+                    connectionError={multiplayer.connectionError}
+                    onPlayOffline={multiplayer.enableOfflineMode}
                 />
             );
         }
@@ -701,6 +707,7 @@ export default function BattleArena() {
 
     return (
         <div className="game-container">
+            <DebugLogger visible={process.env.NODE_ENV !== 'production' || multiplayer.isOffline} />
             {renderOverlay()}
 
             <Canvas

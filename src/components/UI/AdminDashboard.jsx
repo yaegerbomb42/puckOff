@@ -45,10 +45,20 @@ export default function AdminDashboard({ onClose }) {
                 if (roomsRes.ok) {
                     const roomsData = await roomsRes.json();
                     setRooms(roomsData.rooms || []);
-                    setMetrics({ playersOnline: roomsData.playersOnline || 0 });
+                    setMetrics(prev => ({ ...prev, playersOnline: roomsData.playersOnline || 0 }));
+                }
+
+                const revenueRes = await fetch(`${serverUrl}/api/admin/revenue`);
+                if (revenueRes.ok) {
+                    const revenueData = await revenueRes.json();
+                    setMetrics(prev => ({
+                        ...prev,
+                        totalRevenue: revenueData.totalRevenue,
+                        transactions: revenueData.transactions
+                    }));
                 }
             } catch (e) {
-                console.log('Could not fetch server data');
+                console.log('Could not fetch server data', e);
             }
         } catch (error) {
             console.error('Error loading admin data:', error);
@@ -76,6 +86,15 @@ export default function AdminDashboard({ onClose }) {
         if (window.confirm('Reset all your icons? This cannot be undone.')) {
             await resetIcons();
             alert('Icons reset successfully');
+            loadData();
+        }
+    };
+
+    const handleUnlockAll = async () => {
+        if (window.confirm('Unlock ALL 150 skins for your account?')) {
+            const allIcons = Array.from({ length: 150 }, (_, i) => i + 1);
+            await addIcons(allIcons); // AuthContext will merge these
+            alert('🐋 WHALE STATUS GRANTED: All 150 icons unlocked!');
             loadData();
         }
     };
@@ -151,6 +170,14 @@ export default function AdminDashboard({ onClose }) {
                         onClick={() => setActiveTab('metrics')}
                     >📊 Metrics</button>
                     <button
+                        className={activeTab === 'revenue' ? 'active' : ''}
+                        onClick={() => setActiveTab('revenue')}
+                    >💰 Revenue</button>
+                    <button
+                        className={activeTab === 'store_links' ? 'active' : ''}
+                        onClick={() => setActiveTab('store_links')}
+                    >🛒 Links</button>
+                    <button
                         className={activeTab === 'tools' ? 'active' : ''}
                         onClick={() => setActiveTab('tools')}
                     >🛠️ Tools</button>
@@ -225,6 +252,67 @@ export default function AdminDashboard({ onClose }) {
                         </div>
                     )}
 
+                    {activeTab === 'revenue' && (
+                        <div className="revenue-tab">
+                            <div className="section-header">
+                                <span>Real Revenue (Stripe)</span>
+                                <button onClick={loadData}>🔄 Refresh</button>
+                            </div>
+                            <div className="revenue-cards">
+                                <div className="metric-card money">
+                                    <div className="metric-value">
+                                        ${metrics.totalRevenue || '0.00'}
+                                    </div>
+                                    <div className="metric-label">Total Earnings</div>
+                                </div>
+                                <div className="metric-card">
+                                    <div className="metric-value">
+                                        {metrics.transactions?.length || 0}
+                                    </div>
+                                    <div className="metric-label">Transactions</div>
+                                </div>
+                            </div>
+
+                            <div className="transactions-list">
+                                <h4>Recent Transactions</h4>
+                                {metrics.transactions?.slice(0, 10).map(tx => (
+                                    <div key={tx.id} className="tx-row">
+                                        <span className="tx-date">{new Date(tx.date).toLocaleDateString()}</span>
+                                        <span className="tx-email">{tx.email}</span>
+                                        <span className="tx-item">{tx.packType}</span>
+                                        <span className="tx-amount">+${(tx.amount / 100).toFixed(2)}</span>
+                                    </div>
+                                ))}
+                                {(!metrics.transactions || metrics.transactions.length === 0) && (
+                                    <div className="empty">No real transactions recorded yet.</div>
+                                )}
+                            </div>
+                        </div>
+                    )}
+
+                    {activeTab === 'store_links' && (
+                        <div className="store-links-tab">
+                            <h3>🛒 Store Testing Links (Stripe)</h3>
+                            <div className="link-list">
+                                <div className="link-row">
+                                    <span className="link-label">Single Pack ($0.50)</span>
+                                    <input type="text" readOnly value="https://buy.stripe.com/5kQeV577v6FsgIZ0m1aIM07" />
+                                    <button onClick={() => window.open("https://buy.stripe.com/5kQeV577v6FsgIZ0m1aIM07")}>Test</button>
+                                </div>
+                                <div className="link-row">
+                                    <span className="link-label">10-Pack Bundle ($3.00)</span>
+                                    <input type="text" readOnly value="https://buy.stripe.com/3cIbIT0J78NAgIZ0m1aIM06" />
+                                    <button onClick={() => window.open("https://buy.stripe.com/3cIbIT0J78NAgIZ0m1aIM06")}>Test</button>
+                                </div>
+                                <div className="link-row">
+                                    <span className="link-label">Unlock All ($99.99)</span>
+                                    <input type="text" readOnly value="https://buy.stripe.com/6oU4grcrPgg29gx0m1aIM08" />
+                                    <button onClick={() => window.open("https://buy.stripe.com/6oU4grcrPgg29gx0m1aIM08")}>Test</button>
+                                </div>
+                            </div>
+                        </div>
+                    )}
+
                     {activeTab === 'tools' && (
                         <div className="tools-tab">
                             <h3>Admin Tools</h3>
@@ -234,6 +322,9 @@ export default function AdminDashboard({ onClose }) {
                                 <button className="tool-btn grant" onClick={() => handleGrantPack(user?.uid)}>
                                     🎁 Grant Yourself 3 Icons
                                 </button>
+                                <button className="tool-btn whale" onClick={handleUnlockAll}>
+                                    🐋 Unlock ALL Skins
+                                </button>
                                 <button className="tool-btn reset" onClick={handleResetIcons}>
                                     🗑️ Reset Your Icons
                                 </button>
@@ -241,6 +332,7 @@ export default function AdminDashboard({ onClose }) {
 
                             <div className="tool-info">
                                 <p>• Grant Pack: Adds 3 random icons to your account</p>
+                                <p>• Unlock ALL: Instantly grants 1-150 icons (Whale Status)</p>
                                 <p>• Reset Icons: Clears all your icons for testing</p>
                             </div>
                         </div>
@@ -339,11 +431,47 @@ export default function AdminDashboard({ onClose }) {
                     display: flex; gap: 1rem; justify-content: center;
                     margin: 2rem 0;
                 }
+
+                /* Revenue Tab */
+                .revenue-cards { display: flex; gap: 1rem; justify-content: center; margin-top: 1rem; margin-bottom: 2rem; }
+                .metric-card.money .metric-value { color: #00ff87; }
+                
+                .transactions-list h4 { margin-bottom: 0.5rem; color: #888; }
+                .tx-row {
+                    display: flex; justify-content: space-between; padding: 0.8rem;
+                    background: rgba(255,255,255,0.05); border-bottom: 1px solid rgba(255,255,255,0.05);
+                    font-size: 0.9rem;
+                }
+                .tx-row:first-of-type { border-top-left-radius: 10px; border-top-right-radius: 10px; }
+                .tx-row:last-of-type { border-bottom-left-radius: 10px; border-bottom-right-radius: 10px; border-bottom: none; }
+                .tx-date { color: #666; width: 80px; }
+                .tx-email { flex: 1; text-align: left; padding-left: 1rem; color: #aaa; }
+                .tx-item { color: #e0e0e0; margin-right: 1rem; }
+                .tx-amount { color: #00ff87; font-weight: bold; width: 60px; text-align: right; }
+
+                /* Links Tab */
+                .link-list { display: flex; flex-direction: column; gap: 1rem; }
+                .link-row { 
+                    display: flex; gap: 1rem; align-items: center; 
+                    background: rgba(255,255,255,0.05); padding: 1rem;
+                    border-radius: 10px;
+                }
+                .link-label { width: 150px; font-weight: bold; color: #00d4ff; }
+                .link-row input { 
+                    flex: 1; background: #000; border: 1px solid #444; 
+                    color: #888; padding: 0.5rem; border-radius: 5px;
+                }
+                .link-row button {
+                    padding: 0.5rem 1rem; background: #ff006e; border: none;
+                    color: white; border-radius: 5px; cursor: pointer;
+                }
+
                 .tool-btn {
                     padding: 1rem 2rem; border: none; border-radius: 10px;
                     cursor: pointer; font-weight: bold; font-size: 1rem;
                 }
                 .tool-btn.grant { background: #00ff87; color: #000; }
+                .tool-btn.whale { background: #ffd700; color: #000; }
                 .tool-btn.reset { background: #ff006e; color: #fff; }
                 .tool-info {
                     background: rgba(0,0,0,0.3); padding: 1rem;

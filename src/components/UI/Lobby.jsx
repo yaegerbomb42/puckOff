@@ -18,7 +18,9 @@ export default function Lobby({
     onQuickJoin,
     onReady,
     onVoteMap,
-    onBack
+    onBack,
+    connectionError,
+    onPlayOffline
 }) {
     const { user, inventory, loginWithGoogle, loginWithEmail, signupWithEmail, logout } = useAuth();
 
@@ -162,7 +164,18 @@ export default function Lobby({
                 <p className="game-subtitle">⚡ Fast-Paced Multiplayer Mayhem ⚡</p>
 
                 {!connected ? (
-                    <div className="connection-status">Connecting to server...</div>
+                    <div className="connection-status">
+                        {connectionError ? (
+                            <div className="error-container">
+                                <div className="error-msg">⚠️ Server Unreachable</div>
+                                <button className="btn btn-primary shimmer" onClick={onPlayOffline}>
+                                    PLAY OFFLINE MODE
+                                </button>
+                            </div>
+                        ) : (
+                            "Connecting to server..."
+                        )}
+                    </div>
                 ) : !roomCode ? (
                     <div className="menu-options">
                         <input
@@ -282,6 +295,7 @@ export default function Lobby({
                     display: flex; align-items: center; justify-content: center;
                     font-family: 'Orbitron', 'Inter', sans-serif;
                     color: white;
+                    z-index: 100;
                 }
                 .lobby-container {
                     text-align: center; width: 100%; max-width: 500px; padding: 2rem;
@@ -439,6 +453,9 @@ export default function Lobby({
                     background: rgba(0,0,0,0.3); border-radius: 15px; 
                     padding: 1rem; margin: 1rem 0;
                 }
+                .error-container { display: flex; flex-direction: column; gap: 1rem; align-items: center; }
+                .error-msg { color: #ff006e; font-weight: bold; font-size: 1.2rem; }
+                
                 .player-count { color: #888; margin-bottom: 0.5rem; }
                 .player-item {
                     display: flex; align-items: center; gap: 1rem;

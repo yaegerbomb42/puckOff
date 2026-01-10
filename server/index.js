@@ -111,6 +111,17 @@ async function fulfillPurchase(email, packType) {
             console.log(`🎁 Granted ${packsToAdd} packs to ${email}`);
         }
 
+        const paymentData = {
+            userId: uid,
+            email,
+            packType,
+            amount: packType === 'unlockAll' ? 9999 : (packType === 'bundle10' ? 300 : 50),
+            timestamp: admin.firestore.FieldValue.serverTimestamp(),
+            status: 'completed'
+        };
+        await db.collection('payments').add(paymentData);
+        console.log('💰 Payment recorded in history');
+
         await userRef.set(userData, { merge: true });
         console.log('✅ Database updated successfully');
 

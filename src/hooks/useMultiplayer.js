@@ -230,11 +230,26 @@ export function useMultiplayer() {
     }, [socket]);
 
     const setReady = useCallback((ready) => {
+        if (isOffline) {
+            setGameState('playing');
+            setPlayers(prev => prev.map(p => ({ ...p, ready: true })));
+            if (!seed) setSeed(Math.floor(Math.random() * 1000000));
+            return;
+        }
         if (!socket) return;
         socket.emit('playerReady', { ready });
-    }, [socket]);
+    }, [socket, isOffline, seed]);
 
-    const leaveRoom = useCallback(() => {
+    const voteMap = useCallback((mapName) => {
+        if (isOffline) {
+            setSelectedMap(mapName);
+            return;
+        }
+        if (!socket) return;
+        socket.emit('voteMap', { mapName });
+    }, [socket, isOffline]);
+
+    const selectMode = useCallback((mode) => {
         if (socket) {
             socket.disconnect();
             socket.connect();
@@ -250,16 +265,7 @@ export function useMultiplayer() {
 
     // ========== GAME SETUP ACTIONS ==========
 
-    const voteMap = useCallback((mapId) => {
-        if (!socket) return;
-        socket.emit('voteMap', { mapId });
-    }, [socket]);
-
-    const selectMode = useCallback((mode) => {
-        if (!socket) return;
-        setSelectedMode(mode);
-        socket.emit('selectMode', { mode });
-    }, [socket]);
+    // Duplicates removed - using unified definitions above
 
     // ========== GAMEPLAY ACTIONS ==========
 
@@ -333,6 +339,11 @@ export function useMultiplayer() {
         seed,
         mapVotes,
         timer, // <--- Exposed to component
+
+        // Offline / Error status
+        connectionError,
+        isOffline,
+        enableOfflineMode,
 
         // Room actions
         createRoom,

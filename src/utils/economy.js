@@ -1,6 +1,8 @@
 // Economy System - 10 Tier Rarity with Burn/Forge Mechanics
 
 // ============ TIER DEFINITIONS ============
+import rawIconData from './icons.json';
+
 export const TIERS = {
     1: { id: 1, name: 'Common', color: '#9ca3af', dropRate: 0.40, theme: 'Textured Materials', isMystery: false },
     2: { id: 2, name: 'Uncommon', color: '#22c55e', dropRate: 0.20, theme: 'Clean Objects', isMystery: false },
@@ -71,8 +73,6 @@ export function openPack(packType = 'single') {
 }
 
 // ============ ICON DATABASE ============
-import rawIconData from './icons.json';
-
 // Use the imported JSON data directly
 const ICON_DATABASE = rawIconData;
 

@@ -1,21 +1,18 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { io } from 'socket.io-client';
-
-// Server URL - will use Render when deployed
-let SERVER_URL = process.env.REACT_APP_SERVER_URL || 'http://localhost:3002';
-if (SERVER_URL && !SERVER_URL.startsWith('http')) {
-    SERVER_URL = `https://${SERVER_URL}`;
-}
+import CONFIG from '../utils/config';
 
 export function useMultiplayer() {
     const [socket, setSocket] = useState(null);
     const [connected, setConnected] = useState(false);
-    const [roomCode, setRoomCode] = useState(null);
-    const [playerId, setPlayerId] = useState(null);
-    const [playerColor, setPlayerColor] = useState('#00d4ff');
-    const [playerIndex, setPlayerIndex] = useState(0);
+    const [roomCode, setRoomCode] = useState(localStorage.getItem(CONFIG.STORAGE_KEYS.ROOM_CODE) || null);
+    const [playerId, setPlayerId] = useState(localStorage.getItem(CONFIG.STORAGE_KEYS.PLAYER_ID) || null);
     const [players, setPlayers] = useState([]);
     const [gameState, setGameState] = useState('disconnected'); // disconnected, lobby, playing, ended
+
+    // ... rest of state ...
+    const [playerColor, setPlayerColor] = useState('#00d4ff');
+    const [playerIndex, setPlayerIndex] = useState(0);
     const [scores, setScores] = useState({});
     const [serverPowerups, setServerPowerups] = useState([]);
     const [winner, setWinner] = useState(null);
@@ -23,23 +20,52 @@ export function useMultiplayer() {
     const [selectedMode, setSelectedMode] = useState('knockout');
     const [seed, setSeed] = useState(null);
     const [mapVotes, setMapVotes] = useState({});
+    const [timer, setTimer] = useState(null); // Server authoritative timer
 
     // Event handlers ref
     const handlersRef = useRef({});
 
     // Connect to server
     useEffect(() => {
-        const newSocket = io(SERVER_URL, {
+        const newSocket = io(CONFIG.SERVER_URL, {
             transports: ['websocket', 'polling'],
             reconnection: true,
-            reconnectionAttempts: 5,
-            reconnectionDelay: 1000
+            reconnectionAttempts: CONFIG.CONNECTION.RECONNECTION_ATTEMPTS,
+            reconnectionDelay: CONFIG.CONNECTION.RECONNECTION_DELAY
         });
 
         newSocket.on('connect', () => {
-            console.log('✅ Connected to server');
+            console.log('✅ Connected to server:', CONFIG.SERVER_URL);
             setConnected(true);
             setSocket(newSocket);
+
+            // Attempt session recovery if we have data
+            const savedRoom = localStorage.getItem(CONFIG.STORAGE_KEYS.ROOM_CODE);
+            const savedId = localStorage.getItem(CONFIG.STORAGE_KEYS.PLAYER_ID);
+            const savedName = localStorage.getItem(CONFIG.STORAGE_KEYS.PLAYER_NAME);
+
+            if (savedRoom && savedId && savedName) {
+                console.log('🔄 Attempting session recovery for room:', savedRoom);
+                newSocket.emit('joinRoom', {
+                    roomCode: savedRoom,
+                    playerName: savedName,
+                    playerId: savedId // Sending ID hints to server this is a rejoin
+                }, (response) => {
+                    if (response.success) {
+                        console.log('✅ Session recovered!');
+                        setRoomCode(response.roomCode);
+                        setPlayerId(response.playerId);
+                        setPlayerColor(response.color);
+                        setPlayerIndex(response.playerIndex);
+                        setPlayers(response.players);
+                        setGameState('lobby');
+                    } else {
+                        // Invalid session, clear storage
+                        localStorage.removeItem(CONFIG.STORAGE_KEYS.ROOM_CODE);
+                        localStorage.removeItem(CONFIG.STORAGE_KEYS.PLAYER_ID);
+                    }
+                });
+            }
         });
 
         newSocket.on('connect_error', (err) => {
@@ -51,6 +77,8 @@ export function useMultiplayer() {
             setConnected(false);
             setGameState('disconnected');
         });
+
+        // ... (rest of listeners omitted for brevity, keeping existing) ...
 
         newSocket.on('playerUpdate', (playerList) => {
             setPlayers(playerList);
@@ -132,13 +160,17 @@ export function useMultiplayer() {
             handlersRef.current.onRewardEarned?.({ packs, credits, isWinner });
         });
 
+        newSocket.on('timerUpdate', (timeRemaining) => {
+            setTimer(timeRemaining);
+        });
+
         return () => {
             newSocket.disconnect();
         };
     }, []);
 
     // ========== ROOM ACTIONS ==========
-    
+
     const createRoom = useCallback((playerName, userEmail) => {
         if (!socket) return;
         socket.emit('createRoom', { playerName, userEmail }, (response) => {
@@ -149,6 +181,11 @@ export function useMultiplayer() {
                 setPlayerIndex(response.playerIndex);
                 setPlayers(response.players);
                 setGameState('lobby');
+
+                // Persist session
+                localStorage.setItem(CONFIG.STORAGE_KEYS.ROOM_CODE, response.roomCode);
+                localStorage.setItem(CONFIG.STORAGE_KEYS.PLAYER_ID, response.playerId);
+                localStorage.setItem(CONFIG.STORAGE_KEYS.PLAYER_NAME, playerName);
             }
         });
     }, [socket]);
@@ -164,6 +201,12 @@ export function useMultiplayer() {
                     setPlayerIndex(response.playerIndex);
                     setPlayers(response.players);
                     setGameState('lobby');
+
+                    // Persist session
+                    localStorage.setItem(CONFIG.STORAGE_KEYS.ROOM_CODE, response.roomCode);
+                    localStorage.setItem(CONFIG.STORAGE_KEYS.PLAYER_ID, response.playerId);
+                    localStorage.setItem(CONFIG.STORAGE_KEYS.PLAYER_NAME, playerName);
+
                     resolve(response);
                 } else {
                     reject(response.error);
@@ -289,6 +332,7 @@ export function useMultiplayer() {
         selectedMode,
         seed,
         mapVotes,
+        timer, // <--- Exposed to component
 
         // Room actions
         createRoom,

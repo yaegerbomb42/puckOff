@@ -16,10 +16,10 @@ import ProjectileSystem from './ProjectileSystem';
 import ProceduralArena from './ProceduralArena';
 import { useMultiplayer } from '../hooks/useMultiplayer';
 import { useAuth } from '../contexts/AuthContext';
-import { 
-    PHYSICS_CONFIG, 
-    getRandomPowerupPosition, 
-    getRandomPowerupType, 
+import {
+    PHYSICS_CONFIG,
+    getRandomPowerupPosition,
+    getRandomPowerupType,
     getSpawnPosition,
     calculateStompDamage
 } from '../utils/physics';
@@ -98,17 +98,17 @@ function GameScene({
             {/* Environment */}
             <Environment preset={mapData?.biome?.skybox || 'sunset'} />
             <ambientLight intensity={0.6} />
-            <directionalLight 
-                position={[10, 20, 10]} 
-                intensity={1.3} 
+            <directionalLight
+                position={[10, 20, 10]}
+                intensity={1.3}
                 castShadow
                 shadow-mapSize={[2048, 2048]}
             />
             <fog attach="fog" args={[mapData?.biome?.fog?.color || '#d6e4ff', 20, 80]} />
 
             {/* Dynamic Camera */}
-            <DynamicCamera 
-                playerPositions={playerPositions} 
+            <DynamicCamera
+                playerPositions={playerPositions}
                 localPlayerId={localPlayerId}
                 shake={screenShake}
                 knockoutTarget={knockoutTarget}
@@ -184,16 +184,16 @@ export default function BattleArena() {
     const [effects, setEffects] = useState([]);
     const [knockoutMessage, setKnockoutMessage] = useState(null);
     const [knockoutTarget, setKnockoutTarget] = useState(null);
-    
+
     // Visual effects
     const [isPaused, setIsPaused] = useState(false);
     const [screenShake, setScreenShake] = useState(0);
     const [slowmo, setSlowmo] = useState(false);
-    
+
     // Timer - FIX: Actually counts down now
     const [gameTimer, setGameTimer] = useState(180);
     const timerRef = useRef(null);
-    
+
     // Stats tracking
     const [matchStats, setMatchStats] = useState({
         totalDamage: 0,
@@ -203,7 +203,7 @@ export default function BattleArena() {
     });
     const [combo, setCombo] = useState(0);
     const lastHitTime = useRef(0);
-    
+
     // Effect ID counter - FIX: Single atomic counter
     const nextIdRef = useRef(0);
     const getNextId = useCallback(() => nextIdRef.current++, []);
@@ -235,17 +235,24 @@ export default function BattleArena() {
             setGameTimer(modeConfig.timeLimit || 180);
             setMatchStats({ totalDamage: 0, maxCombo: 0, stomps: 0, knockouts: 0 });
             setCombo(0);
-            
+
             // Set map seed
             setMapSeed(multiplayer.seed || Math.floor(Math.random() * 1000000));
-            
-            // Start timer - FIX: Actually decrements
+
+            // Start timer - FIX: Hybrid Server/Local
             if (modeConfig.timeLimit > 0) {
+                // If server provided timer, use it
+                if (multiplayer.timer !== null && multiplayer.timer !== undefined) {
+                    setGameTimer(multiplayer.timer);
+                }
+
+                // Run local countdown for smoothness, but sync with server on updates
                 timerRef.current = setInterval(() => {
                     setGameTimer(prev => {
+                        // If we have a fresh server time, let the effect below handle it? 
+                        // Actually, let's just decrement locally for smoothness
                         if (prev <= 1) {
                             clearInterval(timerRef.current);
-                            // Time's up - trigger game end
                             checkWinCondition(true);
                             return 0;
                         }
@@ -254,7 +261,7 @@ export default function BattleArena() {
                 }, 1000);
             }
         }
-        
+
         return () => {
             if (timerRef.current) {
                 clearInterval(timerRef.current);
@@ -263,16 +270,27 @@ export default function BattleArena() {
         };
     }, [multiplayer.gameState, multiplayer.players, multiplayer.seed, modeConfig]);
 
+    // ========== SYNC SERVER TIMER ==========
+    useEffect(() => {
+        if (multiplayer.timer !== null && multiplayer.timer !== undefined) {
+            // Resync local timer if it drifts too far (>2s) or just trust server?
+            // For now, hard sync to ensure everyone sees the same end time
+            if (Math.abs(gameTimer - multiplayer.timer) > 1) {
+                setGameTimer(multiplayer.timer);
+            }
+        }
+    }, [multiplayer.timer]);
+
     // ========== WIN CONDITION CHECK ==========
     const checkWinCondition = useCallback((timeUp = false) => {
         const mode = modeConfig;
         let winnerId = null;
-        
+
         if (mode.winCondition === 'stocks') {
             // Check if only one player has stocks
             const playersWithStocks = Object.entries(playerStocks)
                 .filter(([_, stocks]) => stocks > 0);
-            
+
             if (playersWithStocks.length === 1) {
                 winnerId = playersWithStocks[0][0];
             }
@@ -280,25 +298,25 @@ export default function BattleArena() {
             // Highest score when time runs out
             const sortedScores = Object.entries(playerScores)
                 .sort(([, a], [, b]) => b - a);
-            
+
             if (sortedScores.length > 0) {
                 winnerId = sortedScores[0][0];
             }
         } else if (mode.winCondition === 'lastStanding') {
             const playersWithStocks = Object.entries(playerStocks)
                 .filter(([_, stocks]) => stocks > 0);
-            
+
             if (playersWithStocks.length === 1) {
                 winnerId = playersWithStocks[0][0];
             }
         }
-        
+
         if (winnerId) {
             // Report game end
             if (multiplayer.connected) {
                 multiplayer.reportGameEnd?.(winnerId, playerScores, matchStats);
             }
-            
+
             // Update local stats
             if (updateMatchStats && user) {
                 updateMatchStats({
@@ -320,7 +338,7 @@ export default function BattleArena() {
         const playerPos = playerPositions[multiplayer.playerId];
         if (!playerPos) return;
 
-        const powerupInfo = typeof activePowerup === 'string' 
+        const powerupInfo = typeof activePowerup === 'string'
             ? getPowerupInfo(activePowerup)
             : activePowerup;
 
@@ -351,10 +369,10 @@ export default function BattleArena() {
     // ========== IMPACT HANDLER ==========
     const handleImpact = useCallback((intensity) => {
         const scaledIntensity = Math.min(intensity, 20);
-        
+
         setIsPaused(true);
         setScreenShake(scaledIntensity * 0.015);
-        
+
         // Combo tracking
         const now = Date.now();
         if (now - lastHitTime.current < 2000) {
@@ -391,13 +409,13 @@ export default function BattleArena() {
 
     const handleCollision = useCallback((impactForce) => {
         const damage = Math.floor(impactForce * 2);
-        
+
         setPlayerDamage(prev => {
             const current = prev[multiplayer.playerId] || 0;
             const newDamage = current + damage;
             return { ...prev, [multiplayer.playerId]: newDamage };
         });
-        
+
         setMatchStats(s => ({ ...s, totalDamage: s.totalDamage + damage }));
 
         if (multiplayer.connected) {
@@ -410,15 +428,15 @@ export default function BattleArena() {
     // ========== STOMP HANDLER ==========
     const handleStomp = useCallback((targetId, stompData) => {
         const damage = calculateStompDamage(stompData.velocity || 10);
-        
+
         setPlayerDamage(prev => ({
             ...prev,
             [targetId]: (prev[targetId] || 0) + damage
         }));
-        
+
         setMatchStats(s => ({ ...s, stomps: s.stomps + 1 }));
         handleImpact(15);
-        
+
         // Stomp effect
         const targetPos = playerPositions[targetId];
         if (targetPos) {
@@ -443,7 +461,7 @@ export default function BattleArena() {
         // Dramatic effects
         setSlowmo(true);
         setKnockoutTarget(knockedOutPlayerId);
-        
+
         setTimeout(() => {
             setSlowmo(false);
             setKnockoutTarget(null);
@@ -545,7 +563,7 @@ export default function BattleArena() {
             ...prev,
             [targetId]: (prev[targetId] || 0) + damage
         }));
-        
+
         setProjectiles(prev => prev.filter(p => p.id !== projId));
     }, []);
 
@@ -555,7 +573,7 @@ export default function BattleArena() {
         if (multiplayer.connected) return;
 
         const spawnRate = modeConfig.powerupSpawnRate || 1;
-        const interval = (PHYSICS_CONFIG.powerups.minSpawnInterval + 
+        const interval = (PHYSICS_CONFIG.powerups.minSpawnInterval +
             Math.random() * (PHYSICS_CONFIG.powerups.maxSpawnInterval - PHYSICS_CONFIG.powerups.minSpawnInterval)) / spawnRate;
 
         const spawnInterval = setInterval(() => {
@@ -582,7 +600,7 @@ export default function BattleArena() {
                 const myLoadout = playerLoadouts[multiplayer.playerId] || DEFAULT_LOADOUT || ['speed_boost', 'rocket', 'shield'];
                 const randomId = myLoadout[Math.floor(Math.random() * myLoadout.length)];
                 const info = getPowerupInfo(randomId);
-                
+
                 return { ...prev, [multiplayer.playerId]: info };
             });
         }, 5000);
@@ -665,8 +683,8 @@ export default function BattleArena() {
 
         if (multiplayer.gameState === 'ended') {
             const winnerId = multiplayer.winner || Object.entries(playerScores)
-                .sort(([,a], [,b]) => b - a)[0]?.[0];
-            
+                .sort(([, a], [, b]) => b - a)[0]?.[0];
+
             return (
                 <VictoryScreen
                     winner={winnerId === multiplayer.playerId ? 'You' : 'Opponent'}

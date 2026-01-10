@@ -27,6 +27,8 @@
   "scripts": {
     "start": "react-scripts start",
     "server": "node server/index.js",
+    "kill-ports": "lsof -t -i:3000 -i:3002 | xargs kill -9 2>/dev/null || true",
+    "predev": "npm run kill-ports",
     "dev": "concurrently \"npm run server\" \"npm start\"",
     "build": "react-scripts build",
     "test": "react-scripts test",

@@ -169,7 +169,7 @@ function GameScene({
 // ============================================
 export default function BattleArena() {
     const multiplayer = useMultiplayer();
-    const { user, inventory, updateMatchStats } = useAuth() || {};
+    const { user, inventory, updateMatchStats, isAdmin } = useAuth() || {};
 
     // ========== GAME STATE ==========
     const [gameMode, setGameMode] = useState('knockout');
@@ -707,7 +707,7 @@ export default function BattleArena() {
 
     return (
         <div className="game-container">
-            <DebugLogger visible={process.env.NODE_ENV !== 'production' || multiplayer.isOffline} />
+            {isAdmin && <DebugLogger visible={true} />}
             {renderOverlay()}
 
             <Canvas

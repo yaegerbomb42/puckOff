@@ -78,7 +78,7 @@ export function AuthProvider({ children }) {
                     stats: { ...DEFAULT_INVENTORY.stats, ...data.stats }
                 });
                 setIsAdmin(data.isAdmin || false);
-                
+
                 // Update last login
                 await updateDoc(doc(db, 'users', uid), {
                     lastLogin: new Date().toISOString()
@@ -112,7 +112,7 @@ export function AuthProvider({ children }) {
     }, [user]);
 
     // ========== AUTH METHODS ==========
-    
+
     async function loginWithGoogle() {
         try {
             await signInWithPopup(auth, googleProvider);
@@ -149,7 +149,7 @@ export function AuthProvider({ children }) {
     }
 
     // ========== ICON MANAGEMENT ==========
-    
+
     const addIcons = useCallback(async (newIcons) => {
         if (!user) return;
         const uniqueIcons = [...new Set([...inventory.icons, ...newIcons])];
@@ -163,7 +163,7 @@ export function AuthProvider({ children }) {
     }, [user, saveInventory]);
 
     // ========== ECONOMY MANAGEMENT ==========
-    
+
     const addCoins = useCallback(async (amount) => {
         if (!user) return;
         try {
@@ -205,7 +205,7 @@ export function AuthProvider({ children }) {
     }, [user, inventory.freePacks]);
 
     // ========== LOADOUT MANAGEMENT ==========
-    
+
     const updateLoadout = useCallback(async (loadoutIndex, newLoadout) => {
         if (!user) return;
         const updatedLoadouts = [...inventory.loadouts];
@@ -219,12 +219,12 @@ export function AuthProvider({ children }) {
     }, [user, saveInventory]);
 
     // ========== STATS MANAGEMENT ==========
-    
+
     const updateMatchStats = useCallback(async (matchResult) => {
         if (!user) return;
-        
+
         const { won, knockouts, damageDealt, stomps, maxCombo } = matchResult;
-        
+
         try {
             // Update stats
             await updateDoc(doc(db, 'users', user.uid), {
@@ -235,17 +235,17 @@ export function AuthProvider({ children }) {
                 'stats.stomps': increment(stomps || 0),
                 'stats.highestCombo': Math.max(inventory.stats.highestCombo, maxCombo || 0)
             });
-            
+
             // Calculate rewards
             const coinsEarned = (won ? 100 : 25) + (knockouts || 0) * 10 + (stomps || 0) * 15;
             const packProgress = (won ? 0.5 : 0.2);
-            
+
             // Award coins and pack progress
             await updateDoc(doc(db, 'users', user.uid), {
                 coins: increment(coinsEarned),
                 packCredits: increment(packProgress)
             });
-            
+
             // Check if earned a free pack
             const newPackCredits = inventory.packCredits + packProgress;
             if (newPackCredits >= 1) {
@@ -254,7 +254,7 @@ export function AuthProvider({ children }) {
                     freePacks: increment(1)
                 });
             }
-            
+
             // Update local state
             setInventory(prev => ({
                 ...prev,
@@ -271,7 +271,7 @@ export function AuthProvider({ children }) {
                     highestCombo: Math.max(prev.stats.highestCombo, maxCombo || 0)
                 }
             }));
-            
+
             return { coinsEarned, earnedPack: newPackCredits >= 1 };
         } catch (error) {
             console.error('Error updating match stats:', error);
@@ -280,7 +280,7 @@ export function AuthProvider({ children }) {
     }, [user, inventory.stats.highestCombo, inventory.packCredits]);
 
     // ========== ACHIEVEMENTS ==========
-    
+
     const unlockAchievement = useCallback(async (achievementId) => {
         if (!user || inventory.achievements.includes(achievementId)) return false;
         try {
@@ -299,7 +299,7 @@ export function AuthProvider({ children }) {
     }, [user, inventory.achievements]);
 
     // ========== ADMIN FUNCTIONS ==========
-    
+
     const resetInventory = useCallback(async () => {
         if (!user) return;
         const resetData = {
@@ -312,35 +312,41 @@ export function AuthProvider({ children }) {
         setInventory(resetData);
     }, [user, inventory.createdAt]);
 
+    const resetIcons = useCallback(async () => {
+        if (!user) return;
+        await saveInventory({ icons: [], equippedIcon: null });
+    }, [user, saveInventory]);
+
     const value = {
         user,
         loading,
         inventory,
         isAdmin,
-        
+
         // Auth
         loginWithGoogle,
         loginWithEmail,
         signupWithEmail,
         logout,
-        
+
         // Icons
         addIcons,
         equipIcon,
-        
+        resetIcons,
+
         // Economy
         addCoins,
         spendCoins,
         useFreePack,
-        
+
         // Loadouts
         updateLoadout,
         setActiveLoadout,
-        
+
         // Stats
         updateMatchStats,
         unlockAchievement,
-        
+
         // Admin
         resetInventory,
         saveInventory

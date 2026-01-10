@@ -22,8 +22,38 @@ export function useMultiplayer() {
     const [mapVotes, setMapVotes] = useState({});
     const [timer, setTimer] = useState(null); // Server authoritative timer
 
+    // Offline / Error State (Missing in previous version)
+    const [isOffline, setIsOffline] = useState(false);
+    const [connectionError, setConnectionError] = useState(null);
+
     // Event handlers ref
     const handlersRef = useRef({});
+
+    const enableOfflineMode = useCallback(() => {
+        setIsOffline(true);
+        setConnected(true); // Fake connection
+        setGameState('lobby');
+        setPlayers([
+            { id: 'offline_p1', name: 'Player 1', color: '#00d4ff', ready: false, isLocal: true },
+            { id: 'offline_bot', name: 'Bot', color: '#ff0000', ready: true, isBot: true }
+        ]);
+        setRoomCode('OFFLINE');
+    }, []);
+
+    const leaveRoom = useCallback(() => {
+        if (socket) {
+            socket.emit('leaveRoom');
+        }
+        setRoomCode(null);
+        setPlayers([]);
+        setGameState('disconnected');
+        setScores({});
+        setWinner(null);
+        setServerPowerups([]);
+        setSeed(null);
+        setIsOffline(false); // Reset offline mode
+        localStorage.removeItem(CONFIG.STORAGE_KEYS.ROOM_CODE);
+    }, [socket]);
 
     // Connect to server
     useEffect(() => {
@@ -38,6 +68,7 @@ export function useMultiplayer() {
             console.log('✅ Connected to server:', CONFIG.SERVER_URL);
             setConnected(true);
             setSocket(newSocket);
+            setConnectionError(null);
 
             // Attempt session recovery if we have data
             const savedRoom = localStorage.getItem(CONFIG.STORAGE_KEYS.ROOM_CODE);
@@ -70,6 +101,7 @@ export function useMultiplayer() {
 
         newSocket.on('connect_error', (err) => {
             console.warn('⚠️ Connection error:', err.message);
+            setConnectionError(err.message);
         });
 
         newSocket.on('disconnect', () => {
@@ -250,10 +282,8 @@ export function useMultiplayer() {
     }, [socket, isOffline]);
 
     const selectMode = useCallback((mode) => {
-        if (socket) {
-            socket.disconnect();
-            socket.connect();
-        }
+        // Mode selection logic
+        // This was previously clearing state, which is fine, but needs to be consistent
         setRoomCode(null);
         setPlayers([]);
         setGameState('disconnected');
@@ -261,7 +291,7 @@ export function useMultiplayer() {
         setWinner(null);
         setServerPowerups([]);
         setSeed(null);
-    }, [socket]);
+    }, []);
 
     // ========== GAME SETUP ACTIONS ==========
 

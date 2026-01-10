@@ -22,7 +22,7 @@ export default function Lobby({
     connectionError,
     onPlayOffline
 }) {
-    const { user, inventory, loginWithGoogle, loginWithEmail, signupWithEmail, logout } = useAuth();
+    const { user, inventory, loginWithGoogle, loginWithEmail, signupWithEmail, logout, equipIcon } = useAuth();
 
     const [showStore, setShowStore] = useState(false);
     const [showLoadout, setShowLoadout] = useState(false);
@@ -96,7 +96,12 @@ export default function Lobby({
             {showIcons && (
                 <IconChooser
                     ownedIcons={inventory?.icons || []}
+                    equippedIcon={inventory?.equippedIcon}
                     onClose={() => setShowIcons(false)}
+                    onSelect={(icon) => {
+                        equipIcon(icon.id);
+                        setShowIcons(false);
+                    }}
                 />
             )}
 

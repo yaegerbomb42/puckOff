@@ -10,12 +10,12 @@ const STRIPE_LINKS = {
 };
 
 export default function Store({ onClose, onOpenPack }) {
-    const { inventory, consumeFreePack } = useAuth();
+    const { inventory, useFreePack } = useAuth();
     const stats = getCollectionStats(inventory?.icons || []);
 
     const handleOpenFreePack = async (type) => {
         if (inventory.freePacks > 0) {
-            const success = await consumeFreePack();
+            const success = await useFreePack();
             if (success) {
                 onOpenPack(type);
             }

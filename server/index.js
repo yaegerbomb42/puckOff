@@ -1,3 +1,4 @@
+require('dotenv').config({ path: require('path').resolve(__dirname, '../.env') }); // Load from root .env
 const express = require('express');
 const http = require('http');
 const { Server } = require('socket.io');
@@ -39,8 +40,32 @@ if (process.env.FIREBASE_SERVICE_ACCOUNT_BASE64) {
     console.warn('⚠️ FIREBASE_SERVICE_ACCOUNT_BASE64 not found. Persistent data will not work.');
 }
 
-const db = getFirestore();
-const auth = getAuth();
+let db, auth;
+
+// MOCK DB for local dev without credentials
+class MockFirestore {
+    collection() { return this; }
+    doc() { return this; }
+    get() { return Promise.resolve({ exists: false, data: () => ({}) }); }
+    set() { return Promise.resolve(); }
+    add() { return Promise.resolve(); }
+    update() { return Promise.resolve(); }
+    runTransaction(cb) { return cb({ get: this.get, update: this.update }); }
+}
+
+class MockAuth {
+    getUserByEmail() { return Promise.reject(new Error('Mock Auth: User not found')); }
+    createUser() { return Promise.resolve({ uid: 'mock_uid_' + Date.now() }); }
+}
+
+if (admin.apps.length > 0) {
+    db = getFirestore();
+    auth = getAuth();
+} else {
+    console.warn('⚠️ using MOCK DATABASE (In-Memory) - Payments/Auth will not persist!');
+    db = new MockFirestore();
+    auth = new MockAuth();
+}
 
 // ============ STRIPE WEBHOOK HANDLER ============
 async function handleStripeWebhook(req, res) {

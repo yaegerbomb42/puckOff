@@ -4,6 +4,7 @@ import { useSphere } from '@react-three/cannon';
 import { Text, Billboard, useTexture, shaderMaterial } from '@react-three/drei';
 import * as THREE from 'three';
 import { PHYSICS_CONFIG, isInKnockoutZone, canStomp, calculateStompDamage } from '../utils/physics';
+import { audio } from '../utils/audio';
 
 // ============================================
 // LEGENDARY SHADER MATERIAL
@@ -255,8 +256,9 @@ function PuckTrail({ positionsRef, color, active }) {
 
     // Cleanup on unmount
     useEffect(() => {
+        const geo = geometryRef.current;
         return () => {
-            geometryRef.current.dispose();
+            geo.dispose();
         };
     }, []);
 
@@ -474,6 +476,7 @@ export default function Puck({
             ], [0, 0, 0]);
 
             onCollision?.(impactVelocity * knockbackMultiplier);
+            audio.playImpact(impactVelocity / 10);
 
             // Heavy hit effects
             if (impactVelocity > 5) {
@@ -608,6 +611,7 @@ export default function Puck({
                     if (now - inputState.current.lastJumpTime > 500) {
                         api.applyImpulse([0, 12, 0], [0, 0, 0]);
                         inputState.current.lastJumpTime = now;
+                        audio.playJump();
                     }
                 }
             }
@@ -674,6 +678,7 @@ export default function Puck({
     const handleKnockout = useCallback(() => {
         setIsRespawning(true);
         onKnockout?.(playerId);
+        audio.playKnockout();
 
         setTimeout(() => {
             api.position.set(...startPosition);
@@ -685,7 +690,6 @@ export default function Puck({
     }, [api, onKnockout, playerId, startPosition]);
 
     // ========== VISUAL STATE ==========
-    const glowIntensity = damage > 100 ? 0.5 + Math.sin(Date.now() * 0.01) * 0.3 : 0.2;
     const puckScale = powerup?.id === 'giant' ? 1.8 : powerup?.id === 'shrink' ? 0.6 : 1;
     const isInvisible = powerup?.id === 'invisible' && !isLocalPlayer;
     const isGhost = powerup?.id === 'ghost';
@@ -708,7 +712,7 @@ export default function Puck({
     });
 
     // Load Texture safely
-    const iconTexture = useTexture(iconPath || '/icons/Tier_1_Common/icon_1.png');
+    const iconTexture = useTexture(iconPath || '/images/logo.png');
 
     if (isInvisible) return null;
 
@@ -717,6 +721,10 @@ export default function Puck({
     const isCosmic = tier === 9;
     const isLegendary = tier >= 6 && tier < 9;
     const isMystery = iconPath && iconPath.includes('icon_150'); // Example logic for unique item
+
+    // Final Puck Mesh Parts
+    const bodyRadius = config.radius;
+    const bodyHeight = 0.35;
 
     return (
         <group>
@@ -762,42 +770,71 @@ export default function Puck({
             )}
 
             {/* Main puck */}
-            <mesh
-                ref={ref}
-                castShadow
-                visible={!isRespawning}
-                scale={[puckScale, puckScale, puckScale]}
-            >
-                <sphereGeometry args={[config.radius, 32, 32]} />
-
-                {/* Dynamic Material Selection */}
-                {isMystery ? (
-                    <mysteryMaterial ref={shaderRef} map={iconTexture} transparent />
-                ) : isDivine ? (
-                    <divineMaterial ref={shaderRef} map={iconTexture} transparent />
-                ) : isCosmic ? (
-                    <cosmicMaterial ref={shaderRef} map={iconTexture} transparent />
-                ) : isLegendary ? (
-                    <legendaryMaterial
-                        ref={shaderRef}
-                        map={iconTexture}
-                        color={new THREE.Color(color)}
-                        transparent
-                    />
-                ) : (
-                    // Standard Material for others
+            <group ref={ref} visible={!isRespawning} scale={[puckScale, puckScale, puckScale]}>
+                {/* Main Body - Metallic Cylinder */}
+                <mesh castShadow receiveShadow>
+                    <cylinderGeometry args={[bodyRadius, bodyRadius, bodyHeight, 32]} />
                     <meshStandardMaterial
-                        map={iconTexture}
-                        color={isFlashing ? '#ffffff' : '#ffffff'} // Use white so texture shows true colors, or blend?
-                        metalness={0.7}
-                        roughness={0.2}
-                        emissive={isFlashing ? '#ffffff' : '#000000'}
+                        color={isFlashing ? "#ffffff" : "#111111"}
+                        metalness={0.9}
+                        roughness={0.1}
+                        emissive={isFlashing ? "#ffffff" : "#000000"}
                         emissiveIntensity={isFlashing ? 2 : 0}
-                        transparent={isGhost}
-                        opacity={isGhost ? 0.4 : 1}
                     />
-                )}
-            </mesh>
+                </mesh>
+
+                {/* Neon Side Trim - The Glowing Strip */}
+                <mesh position={[0, 0, 0]}>
+                    <cylinderGeometry args={[bodyRadius + 0.01, bodyRadius + 0.01, 0.05, 32]} />
+                    <meshStandardMaterial
+                        color={color}
+                        emissive={color}
+                        emissiveIntensity={1.5 + Math.sin(Date.now() * 0.005) * 0.5}
+                    />
+                </mesh>
+
+                {/* Top Face - Armor Plate with Icon */}
+                <group position={[0, bodyHeight / 2 + 0.01, 0]} rotation={[-Math.PI / 2, 0, 0]}>
+                    {/* The "Armor" Plate */}
+                    <mesh>
+                        <circleGeometry args={[bodyRadius, 32]} />
+                        <meshStandardMaterial color="#222222" metalness={0.8} roughness={0.2} />
+                    </mesh>
+
+                    {/* The Icon - Fills 90% of the interior */}
+                    <mesh position={[0, 0, 0.01]}>
+                        <circleGeometry args={[bodyRadius * 0.9, 32]} />
+                        {isMystery ? (
+                            <mysteryMaterial ref={shaderRef} map={iconTexture} transparent />
+                        ) : isDivine ? (
+                            <divineMaterial ref={shaderRef} map={iconTexture} transparent />
+                        ) : isCosmic ? (
+                            <cosmicMaterial ref={shaderRef} map={iconTexture} transparent />
+                        ) : isLegendary ? (
+                            <legendaryMaterial
+                                ref={shaderRef}
+                                map={iconTexture}
+                                color={new THREE.Color(color)}
+                                transparent
+                            />
+                        ) : (
+                            <meshStandardMaterial
+                                map={iconTexture}
+                                transparent={isGhost}
+                                opacity={isGhost ? 0.4 : 1}
+                                metalness={0.5}
+                                roughness={0.3}
+                            />
+                        )}
+                    </mesh>
+                </group>
+
+                {/* High-tech Bottom Detail */}
+                <mesh position={[0, -bodyHeight / 2 - 0.01, 0]} rotation={[Math.PI / 2, 0, 0]}>
+                    <circleGeometry args={[bodyRadius * 0.8, 32]} />
+                    <meshStandardMaterial color={color} emissive={color} emissiveIntensity={0.5} />
+                </mesh>
+            </group>
         </group>
     );
 }

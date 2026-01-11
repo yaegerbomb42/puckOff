@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { useAuth } from '../../contexts/AuthContext';
 import { collection, getDocs } from 'firebase/firestore';
 import { db } from '../../firebase';
@@ -6,7 +6,7 @@ import { db } from '../../firebase';
 const ADMIN_PASSWORD = 'Zawe1234!';
 
 export default function AdminDashboard({ onClose }) {
-    const { user, resetIcons, addIcons, saveInventory } = useAuth();
+    const { user, resetIcons, addIcons } = useAuth();
     const [authenticated, setAuthenticated] = useState(false);
     const [password, setPassword] = useState('');
     const [error, setError] = useState('');
@@ -38,18 +38,24 @@ export default function AdminDashboard({ onClose }) {
             }));
             setUsers(usersList);
 
-            // Try to get rooms from server
+            // Parallel fetch with 3s timeout to prevent "stuck" state
+            const serverUrl = process.env.REACT_APP_SERVER_URL || 'http://localhost:3002';
+            const controller = new AbortController();
+            const timeoutId = setTimeout(() => controller.abort(), 3000);
+
             try {
-                const serverUrl = process.env.REACT_APP_SERVER_URL || 'http://localhost:3002';
-                const roomsRes = await fetch(`${serverUrl}/api/admin/rooms`);
-                if (roomsRes.ok) {
+                const [roomsRes, revenueRes] = await Promise.all([
+                    fetch(`${serverUrl}/api/admin/rooms`, { signal: controller.signal }).catch(() => null),
+                    fetch(`${serverUrl}/api/admin/revenue`, { signal: controller.signal }).catch(() => null)
+                ]);
+
+                if (roomsRes?.ok) {
                     const roomsData = await roomsRes.json();
                     setRooms(roomsData.rooms || []);
                     setMetrics(prev => ({ ...prev, playersOnline: roomsData.playersOnline || 0 }));
                 }
 
-                const revenueRes = await fetch(`${serverUrl}/api/admin/revenue`);
-                if (revenueRes.ok) {
+                if (revenueRes?.ok) {
                     const revenueData = await revenueRes.json();
                     setMetrics(prev => ({
                         ...prev,
@@ -58,7 +64,9 @@ export default function AdminDashboard({ onClose }) {
                     }));
                 }
             } catch (e) {
-                console.log('Could not fetch server data', e);
+                console.log('Server metrics fetch timed out or failed');
+            } finally {
+                clearTimeout(timeoutId);
             }
         } catch (error) {
             console.error('Error loading admin data:', error);
@@ -91,11 +99,21 @@ export default function AdminDashboard({ onClose }) {
     };
 
     const handleUnlockAll = async () => {
-        if (window.confirm('Unlock ALL 150 skins for your account?')) {
-            const allIcons = Array.from({ length: 150 }, (_, i) => i + 1);
-            await addIcons(allIcons); // AuthContext will merge these
-            alert('🐋 WHALE STATUS GRANTED: All 150 icons unlocked!');
-            loadData();
+        if (!user) return;
+        if (window.confirm('🐋 WHALE TEST: Unlock ALL 150 skins for your account?')) {
+            setLoading(true);
+            try {
+                // Ensure IDs are strings as used in IconChooser if needed, 
+                // but usually they are numbers. We'll grant numbers 1-150.
+                const allIcons = Array.from({ length: 150 }, (_, i) => (i + 1));
+                await addIcons(allIcons);
+                alert('Success! All 150 skins unlocked. Restart game to see full collection.');
+                loadData();
+            } catch (err) {
+                alert('Unlock failed: ' + err.message);
+            } finally {
+                setLoading(false);
+            }
         }
     };
 

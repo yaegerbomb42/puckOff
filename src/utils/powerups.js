@@ -20,7 +20,7 @@ export const POWERUP_REGISTRY = {
         cooldown: 5000,
         rarity: 'common'
     },
-    
+
     GLUE_GUN: {
         id: 'glue_gun',
         name: 'Glue Shot',
@@ -36,7 +36,7 @@ export const POWERUP_REGISTRY = {
         cooldown: 4000,
         rarity: 'common'
     },
-    
+
     SAW_BLADE: {
         id: 'saw_blade',
         name: 'Rolling Saw',
@@ -52,7 +52,7 @@ export const POWERUP_REGISTRY = {
         cooldown: 4000,
         rarity: 'uncommon'
     },
-    
+
     BOMB_THROW: {
         id: 'bomb_throw',
         name: 'Cherry Bomb',
@@ -69,7 +69,7 @@ export const POWERUP_REGISTRY = {
         cooldown: 6000,
         rarity: 'uncommon'
     },
-    
+
     FREEZE_RAY: {
         id: 'freeze_ray',
         name: 'Freeze Ray',
@@ -85,7 +85,7 @@ export const POWERUP_REGISTRY = {
         cooldown: 10000,
         rarity: 'rare'
     },
-    
+
     BLACK_HOLE: {
         id: 'black_hole',
         name: 'Singularity',
@@ -93,7 +93,7 @@ export const POWERUP_REGISTRY = {
         category: 'offensive',
         icon: '⚫',
         imagePath: '/images/powerups/black_hole.png',
-        color: '#1a0033',
+        color: '#6d28d9', // Brighter purple for visibility
         description: 'Gravity well that sucks in players',
         damage: 5,
         pullStrength: 15,
@@ -118,7 +118,7 @@ export const POWERUP_REGISTRY = {
         knockbackReduction: 0.5,
         rarity: 'common'
     },
-    
+
     SPIKE_ARMOR: {
         id: 'spike_armor',
         name: 'Spike Vest',
@@ -132,7 +132,7 @@ export const POWERUP_REGISTRY = {
         reflectPercent: 0.5,
         rarity: 'uncommon'
     },
-    
+
     GHOST: {
         id: 'ghost',
         name: 'Phase Shift',
@@ -160,7 +160,7 @@ export const POWERUP_REGISTRY = {
         speedMultiplier: 1.8,
         rarity: 'common'
     },
-    
+
     JUMP_JET: {
         id: 'jump_jet',
         name: 'Jump Jets',
@@ -175,7 +175,7 @@ export const POWERUP_REGISTRY = {
         jumpBoost: 1.5,
         rarity: 'uncommon'
     },
-    
+
     TELEPORT: {
         id: 'teleport',
         name: 'Blink',
@@ -190,7 +190,7 @@ export const POWERUP_REGISTRY = {
         invincibilityFrames: 200,
         rarity: 'uncommon'
     },
-    
+
     GRAPPLE: {
         id: 'grapple',
         name: 'Grapple Hook',
@@ -223,7 +223,7 @@ export const POWERUP_REGISTRY = {
         speedPenalty: 0.7,
         rarity: 'rare'
     },
-    
+
     SHRINK: {
         id: 'shrink',
         name: 'Mini Me',
@@ -239,7 +239,7 @@ export const POWERUP_REGISTRY = {
         knockbackIncrease: 1.3,
         rarity: 'uncommon'
     },
-    
+
     INVISIBLE: {
         id: 'invisible',
         name: 'Cloak',
@@ -247,13 +247,13 @@ export const POWERUP_REGISTRY = {
         category: 'chaos',
         icon: '🕵️',
         imagePath: '/images/powerups/invisible.png',
-        color: '#111111',
+        color: '#6b7280', // Smoke grey for visibility
         description: 'Completely invisible to enemies',
         duration: 8000,
         revealOnAttack: true,
         rarity: 'rare'
     },
-    
+
     MAGNET: {
         id: 'magnet',
         name: 'Attractor',
@@ -268,7 +268,7 @@ export const POWERUP_REGISTRY = {
         pullForce: 8,
         rarity: 'uncommon'
     },
-    
+
     CURSE: {
         id: 'curse',
         name: 'Hex Hex',
@@ -300,7 +300,7 @@ export const POWERUP_REGISTRY = {
         cooldown: 8000,
         rarity: 'common'
     },
-    
+
     FART: {
         id: 'fart',
         name: 'Toxic Cloud',
@@ -335,22 +335,22 @@ const RARITY_WEIGHTS = {
  */
 export function getPowerupInfo(id) {
     if (!id) return null;
-    
+
     // Handle if already a powerup object
     if (typeof id === 'object' && id.id) {
         return id;
     }
-    
+
     // Try uppercase key first
     const upperKey = String(id).toUpperCase();
     if (POWERUP_REGISTRY[upperKey]) {
         return POWERUP_REGISTRY[upperKey];
     }
-    
+
     // Search by id field
     const found = Object.values(POWERUP_REGISTRY).find(p => p.id === id);
     if (found) return found;
-    
+
     // Default fallback
     return POWERUP_REGISTRY.SPEED_BOOST;
 }
@@ -367,12 +367,12 @@ export function getPowerupsByCategory(category) {
  */
 export function getRandomPowerup(excludeIds = []) {
     const available = Object.values(POWERUP_REGISTRY).filter(p => !excludeIds.includes(p.id));
-    
+
     let totalWeight = 0;
     available.forEach(p => {
         totalWeight += RARITY_WEIGHTS[p.rarity] || RARITY_WEIGHTS.common;
     });
-    
+
     let random = Math.random() * totalWeight;
     for (const powerup of available) {
         const weight = RARITY_WEIGHTS[powerup.rarity] || RARITY_WEIGHTS.common;
@@ -381,7 +381,7 @@ export function getRandomPowerup(excludeIds = []) {
             return powerup;
         }
     }
-    
+
     return available[0];
 }
 
@@ -391,14 +391,14 @@ export function getRandomPowerup(excludeIds = []) {
 export function validateLoadout(loadout) {
     if (!Array.isArray(loadout)) return { valid: false, reason: 'Invalid loadout' };
     if (loadout.length > 3) return { valid: false, reason: 'Too many items' };
-    
+
     for (const id of loadout) {
         const powerup = getPowerupInfo(id);
         if (!powerup) {
             return { valid: false, reason: `Invalid powerup: ${id}` };
         }
     }
-    
+
     return { valid: true };
 }
 
@@ -408,7 +408,7 @@ export function validateLoadout(loadout) {
 export function getCooldownRemaining(powerupId, lastUsedTime) {
     const powerup = getPowerupInfo(powerupId);
     if (!powerup?.cooldown) return 0;
-    
+
     const elapsed = Date.now() - lastUsedTime;
     return Math.max(0, powerup.cooldown - elapsed);
 }
@@ -419,14 +419,14 @@ export function getCooldownRemaining(powerupId, lastUsedTime) {
 export function canUsePowerup(powerupId, lastUsedTime, userState) {
     const powerup = getPowerupInfo(powerupId);
     if (!powerup) return { canUse: false, reason: 'Invalid powerup' };
-    
+
     if (lastUsedTime && getCooldownRemaining(powerupId, lastUsedTime) > 0) {
         return { canUse: false, reason: 'On cooldown' };
     }
-    
+
     if (userState?.stunned || userState?.frozen) {
         return { canUse: false, reason: 'Cannot act' };
     }
-    
+
     return { canUse: true };
 }

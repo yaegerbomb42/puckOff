@@ -27,9 +27,9 @@ export default function LoadoutMenu({ equipped = DEFAULT_LOADOUT, onEquip, onClo
             <div className="loadout-container" onClick={e => e.stopPropagation()}>
                 <div className="header">
                     <div className="header-text">
-                        <h2>🎒 TACTICAL LOADOUT</h2>
+                        <h2>🎒 POWERUP LOADOUT</h2>
                         <p className="header-desc">
-                            Choose 3 powerups to bring into battle. Press 1, 2, or 3 during combat to activate them!
+                            Equip 3 powerups. Use <strong>Key 1, 2, or 3</strong> during battle to activate!
                         </p>
                     </div>
                     <button className="close-btn" onClick={onClose}>✓ CONFIRM</button>
@@ -50,10 +50,10 @@ export default function LoadoutMenu({ equipped = DEFAULT_LOADOUT, onEquip, onClo
                                         background: `linear-gradient(135deg, ${info.color}, ${info.color}88)`,
                                         boxShadow: `0 0 20px ${info.color}66`
                                     }}>
-                                        {info.icon}
+                                        {info.imagePath ? <img src={info.imagePath} alt={info.name} className="powerup-img" /> : info.icon}
                                     </div>
                                     <div className="slot-name">{info.name}</div>
-                                    <div className="slot-hint">Press {index + 1}</div>
+                                    <div className="slot-hint">Key {index + 1}</div>
                                 </div>
                             );
                         })}
@@ -81,7 +81,7 @@ export default function LoadoutMenu({ equipped = DEFAULT_LOADOUT, onEquip, onClo
                                             background: `linear-gradient(135deg, ${p.color}33, transparent)`,
                                             color: p.color
                                         }}>
-                                            {p.icon}
+                                            {p.imagePath ? <img src={p.imagePath} alt={p.name} className="powerup-img" /> : p.icon}
                                         </div>
                                         <div className="p-info">
                                             <h4>{p.name}</h4>
@@ -109,10 +109,11 @@ export default function LoadoutMenu({ equipped = DEFAULT_LOADOUT, onEquip, onClo
                 }
                 .loadout-container {
                     width: 95%; max-width: 1000px; height: 90%;
-                    background: linear-gradient(135deg, #0a0a1a, #1a0a2e);
-                    border: 1px solid #333; border-radius: 20px;
+                    background: linear-gradient(135deg, #0f0f25, #250f3e);
+                    border: 1px solid #444; border-radius: 20px;
                     padding: 2rem; display: flex; flex-direction: column;
                     overflow: hidden;
+                    box-shadow: 0 0 50px rgba(0,0,0,0.5);
                 }
 
                 .header { 
@@ -120,11 +121,11 @@ export default function LoadoutMenu({ equipped = DEFAULT_LOADOUT, onEquip, onClo
                     align-items: flex-start; margin-bottom: 1.5rem;
                 }
                 .header-text h2 { 
-                    margin: 0; 
+                    margin: 0; font-size: 2.2rem;
                     background: linear-gradient(45deg, #ff006e, #00d4ff);
                     -webkit-background-clip: text; -webkit-text-fill-color: transparent;
                 }
-                .header-desc { color: #888; font-size: 0.85rem; margin-top: 0.5rem; }
+                .header-desc { color: #ccc; font-size: 0.95rem; margin-top: 0.5rem; }
                 .close-btn {
                     background: linear-gradient(45deg, #00ff87, #00d4ff);
                     border: none; padding: 0.8rem 1.5rem; border-radius: 30px;
@@ -170,8 +171,9 @@ export default function LoadoutMenu({ equipped = DEFAULT_LOADOUT, onEquip, onClo
                 }
                 .powerup-category { margin-bottom: 1.5rem; }
                 .category-title {
-                    color: #888; font-size: 0.85rem; margin-bottom: 0.8rem;
-                    padding-bottom: 0.3rem; border-bottom: 1px solid #333;
+                    color: #fff; font-size: 1rem; margin-bottom: 1rem;
+                    padding-bottom: 0.5rem; border-bottom: 1px solid #444;
+                    letter-spacing: 1px;
                 }
 
                 .powerup-grid {
@@ -186,21 +188,26 @@ export default function LoadoutMenu({ equipped = DEFAULT_LOADOUT, onEquip, onClo
                     position: relative; transition: all 0.2s;
                 }
                 .powerup-item:hover:not(.equipped) { 
-                    background: rgba(255,255,255,0.08);
-                    transform: translateY(-2px);
+                    background: rgba(255,255,255,0.12);
+                    transform: translateY(-3px) scale(1.02);
+                    border-color: rgba(255,255,255,0.2);
                 }
                 .powerup-item.equipped { 
-                    opacity: 0.5; cursor: not-allowed;
+                    opacity: 0.4; cursor: not-allowed; grayscale: 50%;
                 }
                 .p-icon { 
                     font-size: 1.8rem; width: 50px; height: 50px;
                     border-radius: 10px; display: flex; 
                     align-items: center; justify-content: center;
-                    flex-shrink: 0;
+                    flex-shrink: 0; overflow: hidden;
                 }
+                .powerup-img {
+                    width: 100%; height: 100%; object-fit: cover;
+                }
+                .slot-icon { overflow: hidden; }
                 .p-info { flex: 1; min-width: 0; }
-                .p-info h4 { margin: 0 0 0.3rem 0; font-size: 0.85rem; }
-                .p-info p { margin: 0; font-size: 0.7rem; color: #888; line-height: 1.3; }
+                .p-info h4 { margin: 0 0 0.3rem 0; font-size: 0.9rem; color: #fff; }
+                .p-info p { margin: 0; font-size: 0.75rem; color: #bbb; line-height: 1.4; }
                 .equipped-badge {
                     position: absolute; top: 8px; right: 8px; 
                     font-size: 0.6rem; color: #000; padding: 3px 8px; 

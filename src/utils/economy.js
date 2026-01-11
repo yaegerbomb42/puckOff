@@ -28,6 +28,18 @@ export const FREE_PACK_REROLL_CHANCE = 0.025; // 2.5%
 export const BURN_FREE_PACK_CHANCE = 0.50; // 50% chance when burning 2 identical
 export const TOTAL_ICONS = 150;
 
+// ============ REWARDS & PENALTIES ============
+export const REWARDS = {
+    GAME_COMPLETE: { min: 2, max: 3 },
+    WIN_BONUS: 1,
+    PACK_COST: 10
+};
+
+export const PENALTIES = {
+    RAGE_QUIT: -1,
+    BAN_PROGRESSION: [1, 5, 30, 60, 1440] // Minutes
+};
+
 // ============ PACK OPENING ============
 export function rollTier() {
     const rand = Math.random();

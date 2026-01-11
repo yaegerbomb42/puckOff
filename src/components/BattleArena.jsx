@@ -16,6 +16,7 @@ import ProjectileSystem from './ProjectileSystem';
 import ProceduralArena from './ProceduralArena';
 import { useMultiplayer } from '../hooks/useMultiplayer';
 import { useAuth } from '../contexts/AuthContext';
+import { audio } from '../utils/audio';
 import DebugLogger, { logGame } from './DebugLogger';
 import {
     PHYSICS_CONFIG,
@@ -169,7 +170,7 @@ function GameScene({
 // ============================================
 export default function BattleArena() {
     const multiplayer = useMultiplayer();
-    const { user, inventory, updateMatchStats, isAdmin } = useAuth() || {};
+    const { user, updateMatchStats, isAdmin } = useAuth() || {};
 
     // ========== GAME STATE ==========
     const [gameMode, setGameMode] = useState('knockout');
@@ -220,6 +221,35 @@ export default function BattleArena() {
 
     const modeConfig = GAME_MODES[gameMode] || GAME_MODES.knockout;
 
+    const checkWinCondition = useCallback((timeUp = false) => {
+        const mode = modeConfig;
+        let winnerId = null;
+
+        if (mode.winCondition === 'stocks') {
+            const playersWithStocks = Object.entries(playerStocks).filter(([_, stocks]) => stocks > 0);
+            if (playersWithStocks.length === 1) winnerId = playersWithStocks[0][0];
+        } else if (mode.winCondition === 'score' && timeUp) {
+            const sortedScores = Object.entries(playerScores).sort(([, a], [, b]) => b - a);
+            if (sortedScores.length > 0) winnerId = sortedScores[0][0];
+        } else if (mode.winCondition === 'lastStanding') {
+            const playersWithStocks = Object.entries(playerStocks).filter(([_, stocks]) => stocks > 0);
+            if (playersWithStocks.length === 1) winnerId = playersWithStocks[0][0];
+        }
+
+        if (winnerId) {
+            if (multiplayer.connected) multiplayer.reportGameEnd?.(winnerId, playerScores, matchStats);
+            if (updateMatchStats && user) {
+                updateMatchStats({
+                    won: winnerId === multiplayer.playerId,
+                    knockouts: matchStats.knockouts,
+                    damageDealt: matchStats.totalDamage,
+                    stomps: matchStats.stomps,
+                    maxCombo: matchStats.maxCombo
+                });
+            }
+        }
+    }, [modeConfig, playerStocks, playerScores, multiplayer, matchStats, updateMatchStats, user]);
+
     // ========== GAME INITIALIZATION ==========
     useEffect(() => {
         if (multiplayer.gameState === 'playing') {
@@ -240,6 +270,7 @@ export default function BattleArena() {
 
             // Set map seed
             setMapSeed(multiplayer.seed || Math.floor(Math.random() * 1000000));
+            audio.playStart();
 
             // Start timer - FIX: Hybrid Server/Local
             if (modeConfig.timeLimit > 0) {
@@ -270,7 +301,7 @@ export default function BattleArena() {
                 timerRef.current = null;
             }
         };
-    }, [multiplayer.gameState, multiplayer.players, multiplayer.seed, modeConfig]);
+    }, [multiplayer.gameState, multiplayer.players, multiplayer.seed, modeConfig, checkWinCondition, multiplayer.timer, gameMode]);
 
     // ========== SYNC SERVER TIMER ==========
     useEffect(() => {
@@ -281,57 +312,9 @@ export default function BattleArena() {
                 setGameTimer(multiplayer.timer);
             }
         }
-    }, [multiplayer.timer]);
+    }, [multiplayer.timer, gameTimer]);
 
     // ========== WIN CONDITION CHECK ==========
-    const checkWinCondition = useCallback((timeUp = false) => {
-        const mode = modeConfig;
-        let winnerId = null;
-
-        if (mode.winCondition === 'stocks') {
-            // Check if only one player has stocks
-            const playersWithStocks = Object.entries(playerStocks)
-                .filter(([_, stocks]) => stocks > 0);
-
-            if (playersWithStocks.length === 1) {
-                winnerId = playersWithStocks[0][0];
-            }
-        } else if (mode.winCondition === 'score' && timeUp) {
-            // Highest score when time runs out
-            const sortedScores = Object.entries(playerScores)
-                .sort(([, a], [, b]) => b - a);
-
-            if (sortedScores.length > 0) {
-                winnerId = sortedScores[0][0];
-            }
-        } else if (mode.winCondition === 'lastStanding') {
-            const playersWithStocks = Object.entries(playerStocks)
-                .filter(([_, stocks]) => stocks > 0);
-
-            if (playersWithStocks.length === 1) {
-                winnerId = playersWithStocks[0][0];
-            }
-        }
-
-        if (winnerId) {
-            // Report game end
-            if (multiplayer.connected) {
-                multiplayer.reportGameEnd?.(winnerId, playerScores, matchStats);
-            }
-
-            // Update local stats
-            if (updateMatchStats && user) {
-                updateMatchStats({
-                    won: winnerId === multiplayer.playerId,
-                    knockouts: matchStats.knockouts,
-                    damageDealt: matchStats.totalDamage,
-                    stomps: matchStats.stomps,
-                    maxCombo: matchStats.maxCombo
-                });
-            }
-        }
-    }, [modeConfig, playerStocks, playerScores, multiplayer, matchStats, updateMatchStats, user]);
-
     // ========== USE ITEM HANDLER ==========
     const handleUseItem = useCallback(() => {
         const activePowerup = playerPowerups[multiplayer.playerId];
@@ -539,6 +522,7 @@ export default function BattleArena() {
         if (multiplayer.connected) {
             multiplayer.collectPowerup?.(powerupId);
         }
+        audio.playPowerup();
 
         // Handle buff duration
         const powerupInfo = getPowerupInfo(powerup.type?.id || powerup.type);
@@ -673,6 +657,8 @@ export default function BattleArena() {
                         setPlayerLoadouts(prev => ({ ...prev, [multiplayer.playerId]: loadout }));
                         multiplayer.setReady?.(ready);
                     }}
+                    selectedMap={multiplayer.selectedMap}
+                    mapVotes={multiplayer.mapVotes}
                     onVoteMap={(mapId) => {
                         multiplayer.voteMap?.(mapId);
                     }}

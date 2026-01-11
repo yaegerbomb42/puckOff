@@ -7,6 +7,7 @@ import AdminDashboard from './AdminDashboard';
 import { SKIN_DEFINITIONS } from '../../utils/skins';
 import { DEFAULT_LOADOUT } from '../../utils/powerups';
 import { useAuth } from '../../contexts/AuthContext';
+import { audio } from '../../utils/audio';
 
 export default function Lobby({
     connected,
@@ -20,9 +21,11 @@ export default function Lobby({
     onVoteMap,
     onBack,
     connectionError,
-    onPlayOffline
+    onPlayOffline,
+    selectedMap,
+    mapVotes
 }) {
-    const { user, inventory, loginWithGoogle, loginWithEmail, signupWithEmail, logout, equipIcon } = useAuth();
+    const { user, inventory, loginWithGoogle, loginWithEmail, signupWithEmail, logout, equipIcon, equipSkin } = useAuth();
 
     const [showStore, setShowStore] = useState(false);
     const [showLoadout, setShowLoadout] = useState(false);
@@ -35,10 +38,7 @@ export default function Lobby({
     const [authError, setAuthError] = useState('');
 
     const [openingPack, setOpeningPack] = useState(null);
-    const [unlockedSkins, setUnlockedSkins] = useState(['skin_1', 'skin_2']);
-    const [equippedSkin, setEquippedSkin] = useState('skin_1');
-    const [loadout, setLoadout] = useState(DEFAULT_LOADOUT);
-    const [playerName, setPlayerName] = useState('');
+    const [playerName, setPlayerName] = useState(user?.displayName || '');
 
     const handleAuth = async (e) => {
         e.preventDefault();
@@ -68,8 +68,7 @@ export default function Lobby({
                     packType={openingPack}
                     onClose={() => {
                         setOpeningPack(null);
-                        const randomId = Math.floor(Math.random() * 20) + 1;
-                        setUnlockedSkins(prev => [...new Set([...prev, `skin_${randomId}`])]);
+                        // Stats are updated in AuthContext now
                     }}
                 />
             )}
@@ -87,8 +86,10 @@ export default function Lobby({
 
             {showLoadout && (
                 <LoadoutMenu
-                    equipped={loadout}
-                    onEquip={setLoadout}
+                    equipped={inventory?.loadouts?.[0] || DEFAULT_LOADOUT}
+                    onEquip={(newLoadout) => {
+                        // For now we just update slot 0
+                    }}
                     onClose={() => setShowLoadout(false)}
                 />
             )}
@@ -139,9 +140,9 @@ export default function Lobby({
                         </button>
                         <div className="auth-toggle">
                             {authMode === 'login' ? (
-                                <span>New here? <a onClick={() => setAuthMode('signup')}>Create account</a></span>
+                                <span>New here? <button className="btn-link" onClick={() => setAuthMode('signup')}>Create account</button></span>
                             ) : (
-                                <span>Have an account? <a onClick={() => setAuthMode('login')}>Sign in</a></span>
+                                <span>Have an account? <button className="btn-link" onClick={() => setAuthMode('login')}>Sign in</button></span>
                             )}
                         </div>
                     </div>
@@ -162,11 +163,14 @@ export default function Lobby({
                             🔐 Sign In / Sign Up
                         </button>
                     )}
-                    <button className="btn-admin-hidden" onClick={() => setShowAdmin(true)}>⚙️</button>
+                    <button className="btn-admin-hidden" onClick={() => { audio.playClick(); setShowAdmin(true); }}>⚙️</button>
                 </div>
 
-                <h1 className="game-title">PUCK BATTLE ARENA</h1>
-                <p className="game-subtitle">⚡ Fast-Paced Multiplayer Mayhem ⚡</p>
+                <div className="logo-container">
+                    <img src="/images/logo.png" alt="puckOFF Logo" className="logo-img" />
+                    <h1 className="game-title">puck<span>OFF</span></h1>
+                </div>
+                <p className="game-subtitle">The Ultimate Physics-Based Arena Combat. Smash. Collect. puck<span>OFF</span>.</p>
 
                 {!connected ? (
                     <div className="connection-status">
@@ -192,10 +196,10 @@ export default function Lobby({
                         />
 
                         <div className="main-buttons">
-                            <button className="btn btn-primary btn-large shimmer" onClick={() => onQuickJoin(playerName, user?.email)}>
+                            <button className="btn btn-primary btn-large shimmer" onClick={() => { audio.playClick(); onQuickJoin(playerName, user?.email); }}>
                                 ⚡ QUICK PLAY
                             </button>
-                            <button className="btn btn-secondary btn-large" onClick={() => onCreateRoom(playerName, user?.email)}>
+                            <button className="btn btn-secondary btn-large" onClick={() => { audio.playClick(); onCreateRoom(playerName, user?.email); }}>
                                 🏠 CREATE ROOM
                             </button>
                         </div>
@@ -203,6 +207,7 @@ export default function Lobby({
                         <div className="join-form">
                             <input type="text" placeholder="ROOM CODE" id="roomCodeInput" maxLength={6} />
                             <button className="btn btn-small" onClick={() => {
+                                audio.playClick();
                                 const code = document.getElementById('roomCodeInput').value;
                                 if (code) onJoinRoom(code, playerName, user?.email);
                             }}>JOIN</button>
@@ -211,24 +216,27 @@ export default function Lobby({
                         <div className="divider"></div>
 
                         <div className="feature-buttons">
-                            <button className="btn btn-loadout" onClick={() => setShowLoadout(true)}>
+                            <button className="btn btn-loadout" onClick={() => { audio.playClick(); setShowLoadout(true); }}>
                                 🎒 LOADOUT
                                 <span className="btn-desc">Choose 3 Powerups for Battle</span>
                             </button>
 
-                            <button className="btn btn-icons" onClick={() => setShowIcons(true)}>
+                            <button className="btn btn-icons" onClick={() => { audio.playClick(); setShowIcons(true); }}>
                                 ✨ ICONS
                                 <span className="btn-desc">{inventory?.icons?.length || 0} / 150 Collected</span>
                             </button>
                         </div>
 
                         <div className="cosmetics-row">
-                            <button className="btn btn-store" onClick={() => setShowStore(true)}>
+                            <button className="btn btn-store" onClick={() => { audio.playClick(); setShowStore(true); }}>
                                 🛒 STORE
                             </button>
                             <div className="skin-selector">
-                                <select value={equippedSkin} onChange={(e) => setEquippedSkin(e.target.value)}>
-                                    {SKIN_DEFINITIONS.filter(s => unlockedSkins.includes(s.id) || s.rarity === 'common').map(skin => (
+                                <select
+                                    value={inventory?.equippedSkin || 'skin_1'}
+                                    onChange={(e) => equipSkin(e.target.value)}
+                                >
+                                    {SKIN_DEFINITIONS.filter(s => (inventory?.skins || []).includes(s.id) || s.rarity === 'common').map(skin => (
                                         <option key={skin.id} value={skin.id}>
                                             {skin.name} ({skin.rarity})
                                         </option>
@@ -258,14 +266,29 @@ export default function Lobby({
                         </div>
 
                         <div className="map-voting">
-                            <h3>VOTE MAP</h3>
+                            <h3>VOTE FOR ARENA</h3>
                             <div className="vote-options">
-                                {['SAWBLADE CITY', 'RAMP HEAVEN', 'BOX FORT'].map(map => (
-                                    <button
-                                        key={map}
-                                        className="btn-vote"
-                                        onClick={() => onVoteMap && onVoteMap(map)}
-                                    >{map}</button>
+                                {[
+                                    { name: 'SAWBLADE CITY', img: '/images/maps/sawblade_city.png', desc: 'Deadly traps and tight corners' },
+                                    { name: 'RAMP HEAVEN', img: '/images/maps/ramp_heaven.png', desc: 'High-flying vertical combat' },
+                                    { name: 'BOX FORT', img: '/images/maps/box_fort.png', desc: 'Chaos in a cluttered warehouse' }
+                                ].map(map => (
+                                    <div
+                                        key={map.name}
+                                        className={`map-card ${selectedMap === map.name ? 'selected' : ''}`}
+                                        onClick={() => { audio.playClick(); onVoteMap && onVoteMap(map.name); }}
+                                    >
+                                        <div className="map-preview">
+                                            <img src={map.img} alt={map.name} />
+                                            <div className="map-overlay">
+                                                <div className="vote-count">🔥 {Object.values(mapVotes).filter(v => v === map.name).length}</div>
+                                            </div>
+                                        </div>
+                                        <div className="map-info">
+                                            <h4>{map.name}</h4>
+                                            <p>{map.desc}</p>
+                                        </div>
+                                    </div>
                                 ))}
                             </div>
                         </div>
@@ -273,11 +296,11 @@ export default function Lobby({
                         <div className="room-actions">
                             <button
                                 className={`btn ${isReady ? 'btn-ready' : 'btn-primary'}`}
-                                onClick={() => onReady(!isReady, loadout)}
+                                onClick={() => { audio.playClick(); onReady(!isReady, inventory?.loadouts?.[0] || DEFAULT_LOADOUT); }}
                             >
                                 {isReady ? 'CANCEL READY' : '✔ READY UP'}
                             </button>
-                            <button className="btn btn-danger" onClick={onBack}>LEAVE ROOM</button>
+                            <button className="btn btn-danger" onClick={() => { audio.playClick(); onBack(); }}>LEAVE ROOM</button>
                         </div>
 
                         <div className="lobby-hint">Game starts when all players are ready!</div>
@@ -326,15 +349,30 @@ export default function Lobby({
                 }
                 .btn-admin-hidden:hover { opacity: 1; }
 
+                .logo-container {
+                    display: flex; flex-direction: column; align-items: center; margin-bottom: 0.5rem;
+                }
+                .logo-img {
+                    width: 120px; height: 120px; object-fit: contain;
+                    filter: drop-shadow(0 0 20px rgba(0,212,255,0.4));
+                    animation: logoFloat 4s ease-in-out infinite;
+                }
+                @keyframes logoFloat {
+                    0%, 100% { transform: translateY(0); }
+                    50% { transform: translateY(-10px); }
+                }
+
                 /* Title */
                 .game-title {
-                    font-size: 2.5rem; margin-bottom: 0.5rem;
+                    font-size: 3.5rem; margin: 0;
+                    font-weight: 900;
+                    letter-spacing: -2px;
                     background: linear-gradient(45deg, #00d4ff, #ff006e, #00ff87);
                     -webkit-background-clip: text; -webkit-text-fill-color: transparent;
-                    text-shadow: 0 0 30px rgba(0,212,255,0.5);
-                    animation: titleGlow 3s ease-in-out infinite;
+                    text-shadow: 0 0 30px rgba(0,212,255,0.3);
                 }
-                .game-subtitle { color: #888; margin-bottom: 2rem; font-size: 0.9rem; }
+                .game-title span { font-style: italic; color: #ff006e; -webkit-text-fill-color: initial; }
+                .game-subtitle { color: #aaa; margin-bottom: 2rem; font-size: 1rem; font-weight: 500; }
 
                 @keyframes titleGlow {
                     0%, 100% { filter: brightness(1); }
@@ -436,7 +474,11 @@ export default function Lobby({
                     cursor: pointer; font-weight: bold; width: 100%;
                 }
                 .auth-toggle { margin-top: 1rem; font-size: 0.85rem; color: #888; }
-                .auth-toggle a { color: #00d4ff; cursor: pointer; }
+                .btn-link { 
+                    background: none; border: none; color: #00d4ff; 
+                    cursor: pointer; padding: 0; font-family: inherit; 
+                    text-decoration: underline;
+                }
 
                 /* Shimmer */
                 .shimmer { position: relative; overflow: hidden; }
@@ -472,15 +514,33 @@ export default function Lobby({
                 .ready-status { font-size: 0.8rem; color: #888; }
                 .ready-status.ready { color: #00ff87; }
 
-                .map-voting { margin: 1rem 0; }
-                .map-voting h3 { color: #888; margin-bottom: 0.5rem; }
-                .vote-options { display: flex; gap: 0.5rem; justify-content: center; flex-wrap: wrap; }
-                .btn-vote {
-                    padding: 0.5rem 1rem; background: rgba(255,255,255,0.1);
-                    border: 1px solid #444; border-radius: 8px; color: white;
-                    cursor: pointer;
+                .map-voting { margin: 2rem 0; width: 100%; }
+                .map-voting h3 { color: #fff; margin-bottom: 1rem; font-size: 1rem; letter-spacing: 2px; }
+                .vote-options { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; }
+                
+                .map-card {
+                    background: rgba(255,255,255,0.03); border-radius: 12px; overflow: hidden;
+                    cursor: pointer; transition: all 0.3s; border: 2px solid transparent;
                 }
-                .btn-vote:hover { background: rgba(0,212,255,0.2); border-color: #00d4ff; }
+                .map-card:hover { background: rgba(255,255,255,0.08); transform: translateY(-5px); }
+                .map-card.selected { border-color: #00d4ff; box-shadow: 0 0 20px rgba(0,212,255,0.3); }
+                
+                .map-preview { position: relative; aspect-ratio: 16/9; overflow: hidden; }
+                .map-preview img { width: 100%; height: 100%; object-fit: cover; transition: transform 0.5s; }
+                .map-card:hover .map-preview img { transform: scale(1.1); }
+                
+                .map-overlay {
+                    position: absolute; inset: 0; background: linear-gradient(to top, rgba(0,0,0,0.8), transparent);
+                    display: flex; align-items: flex-end; padding: 0.5rem;
+                }
+                .vote-count {
+                    background: rgba(0,212,255,0.8); color: #000; padding: 2px 8px;
+                    border-radius: 20px; font-size: 0.75rem; font-weight: bold;
+                }
+                
+                .map-info { padding: 0.8rem; text-align: left; }
+                .map-info h4 { margin: 0; font-size: 0.8rem; color: #fff; }
+                .map-info p { margin: 0.3rem 0 0; font-size: 0.65rem; color: #888; line-height: 1.2; }
 
                 .room-actions { display: flex; gap: 1rem; justify-content: center; margin-top: 1rem; }
                 .btn { padding: 0.8rem 1.5rem; border-radius: 30px; cursor: pointer; font-weight: bold; }

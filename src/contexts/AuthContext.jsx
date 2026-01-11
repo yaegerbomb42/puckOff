@@ -21,10 +21,11 @@ const DEFAULT_INVENTORY = {
     equippedIcon: null,
     skins: [],
     equippedSkin: null,
-    coins: 500,
-    gems: 0,
+    credits: 0,
     freePacks: 1,
     packCredits: 0,
+    banUntil: null,
+    consecutiveQuits: 0,
     loadouts: [
         ['speed_boost', 'rocket', 'shield'],
         ['teleport', 'bomb_throw', 'ghost'],
@@ -164,31 +165,65 @@ export function AuthProvider({ children }) {
 
     // ========== ECONOMY MANAGEMENT ==========
 
-    const addCoins = useCallback(async (amount) => {
+    const addCredits = useCallback(async (amount) => {
         if (!user) return;
         try {
             await updateDoc(doc(db, 'users', user.uid), {
-                coins: increment(amount)
+                credits: increment(amount)
             });
-            setInventory(prev => ({ ...prev, coins: prev.coins + amount }));
+            setInventory(prev => ({ ...prev, credits: (prev.credits || 0) + amount }));
         } catch (error) {
-            console.error('Error adding coins:', error);
+            console.error('Error adding credits:', error);
         }
     }, [user]);
 
-    const spendCoins = useCallback(async (amount) => {
-        if (!user || inventory.coins < amount) return false;
+    const spendCredits = useCallback(async (amount) => {
+        if (!user || (inventory.credits || 0) < amount) return false;
         try {
             await updateDoc(doc(db, 'users', user.uid), {
-                coins: increment(-amount)
+                credits: increment(-amount)
             });
-            setInventory(prev => ({ ...prev, coins: prev.coins - amount }));
+            setInventory(prev => ({ ...prev, credits: (prev.credits || 0) - amount }));
             return true;
         } catch (error) {
-            console.error('Error spending coins:', error);
+            console.error('Error spending credits:', error);
             return false;
         }
-    }, [user, inventory.coins]);
+    }, [user, inventory.credits]);
+
+    const applyPenalty = useCallback(async (penaltyType) => {
+        if (!user) return;
+
+        let updates = {};
+        if (penaltyType === 'RAGE_QUIT') {
+            const newConsecutive = (inventory.consecutiveQuits || 0) + 1;
+            const penaltyAmount = -1; // -1 credit
+
+            updates = {
+                credits: increment(penaltyAmount),
+                consecutiveQuits: increment(1)
+            };
+
+            // Apply ban if 0 credits or multiple quits
+            if ((inventory.credits || 0) <= 0 || newConsecutive > 1) {
+                const banMinutes = [1, 5, 30, 60, 1440][Math.min(newConsecutive - 1, 4)];
+                const banUntil = new Date(Date.now() + banMinutes * 60000).toISOString();
+                updates.banUntil = banUntil;
+            }
+        }
+
+        try {
+            await updateDoc(doc(db, 'users', user.uid), updates);
+            setInventory(prev => ({
+                ...prev,
+                credits: Math.max(0, (prev.credits || 0) - 1),
+                consecutiveQuits: (prev.consecutiveQuits || 0) + 1,
+                ...((updates.banUntil) ? { banUntil: updates.banUntil } : {})
+            }));
+        } catch (error) {
+            console.error('Error applying penalty:', error);
+        }
+    }, [user, inventory.credits, inventory.consecutiveQuits]);
 
     const useFreePack = useCallback(async () => {
         if (!user || inventory.freePacks < 1) return false;
@@ -226,41 +261,23 @@ export function AuthProvider({ children }) {
         const { won, knockouts, damageDealt, stomps, maxCombo } = matchResult;
 
         try {
-            // Update stats
+            const creditsEarned = won ? 3 : 2;
+
             await updateDoc(doc(db, 'users', user.uid), {
                 'stats.gamesPlayed': increment(1),
                 'stats.wins': increment(won ? 1 : 0),
                 'stats.knockouts': increment(knockouts || 0),
                 'stats.damageDealt': increment(Math.floor(damageDealt || 0)),
                 'stats.stomps': increment(stomps || 0),
-                'stats.highestCombo': Math.max(inventory.stats.highestCombo, maxCombo || 0)
+                'stats.highestCombo': Math.max(inventory.stats.highestCombo, maxCombo || 0),
+                credits: increment(creditsEarned),
+                consecutiveQuits: 0
             });
 
-            // Calculate rewards
-            const coinsEarned = (won ? 100 : 25) + (knockouts || 0) * 10 + (stomps || 0) * 15;
-            const packProgress = (won ? 0.5 : 0.2);
-
-            // Award coins and pack progress
-            await updateDoc(doc(db, 'users', user.uid), {
-                coins: increment(coinsEarned),
-                packCredits: increment(packProgress)
-            });
-
-            // Check if earned a free pack
-            const newPackCredits = inventory.packCredits + packProgress;
-            if (newPackCredits >= 1) {
-                await updateDoc(doc(db, 'users', user.uid), {
-                    packCredits: newPackCredits - 1,
-                    freePacks: increment(1)
-                });
-            }
-
-            // Update local state
             setInventory(prev => ({
                 ...prev,
-                coins: prev.coins + coinsEarned,
-                packCredits: newPackCredits >= 1 ? newPackCredits - 1 : newPackCredits,
-                freePacks: newPackCredits >= 1 ? prev.freePacks + 1 : prev.freePacks,
+                credits: (prev.credits || 0) + creditsEarned,
+                consecutiveQuits: 0,
                 stats: {
                     ...prev.stats,
                     gamesPlayed: prev.stats.gamesPlayed + 1,
@@ -272,12 +289,12 @@ export function AuthProvider({ children }) {
                 }
             }));
 
-            return { coinsEarned, earnedPack: newPackCredits >= 1 };
+            return { creditsEarned };
         } catch (error) {
             console.error('Error updating match stats:', error);
             return null;
         }
-    }, [user, inventory.stats.highestCombo, inventory.packCredits]);
+    }, [user, inventory.stats.highestCombo]);
 
     // ========== ACHIEVEMENTS ==========
 
@@ -335,9 +352,10 @@ export function AuthProvider({ children }) {
         resetIcons,
 
         // Economy
-        addCoins,
-        spendCoins,
+        addCredits,
+        spendCredits,
         useFreePack,
+        applyPenalty,
 
         // Loadouts
         updateLoadout,

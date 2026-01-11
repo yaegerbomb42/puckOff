@@ -1,6 +1,6 @@
-import React, { useState } from 'react';
 import { useAuth } from '../../contexts/AuthContext';
-import { TIERS, PACK_PRICES, TOTAL_ICONS, getCollectionStats } from '../../utils/economy';
+import { TIERS, getCollectionStats } from '../../utils/economy';
+import { audio } from '../../utils/audio';
 
 // Stripe Payment Links (Replace with your real URLs)
 const STRIPE_LINKS = {
@@ -10,7 +10,7 @@ const STRIPE_LINKS = {
 };
 
 export default function Store({ onClose, onOpenPack }) {
-    const { inventory, useFreePack: consumeFreePack } = useAuth();
+    const { user, inventory, useFreePack: consumeFreePack } = useAuth();
     const stats = getCollectionStats(inventory?.icons || []);
 
     const handleOpenFreePack = async (type) => {
@@ -30,12 +30,14 @@ export default function Store({ onClose, onOpenPack }) {
             <div className="store-header">
                 <div className="header-info">
                     <h2>🎰 ICON VAULT</h2>
-                    {inventory?.freePacks > 0 && (
-                        <div className="free-packs-badge">
-                            🎁 {inventory.freePacks} Packs Owned
-                        </div>
-                    )}
+                    <div className="stats-row">
+                        {inventory?.freePacks > 0 && (
+                            <div className="stat-badge packs">🎁 {inventory.freePacks} Packs</div>
+                        )}
+                        <div className="stat-badge credits">💎 {inventory?.credits || 0} Credits</div>
+                    </div>
                 </div>
+                {!user && <div className="auth-nag">Sign in to save progress!</div>}
                 <div className="collection-progress">
                     📦 {stats.owned}/{stats.total} ({stats.percentage}%)
                 </div>
@@ -43,6 +45,23 @@ export default function Store({ onClose, onOpenPack }) {
             </div>
 
             <div className="store-content">
+                {/* Tier Preview - MOVED TO TOP */}
+                <div className="tier-section top-tiers">
+                    <div className="tier-grid">
+                        {Object.entries(TIERS).map(([id, tier]) => (
+                            <div
+                                key={id}
+                                className="tier-chip"
+                                style={{ borderColor: tier.color }}
+                            >
+                                <span className="tier-dot" style={{ background: tier.color }}></span>
+                                <span className="tier-name">{tier.name}</span>
+                                <span className="tier-rate">{(tier.dropRate * 100).toFixed(1)}%</span>
+                            </div>
+                        ))}
+                    </div>
+                </div>
+
                 {/* Pack Purchasing Section */}
                 <div className="packs-section">
                     <h3>Open Packs</h3>
@@ -50,14 +69,15 @@ export default function Store({ onClose, onOpenPack }) {
 
                     <div className="packs-grid">
                         <PackCard
-                            name="Single Pack"
-                            price={inventory?.freePacks > 0 ? "OPEN NOW" : "$0.50"}
+                            name="Basic Pack"
+                            price={!user ? "SIGN IN" : (inventory?.credits >= 10 || inventory?.freePacks > 0 ? "OPEN NOW" : "10 Credits")}
                             slots={3}
                             color="#00d4ff"
                             image="/images/packs/single_pack.png"
-                            owned={inventory?.freePacks > 0}
+                            owned={user && (inventory?.freePacks > 0 || inventory?.credits >= 10)}
                             onClick={() => {
-                                if (inventory?.freePacks > 0) {
+                                if (!user) return; // Should show auth modal instead?
+                                if (inventory?.freePacks > 0 || inventory?.credits >= 10) {
                                     handleOpenFreePack('single');
                                 } else {
                                     window.open(STRIPE_LINKS.single, '_blank');
@@ -73,40 +93,6 @@ export default function Store({ onClose, onOpenPack }) {
                             badge="SAVE 40%"
                             onClick={() => window.open(STRIPE_LINKS.bundle10, '_blank')}
                         />
-                    </div>
-                </div>
-
-                <hr className="divider" />
-
-                {/* Whale Option */}
-                <div className="whale-section">
-                    <div className="whale-card" onClick={() => window.open(STRIPE_LINKS.unlockAll, '_blank')}>
-                        <div className="whale-glow"></div>
-                        <img src="/images/packs/unlock_all.png" alt="Unlock All" className="whale-image" />
-                        <h3>🐋 UNLOCK ALL</h3>
-                        <p>Instantly unlock all 150 icons including Mystery Tiers</p>
-                        <div className="whale-price">$99.99</div>
-                        <div className="whale-bonus">+ Hidden Divine Bonuses</div>
-                    </div>
-                </div>
-
-                <hr className="divider" />
-
-                {/* Tier Preview */}
-                <div className="tier-section">
-                    <h3>Rarity Tiers</h3>
-                    <div className="tier-grid">
-                        {Object.entries(TIERS).map(([id, tier]) => (
-                            <div
-                                key={id}
-                                className={`tier-chip ${tier.isMystery ? 'mystery' : ''}`}
-                                style={{ borderColor: tier.color }}
-                            >
-                                <span className="tier-dot" style={{ background: tier.color }}></span>
-                                <span className="tier-name">{tier.isMystery ? '???' : tier.name}</span>
-                                <span className="tier-rate">{(tier.dropRate * 100).toFixed(1)}%</span>
-                            </div>
-                        ))}
                     </div>
                 </div>
             </div>
@@ -140,8 +126,9 @@ export default function Store({ onClose, onOpenPack }) {
                 }
                 .close-btn:hover { background: rgba(255,0,110,0.3); }
 
-                .packs-section, .whale-section, .tier-section { margin-bottom: 2rem; }
-                .packs-section h3, .tier-section h3 { text-align: center; margin-bottom: 0.5rem; }
+                .packs-section, .whale-section { margin-bottom: 2rem; }
+                .tier-section.top-tiers { margin-bottom: 3rem; background: rgba(0,0,0,0.2); padding: 1.5rem; border-radius: 15px; }
+                .packs-section h3 { text-align: center; margin-bottom: 0.5rem; font-size: 1.5rem; }
                 .pack-info { text-align: center; color: #888; font-size: 0.9rem; margin-bottom: 1rem; }
                 
                 .packs-grid { display: flex; gap: 2rem; justify-content: center; flex-wrap: wrap; }

@@ -8,6 +8,9 @@ import { SKIN_DEFINITIONS } from '../../utils/skins';
 import { DEFAULT_LOADOUT } from '../../utils/powerups';
 import { useAuth } from '../../contexts/AuthContext';
 import { audio } from '../../utils/audio';
+import SkeletonLoader from './SkeletonLoader';
+import { getBiomeList } from '../../utils/mapGenerator';
+import { GAME_MODES } from '../../utils/gameModes';
 
 export default function Lobby({
     connected,
@@ -23,9 +26,11 @@ export default function Lobby({
     connectionError,
     onPlayOffline,
     selectedMap,
+    gameMode,
+    onSelectMode,
     mapVotes
 }) {
-    const { user, inventory, loginWithGoogle, loginWithEmail, signupWithEmail, logout, equipIcon, equipSkin, updateLoadout, setActiveLoadout } = useAuth();
+    const { user, inventory, loading, loginWithGoogle, loginWithEmail, signupWithEmail, logout, equipIcon, equipSkin, updateLoadout, setActiveLoadout } = useAuth();
 
     const [showStore, setShowStore] = useState(false);
     const [showLoadout, setShowLoadout] = useState(false);
@@ -103,6 +108,7 @@ export default function Lobby({
                 <IconChooser
                     ownedIcons={inventory?.icons || []}
                     equippedIcon={inventory?.equippedIcon}
+                    loading={loading}
                     onClose={() => setShowIcons(false)}
                     onSelect={(icon) => {
                         equipIcon(icon.id);
@@ -157,7 +163,12 @@ export default function Lobby({
             <div className="lobby-container">
                 {/* User Bar */}
                 <div className="user-bar">
-                    {user ? (
+                    {loading ? (
+                        <div style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
+                            <SkeletonLoader width="150px" height="24px" />
+                            <SkeletonLoader width="80px" height="24px" />
+                        </div>
+                    ) : user ? (
                         <>
                             <span className="user-email">👤 {user.email}</span>
                             <span className="user-packs">🎁 {inventory?.freePacks || 0} Packs</span>
@@ -269,28 +280,48 @@ export default function Lobby({
                             ))}
                         </div>
 
-                        <div className="map-voting">
-                            <h3>VOTE FOR ARENA</h3>
-                            <div className="vote-options">
-                                {[
-                                    { name: 'SAWBLADE CITY', img: '/images/maps/sawblade_city.png', desc: 'Deadly traps and tight corners' },
-                                    { name: 'RAMP HEAVEN', img: '/images/maps/ramp_heaven.png', desc: 'High-flying vertical combat' },
-                                    { name: 'BOX FORT', img: '/images/maps/box_fort.png', desc: 'Chaos in a cluttered warehouse' }
-                                ].map(map => (
-                                    <div
-                                        key={map.name}
-                                        className={`map-card ${selectedMap === map.name ? 'selected' : ''}`}
-                                        onClick={() => { audio.playClick(); onVoteMap && onVoteMap(map.name); }}
+                        <div className="game-settings">
+                            <h3>GAME MODE</h3>
+                            <div className="mode-options">
+                                {Object.entries(GAME_MODES).map(([key, mode]) => (
+                                    <button
+                                        key={key}
+                                        className={`btn mode-btn ${gameMode === key ? 'selected' : ''}`}
+                                        disabled={!isReady && players.length > 0 && players[0].id !== playerId} // Only host can change
+                                        onClick={() => {
+                                            if (players.length > 0 && players[0].id !== playerId) return;
+                                            audio.playClick();
+                                            onSelectMode && onSelectMode(key);
+                                        }}
+                                        title={mode.description}
                                     >
-                                        <div className="map-preview">
-                                            <img src={map.img} alt={map.name} />
+                                        {mode.name}
+                                    </button>
+                                ))}
+                            </div>
+                            <div className="mode-desc">
+                                {GAME_MODES[gameMode]?.description}
+                            </div>
+                        </div>
+
+                        <div className="map-voting">
+                            <h3>VOTE FOR BIOME</h3>
+                            <div className="vote-subtext">Vote for the arena theme. Layout is procedurally generated.</div>
+                            <div className="vote-options">
+                                {getBiomeList().slice(0, 3).map(biome => (
+                                    <div
+                                        key={biome.id}
+                                        className={`map-card ${selectedMap === biome.id ? 'selected' : ''}`}
+                                        onClick={() => { audio.playClick(); onVoteMap && onVoteMap(biome.id); }}
+                                    >
+                                        <div className="map-preview" style={{ background: `linear-gradient(45deg, ${biome.colors.floor}, ${biome.colors.accent})` }}>
                                             <div className="map-overlay">
-                                                <div className="vote-count">🔥 {Object.values(mapVotes).filter(v => v === map.name).length}</div>
+                                                <div className="vote-count">🔥 {Object.values(mapVotes).filter(v => v === biome.id).length}</div>
                                             </div>
                                         </div>
                                         <div className="map-info">
-                                            <h4>{map.name}</h4>
-                                            <p>{map.desc}</p>
+                                            <h4>{biome.name}</h4>
+                                            <p>{biome.description}</p>
                                         </div>
                                     </div>
                                 ))}
@@ -320,7 +351,7 @@ export default function Lobby({
                 </div>
             </div>
 
-            <style jsx>{`
+            <style>{`
                 .lobby-overlay {
                     position: fixed; inset: 0;
                     background: url('/images/lobby_background.png') center center / cover no-repeat;
@@ -526,8 +557,25 @@ export default function Lobby({
                 .ready-status { font-size: 0.8rem; color: #888; }
                 .ready-status.ready { color: #00ff87; }
 
+                .game-settings { margin: 1rem 0; width: 100%; }
+                .game-settings h3 { color: #fff; margin-bottom: 0.5rem; font-size: 1rem; letter-spacing: 2px; }
+                .mode-options { display: flex; gap: 0.5rem; justify-content: center; flex-wrap: wrap; }
+                .mode-btn { 
+                    background: rgba(255,255,255,0.05); color: #888; border: 1px solid #444;
+                    padding: 0.5rem 1rem; font-size: 0.8rem;
+                }
+                .mode-btn:hover:not(:disabled) { background: rgba(255,255,255,0.1); color: white; }
+                .mode-btn.selected { 
+                    background: linear-gradient(45deg, #00d4ff, #00ff87); 
+                    color: black; border-color: transparent;
+                    box-shadow: 0 0 15px rgba(0,212,255,0.3);
+                }
+                .mode-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+                .mode-desc { color: #aaa; font-size: 0.75rem; margin-top: 0.5rem; font-style: italic; }
+
                 .map-voting { margin: 2rem 0; width: 100%; }
-                .map-voting h3 { color: #fff; margin-bottom: 1rem; font-size: 1rem; letter-spacing: 2px; }
+                .map-voting h3 { color: #fff; margin-bottom: 0.2rem; font-size: 1rem; letter-spacing: 2px; }
+                .vote-subtext { color: #888; font-size: 0.7rem; margin-bottom: 1rem; font-style: italic; }
                 .vote-options { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; }
                 
                 .map-card {
@@ -538,8 +586,7 @@ export default function Lobby({
                 .map-card.selected { border-color: #00d4ff; box-shadow: 0 0 20px rgba(0,212,255,0.3); }
                 
                 .map-preview { position: relative; aspect-ratio: 16/9; overflow: hidden; }
-                .map-preview img { width: 100%; height: 100%; object-fit: cover; transition: transform 0.5s; }
-                .map-card:hover .map-preview img { transform: scale(1.1); }
+                /* img rule removed as we use gradients */
                 
                 .map-overlay {
                     position: absolute; inset: 0; background: linear-gradient(to top, rgba(0,0,0,0.8), transparent);

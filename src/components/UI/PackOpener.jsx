@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { openPack, TIERS } from '../../utils/economy';
+import { audio } from '../../utils/audio';
 import { Canvas, useFrame } from '@react-three/fiber';
 import { Environment, Stars, Float, PerspectiveCamera, Points, PointMaterial } from '@react-three/drei';
 import * as THREE from 'three';
@@ -49,6 +50,45 @@ function ParticleBurst({ color = "#00d4ff", count = 100 }) {
     );
 }
 
+// 3D Pack Component
+function Pack3D({ onClick, color = "#00d4ff", opening }) {
+    const mesh = useRef();
+
+    useFrame((state) => {
+        if (!mesh.current) return;
+        const t = state.clock.getElapsedTime();
+
+        if (opening) {
+            mesh.current.rotation.x += 0.2;
+            mesh.current.rotation.y += 0.2;
+            mesh.current.scale.multiplyScalar(1.05);
+        } else {
+            // Floating animation
+            mesh.current.position.y = Math.sin(t * 2) * 0.2;
+            mesh.current.rotation.y = Math.sin(t * 1) * 0.2;
+            mesh.current.rotation.z = Math.sin(t * 0.5) * 0.1;
+        }
+    });
+
+    return (
+        <mesh ref={mesh} onClick={onClick} scale={opening ? [1, 1, 1] : [1.5, 2, 0.5]}>
+            <boxGeometry args={[1, 1, 1]} />
+            <meshStandardMaterial
+                color={color}
+                metalness={0.9}
+                roughness={0.2}
+                emissive={color}
+                emissiveIntensity={0.2}
+            />
+            {/* Edge highlights */}
+            <lineSegments>
+                <edgesGeometry args={[new THREE.BoxGeometry(1, 1, 1)]} />
+                <lineBasicMaterial color="white" />
+            </lineSegments>
+        </mesh>
+    );
+}
+
 export default function PackOpener({ packType = 'single', onClose, onClaimRewards }) {
     const [step, setStep] = useState('sealed'); // sealed, opening, revealing, complete
     const [slots, setSlots] = useState([]);
@@ -58,14 +98,18 @@ export default function PackOpener({ packType = 'single', onClose, onClaimReward
     useEffect(() => {
         const packContents = openPack(packType);
         setSlots(packContents.map(slot => ({ ...slot, revealed: false })));
+        // Set initial color based on pack type
+        if (packType === 'bundle10') setActiveColor("#a855f7"); // Purple for bundle
     }, [packType]);
 
     const handleOpen = () => {
+        if (step !== 'sealed') return;
+        audio.playClick();
         setStep('opening');
         setTimeout(() => {
             setStep('revealing');
             revealNextSlot();
-        }, 1800);
+        }, 1500);
     };
 
     const revealNextSlot = useCallback(() => {
@@ -102,37 +146,37 @@ export default function PackOpener({ packType = 'single', onClose, onClaimReward
 
     return (
         <div className={`opener-overlay ${step}`}>
-            <div className="background-canvas">
+            <div className={`background-canvas ${step !== 'sealed' ? 'blur' : ''}`}>
                 <Canvas shadows dpr={[1, 2]}>
                     <PerspectiveCamera makeDefault position={[0, 0, 5]} />
                     <Stars radius={100} depth={50} count={5000} factor={4} saturation={0} fade speed={1} />
                     <ambientLight intensity={0.5} />
                     <pointLight position={[10, 10, 10]} intensity={1} color={activeColor} />
-                    {(step === 'opening' || step === 'revealing') && (
+                    <pointLight position={[-10, -10, -5]} intensity={0.5} color="white" />
+
+                    {step === 'sealed' || step === 'opening' ? (
+                        <>
+                            <Float speed={2} rotationIntensity={0.5} floatIntensity={0.5}>
+                                <Pack3D
+                                    onClick={handleOpen}
+                                    color={activeColor}
+                                    opening={step === 'opening'}
+                                />
+                            </Float>
+                            <ParticleBurst color={activeColor} count={50} />
+                        </>
+                    ) : (
                         <ParticleBurst color={activeColor} count={200} />
                     )}
+
                     <Environment preset="night" />
                 </Canvas>
             </div>
 
             <div className="content-layer">
                 {step === 'sealed' && (
-                    <div className="pack-stage" onClick={handleOpen}>
-                        <div className="pack-aura"></div>
-                        <div className="premium-pack">
-                            <div className="pack-face">
-                                <div className="pack-symbol">⚡</div>
-                                <div className="pack-label">{packType.toUpperCase()}</div>
-                            </div>
-                        </div>
-                        <h2 className="glitch-text">TAP TO UNLEASH</h2>
-                    </div>
-                )}
-
-                {step === 'opening' && (
-                    <div className="opening-center">
-                        <div className="energy-beam" style={{ background: activeColor }}></div>
-                        <div className="pack-explosion">📦</div>
+                    <div className="tutorial-text" style={{ pointerEvents: 'none' }}>
+                        <h2 className="glitch-text">TAP PACK TO OPEN</h2>
                     </div>
                 )}
 
@@ -170,42 +214,20 @@ export default function PackOpener({ packType = 'single', onClose, onClaimReward
                 }
                 .background-canvas {
                     position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-                    z-index: 1; pointer-events: none;
+                    z-index: 10;
+                    transition: filter 0.5s;
                 }
-                .content-layer { position: relative; z-index: 2; width: 100%; text-align: center; }
+                .background-canvas.blur { filter: blur(5px) brightness(0.5); }
+                
+                .content-layer { position: relative; z-index: 20; width: 100%; text-align: center; pointer-events: none; }
+                .reveal-stage { pointer-events: auto; }
 
-                /* Sealed State */
-                .pack-stage { cursor: pointer; transition: 0.5s; }
-                .pack-aura {
-                    position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%);
-                    width: 400px; height: 400px;
-                    background: radial-gradient(circle, rgba(0,212,255,0.2), transparent 70%);
-                    animation: auraPulse 2s infinite ease-in-out;
+                .tutorial-text {
+                    position: absolute; top: 70%; left: 50%; transform: translateX(-50%);
+                    width: 100%;
                 }
-                .premium-pack {
-                    width: 250px; height: 350px; margin: 0 auto;
-                    background: linear-gradient(145deg, #111, #222);
-                    border: 4px solid #00d4ff; border-radius: 20px;
-                    display: flex; align-items: center; justify-content: center;
-                    box-shadow: 0 0 50px rgba(0,212,255,0.3);
-                    transform: perspective(1000px) rotateY(10deg);
-                    transition: 0.3s;
-                }
-                .pack-stage:hover .premium-pack {
-                    transform: perspective(1000px) rotateY(0deg) scale(1.05);
-                    box-shadow: 0 0 70px rgba(0,212,255,0.5);
-                }
-                .pack-symbol { font-size: 5rem; margin-bottom: 1rem; text-shadow: 0 0 20px #00d4ff; }
-                .pack-label { font-weight: bold; font-size: 1.2rem; color: #00d4ff; letter-spacing: 2px; }
+
                 .glitch-text { margin-top: 3rem; animation: glitch 1s infinite alternate; }
-
-                /* Opening State */
-                .energy-beam {
-                    position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%);
-                    width: 10px; height: 100vh;
-                    filter: blur(20px); animation: beamGrow 1.8s forwards;
-                }
-                .pack-explosion { font-size: 15rem; animation: explode 1.8s forwards; }
 
                 /* Reveal Stage */
                 .reveal-stage { width: 100%; max-width: 1200px; margin: 0 auto; padding: 2rem; }
@@ -223,26 +245,13 @@ export default function PackOpener({ packType = 'single', onClose, onClaimReward
                     font-family: 'Orbitron', sans-serif;
                     box-shadow: 0 5px 30px rgba(0,255,135,0.4);
                     transition: 0.3s;
+                    pointer-events: auto;
                 }
                 .premium-claim-btn:hover {
                     transform: translateY(-5px) scale(1.05);
                     box-shadow: 0 10px 50px rgba(0,255,135,0.6);
                 }
 
-                @keyframes auraPulse {
-                    0%, 100% { transform: translate(-50%, -50%) scale(1); opacity: 0.5; }
-                    50% { transform: translate(-50%, -50%) scale(1.2); opacity: 1; }
-                }
-                @keyframes beamGrow {
-                    0% { width: 0; opacity: 0; }
-                    50% { width: 500px; opacity: 1; }
-                    100% { width: 2000px; opacity: 0; }
-                }
-                @keyframes explode {
-                    0% { transform: scale(1) rotate(0); }
-                    30% { transform: scale(1.5) rotate(15deg); }
-                    100% { transform: scale(0) rotate(-45deg); opacity: 0; }
-                }
                 @keyframes glitch {
                     0% { transform: skew(0); text-shadow: 0 0 0 #fff; }
                     10% { transform: skew(2deg); text-shadow: 2px 0 #ff006e, -2px 0 #00d4ff; }

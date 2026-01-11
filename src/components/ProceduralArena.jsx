@@ -23,7 +23,17 @@ function FloorTile({ position, color, elevation = 0 }) {
     return (
         <mesh ref={ref} receiveShadow>
             <boxGeometry args={[TILE_SIZE, TILE_HEIGHT, TILE_SIZE]} />
-            <meshStandardMaterial color={color} metalness={0.1} roughness={0.8} />
+            <meshStandardMaterial
+                color={color}
+                metalness={0.4}
+                roughness={0.6}
+                dithering
+            />
+            {/* Edge highlight */}
+            <lineSegments>
+                <edgesGeometry args={[new THREE.BoxGeometry(TILE_SIZE, TILE_HEIGHT, TILE_SIZE)]} />
+                <lineBasicMaterial color="#333" linewidth={2} transparent opacity={0.2} />
+            </lineSegments>
         </mesh>
     );
 }
@@ -44,12 +54,16 @@ function IceTile({ position, color, elevation = 0 }) {
     return (
         <mesh ref={ref} receiveShadow>
             <boxGeometry args={[TILE_SIZE, TILE_HEIGHT, TILE_SIZE]} />
-            <meshStandardMaterial
+            <meshPhysicalMaterial
                 color={color || '#88ccff'}
-                metalness={0.95}
+                metalness={0.1}
                 roughness={0.05}
+                transmission={0.6} // Glass-like transmission
+                thickness={1.5}    // Refraction depth
+                clearcoat={1}
+                clearcoatRoughness={0.1}
                 transparent
-                opacity={0.85}
+                opacity={0.9}
             />
         </mesh>
     );
@@ -62,14 +76,22 @@ function LavaTile({ position, color }) {
     const meshRef = useRef();
 
     useFrame((state) => {
-        if (meshRef.current) {
+        if (meshRef.current?.material) {
             meshRef.current.material.emissiveIntensity = 1.5 + Math.sin(state.clock.elapsedTime * 3) * 0.5;
         }
     });
 
+    const [ref] = useBox(() => ({
+        type: 'Static',
+        position: [position.x, -TILE_HEIGHT, position.z],
+        args: [TILE_SIZE, TILE_HEIGHT * 0.3, TILE_SIZE],
+        material: { friction: 0.5, restitution: 0.1 },
+        userData: { type: 'lava' }
+    }));
+
     return (
-        <group position={[position.x, -TILE_HEIGHT, position.z]}>
-            <mesh ref={meshRef} receiveShadow>
+        <group>
+            <mesh ref={ref} receiveShadow>
                 <boxGeometry args={[TILE_SIZE, TILE_HEIGHT * 0.3, TILE_SIZE]} />
                 <meshStandardMaterial
                     color={color || '#ff4500'}
@@ -83,7 +105,7 @@ function LavaTile({ position, color }) {
                 color="#ff4500"
                 intensity={0.8}
                 distance={6}
-                position={[0, 1.5, 0]}
+                position={[position.x, 1.5, position.z]}
             />
         </group>
     );
@@ -123,7 +145,7 @@ function BumperTile({ position, color }) {
     }));
 
     useFrame((state) => {
-        if (meshRef.current) {
+        if (meshRef.current?.material) {
             meshRef.current.material.emissiveIntensity = 0.5 + Math.sin(state.clock.elapsedTime * 4) * 0.3;
         }
     });
@@ -340,6 +362,62 @@ function PitTile({ position }) {
 // ============================================
 // MAIN PROCEDURAL ARENA
 // ============================================
+// ============================================
+// OUTER DECORATIONS (Step 26)
+// ============================================
+function ArenaDecorations() {
+    const pillars = useMemo(() => {
+        return new Array(20).fill(0).map((_, i) => ({
+            position: [
+                (Math.random() - 0.5) * 80,
+                (Math.random() * 10) - 10,
+                (Math.random() - 0.5) * 80
+            ],
+            scale: [1 + Math.random() * 2, 10 + Math.random() * 20, 1 + Math.random() * 2],
+            rotation: [0, Math.random() * Math.PI, 0]
+        })).filter(p => Math.abs(p.position[0]) > 25 || Math.abs(p.position[2]) > 25);
+    }, []);
+
+    return (
+        <group>
+            {pillars.map((p, i) => (
+                <mesh key={i} position={p.position} scale={p.scale} rotation={p.rotation} receiveShadow>
+                    <boxGeometry />
+                    <meshStandardMaterial color="#111" roughness={0.9} />
+                </mesh>
+            ))}
+            <gridHelper args={[200, 50, '#222', '#111']} position={[0, -2, 0]} />
+        </group>
+    );
+}
+
+// ============================================
+// ANIMATED LAVA (Step 27)
+// ============================================
+function AnimatedLava() {
+    // Basic animated lava plane without texture asset dependency
+    const materialRef = useRef();
+
+    useFrame((state) => {
+        if (materialRef.current) {
+            materialRef.current.emissiveIntensity = 1.2 + Math.sin(state.clock.elapsedTime * 2) * 0.4;
+        }
+    });
+
+    return (
+        <mesh position={[0, -5, 0]} rotation={[-Math.PI / 2, 0, 0]}>
+            <planeGeometry args={[300, 300]} />
+            <meshStandardMaterial
+                ref={materialRef}
+                color="#ff3300"
+                emissive="#ff0000"
+                emissiveIntensity={1.2}
+                roughness={0.8}
+            />
+        </mesh>
+    );
+}
+
 export default function ProceduralArena({ mapData }) {
     const tiles = useMemo(() => {
         if (!mapData?.grid) return [];
@@ -476,31 +554,17 @@ export default function ProceduralArena({ mapData }) {
         <group>
             {tiles}
             {decorations}
+            <ArenaDecorations />
+            <AnimatedLava />
 
-            {/* Biome-specific lighting */}
-            <ambientLight intensity={0.4} />
-            <directionalLight
-                position={[15, 25, 15]}
-                intensity={1}
-                castShadow
-                shadow-mapSize={[2048, 2048]}
-                shadow-camera-far={100}
-                shadow-camera-left={-30}
-                shadow-camera-right={30}
-                shadow-camera-top={30}
-                shadow-camera-bottom={-30}
-            />
-
-            {/* Secondary accent light */}
+            {/* Note: Main lighting is now handled by GameScene for better global control.
+                Only simple biome accent light remains here. */}
             <pointLight
                 position={[0, 10, 0]}
                 color={biome?.colors?.glow || '#ffffff'}
                 intensity={0.3}
                 distance={50}
             />
-
-            {/* Fog from biome */}
-            {fog && <fog attach="fog" args={[fog.color, fog.near, fog.far]} />}
         </group>
     );
 }

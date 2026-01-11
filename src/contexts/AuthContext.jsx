@@ -48,19 +48,27 @@ const DEFAULT_INVENTORY = {
 export function AuthProvider({ children }) {
     const [user, setUser] = useState(null);
     const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(null);
     const [inventory, setInventory] = useState(DEFAULT_INVENTORY);
     const [isAdmin, setIsAdmin] = useState(false);
+
+    const clearError = useCallback(() => setError(null), []);
 
     // Listen to auth state changes
     useEffect(() => {
         const unsubscribe = onAuthStateChanged(auth, async (firebaseUser) => {
-            if (firebaseUser) {
-                setUser(firebaseUser);
-                await loadUserData(firebaseUser.uid);
-            } else {
-                setUser(null);
-                setInventory(DEFAULT_INVENTORY);
-                setIsAdmin(false);
+            try {
+                if (firebaseUser) {
+                    setUser(firebaseUser);
+                    await loadUserData(firebaseUser.uid);
+                } else {
+                    setUser(null);
+                    setInventory(DEFAULT_INVENTORY);
+                    setIsAdmin(false);
+                }
+            } catch (err) {
+                console.error("Auth state change error:", err);
+                setError("Failed to load user data. Please refresh.");
             }
             setLoading(false);
         });
@@ -70,6 +78,7 @@ export function AuthProvider({ children }) {
     // Load user data from Firestore
     async function loadUserData(uid) {
         try {
+            setError(null);
             const userDoc = await getDoc(doc(db, 'users', uid));
             if (userDoc.exists()) {
                 const data = userDoc.data();
@@ -98,6 +107,7 @@ export function AuthProvider({ children }) {
             }
         } catch (error) {
             console.error('Error loading user data:', error);
+            setError("Failed to load profile. Please check your connection.");
         }
     }
 
@@ -109,6 +119,7 @@ export function AuthProvider({ children }) {
             setInventory(prev => ({ ...prev, ...updates }));
         } catch (error) {
             console.error('Error saving inventory:', error);
+            setError("Failed to save changes. Your data may be out of sync.");
         }
     }, [user]);
 
@@ -116,36 +127,44 @@ export function AuthProvider({ children }) {
 
     async function loginWithGoogle() {
         try {
+            setError(null);
             await signInWithPopup(auth, googleProvider);
         } catch (error) {
             console.error('Google login error:', error);
+            setError("Google login failed. Please try again.");
             throw error;
         }
     }
 
     async function loginWithEmail(email, password) {
         try {
+            setError(null);
             await signInWithEmailAndPassword(auth, email, password);
         } catch (error) {
             console.error('Email login error:', error);
+            setError("Login failed. Check your email and password.");
             throw error;
         }
     }
 
     async function signupWithEmail(email, password) {
         try {
+            setError(null);
             await createUserWithEmailAndPassword(auth, email, password);
         } catch (error) {
             console.error('Signup error:', error);
+            setError("Failed to create account. Email might be in use.");
             throw error;
         }
     }
 
     async function logout() {
         try {
+            setError(null);
             await signOut(auth);
         } catch (error) {
             console.error('Logout error:', error);
+            setError("Logout failed.");
         }
     }
 
@@ -187,11 +206,13 @@ export function AuthProvider({ children }) {
             return true;
         } catch (error) {
             console.error('Error spending credits:', error);
+            setError("Transaction failed. Credits not deducted.");
             return false;
         }
     }, [user, inventory.credits]);
 
     const applyPenalty = useCallback(async (penaltyType) => {
+        // ... (no change needed for logic, but error handling)
         if (!user) return;
 
         let updates = {};
@@ -235,6 +256,7 @@ export function AuthProvider({ children }) {
             return true;
         } catch (error) {
             console.error('Error using free pack:', error);
+            setError("Failed to open pack. Please try again.");
             return false;
         }
     }, [user, inventory.freePacks]);
@@ -292,6 +314,7 @@ export function AuthProvider({ children }) {
             return { creditsEarned };
         } catch (error) {
             console.error('Error updating match stats:', error);
+            // Don't error prompt for background stats update
             return null;
         }
     }, [user, inventory.stats.highestCombo]);
@@ -337,6 +360,8 @@ export function AuthProvider({ children }) {
     const value = {
         user,
         loading,
+        error,
+        clearError,
         inventory,
         isAdmin,
 
@@ -372,7 +397,7 @@ export function AuthProvider({ children }) {
 
     return (
         <AuthContext.Provider value={value}>
-            {!loading && children}
+            {children}
         </AuthContext.Provider>
     );
 }

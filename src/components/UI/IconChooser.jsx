@@ -1,10 +1,11 @@
 import React, { useState } from 'react';
 import { TIERS, getAllIcons } from '../../utils/economy';
+import SkeletonLoader from './SkeletonLoader';
 
 // Get all 150 icons from the centralized database
 const ICON_SLOTS = getAllIcons().sort((a, b) => a.id - b.id);
 
-export default function IconChooser({ ownedIcons = [], onClose, onSelect, equippedIcon }) {
+export default function IconChooser({ ownedIcons = [], onClose, onSelect, equippedIcon, loading }) {
     const [hoveredIcon, setHoveredIcon] = useState(null);
     const [selectedPreview, setSelectedPreview] = useState(null);
 
@@ -63,60 +64,86 @@ export default function IconChooser({ ownedIcons = [], onClose, onSelect, equipp
                 <div className="collection-panel">
                     <div className="modal-header">
                         <h2>✨ ICON COLLECTION</h2>
-                        <p className="collection-progress">{totalOwned} / 150 Collected</p>
+                        <p className="collection-progress">
+                            {loading ? <SkeletonLoader width="100px" height="20px" /> : `${totalOwned} / 150 Collected`}
+                        </p>
                         <button className="close-btn" onClick={onClose}>✕</button>
                     </div>
 
                     <div className="icon-grid-container">
-                        {Object.entries(groupedByTier).map(([tier, icons]) => {
-                            const tierData = TIERS[tier];
-                            const ownedInTier = icons.filter(i => ownedSet.has(i.id)).length;
-
-                            return (
-                                <div key={tier} className="tier-section">
-                                    <div className="tier-header" style={{ borderColor: tierData.color }}>
-                                        <span className="tier-badge" style={{ background: tierData.color }}>
-                                            {tierData.isMystery ? '???' : tierData.name}
-                                        </span>
-                                        <span className="tier-count">{ownedInTier} / {icons.length}</span>
-                                    </div>
-                                    <div className="tier-icons">
-                                        {icons.map(icon => {
-                                            const owned = ownedSet.has(icon.id);
-                                            const isEquipped = equippedIcon === icon.id;
-                                            return (
-                                                <div
-                                                    key={icon.id}
-                                                    className={`icon-slot ${owned ? 'owned' : 'locked'} ${isEquipped ? 'equipped' : ''}`}
-                                                    style={{
-                                                        borderColor: owned ? tierData.color : '#333',
-                                                        boxShadow: owned ? `0 0 10px ${tierData.color}40` : 'none'
-                                                    }}
-                                                    onMouseEnter={() => owned && setHoveredIcon(icon)}
-                                                    onMouseLeave={() => setHoveredIcon(null)}
-                                                    onClick={() => {
-                                                        if (owned) {
-                                                            setSelectedPreview(icon);
-                                                        }
-                                                    }}
-                                                >
-                                                    {owned ? (
-                                                        <>
-                                                            <div className="icon-visual">
-                                                                <img src={icon.imageUrl} alt={icon.name} className="icon-img" />
-                                                            </div>
-                                                            {isEquipped && <div className="equipped-badge">✓</div>}
-                                                        </>
-                                                    ) : (
-                                                        <div className="icon-visual locked-visual">?</div>
-                                                    )}
-                                                </div>
-                                            );
-                                        })}
-                                    </div>
+                        {loading ? (
+                            <div className="tier-section">
+                                <div className="tier-header" style={{ borderColor: '#333' }}>
+                                    <SkeletonLoader width="80px" height="24px" style={{ borderRadius: '20px' }} />
+                                    <SkeletonLoader width="40px" height="20px" />
                                 </div>
-                            );
-                        })}
+                                <div className="tier-icons">
+                                    {Array(10).fill(0).map((_, i) => (
+                                        <SkeletonLoader key={i} width="100%" height="auto" style={{ aspectRatio: '1', borderRadius: '50%' }} variant="circle" />
+                                    ))}
+                                </div>
+                                <div className="tier-header" style={{ borderColor: '#333', marginTop: '2rem' }}>
+                                    <SkeletonLoader width="80px" height="24px" style={{ borderRadius: '20px' }} />
+                                    <SkeletonLoader width="40px" height="20px" />
+                                </div>
+                                <div className="tier-icons">
+                                    {Array(10).fill(0).map((_, i) => (
+                                        <SkeletonLoader key={i} width="100%" height="auto" style={{ aspectRatio: '1', borderRadius: '50%' }} variant="circle" />
+                                    ))}
+                                </div>
+                            </div>
+                        ) : (
+                            Object.entries(groupedByTier).map(([tier, icons]) => {
+                                // ... existing rendering logic ...
+                                const tierData = TIERS[tier];
+                                const ownedInTier = icons.filter(i => ownedSet.has(i.id)).length;
+
+                                return (
+                                    <div key={tier} className="tier-section">
+                                        <div className="tier-header" style={{ borderColor: tierData.color }}>
+                                            <span className="tier-badge" style={{ background: tierData.color }}>
+                                                {tierData.isMystery ? '???' : tierData.name}
+                                            </span>
+                                            <span className="tier-count">{ownedInTier} / {icons.length}</span>
+                                        </div>
+                                        <div className="tier-icons">
+                                            {icons.map(icon => {
+                                                const owned = ownedSet.has(icon.id);
+                                                const isEquipped = equippedIcon === icon.id;
+                                                return (
+                                                    <div
+                                                        key={icon.id}
+                                                        className={`icon-slot ${owned ? 'owned' : 'locked'} ${isEquipped ? 'equipped' : ''}`}
+                                                        style={{
+                                                            borderColor: owned ? tierData.color : '#333',
+                                                            boxShadow: owned ? `0 0 10px ${tierData.color}40` : 'none'
+                                                        }}
+                                                        onMouseEnter={() => owned && setHoveredIcon(icon)}
+                                                        onMouseLeave={() => setHoveredIcon(null)}
+                                                        onClick={() => {
+                                                            if (owned) {
+                                                                setSelectedPreview(icon);
+                                                            }
+                                                        }}
+                                                    >
+                                                        {owned ? (
+                                                            <>
+                                                                <div className="icon-visual">
+                                                                    <img src={icon.imageUrl} alt={icon.name} className="icon-img" />
+                                                                </div>
+                                                                {isEquipped && <div className="equipped-badge">✓</div>}
+                                                            </>
+                                                        ) : (
+                                                            <div className="icon-visual locked-visual">?</div>
+                                                        )}
+                                                    </div>
+                                                );
+                                            })}
+                                        </div>
+                                    </div>
+                                );
+                            })
+                        )}
                     </div>
                 </div>
             </div>

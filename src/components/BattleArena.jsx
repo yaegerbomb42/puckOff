@@ -1,7 +1,7 @@
 import React, { useState, useCallback, Suspense, useRef, useEffect, useMemo } from 'react';
 import { Canvas } from '@react-three/fiber';
 import { Physics } from '@react-three/cannon';
-import { Stars, Environment } from '@react-three/drei';
+import { Stars, Environment, ContactShadows, Sparkles } from '@react-three/drei';
 
 import ArenaChaos from './ArenaChaos';
 import Puck from './Puck';
@@ -29,46 +29,9 @@ import { getPowerupInfo, DEFAULT_LOADOUT } from '../utils/powerups';
 import { generateMap } from '../utils/mapGenerator';
 import { analytics } from '../utils/analytics';
 import ReplayPlayer, { useReplayRecorder } from './ReplaySystem';
+import { GAME_MODES } from '../utils/gameModes';
 
-// ============================================
-// GAME MODE CONFIGURATIONS
-// ============================================
-const GAME_MODES = {
-    knockout: {
-        name: 'Knockout',
-        description: 'Knock enemies off to score. First to 3 KOs wins.',
-        stocksPerPlayer: 3,
-        timeLimit: 180,
-        winCondition: 'stocks',
-        damageDecay: false,
-        scoreToWin: 3
-    },
-    survival: {
-        name: 'Survival',
-        description: 'Last puck standing wins!',
-        stocksPerPlayer: 1,
-        timeLimit: 0,
-        winCondition: 'lastStanding',
-        damageDecay: false
-    },
-    timed: {
-        name: 'Timed Match',
-        description: 'Most KOs when time runs out wins.',
-        stocksPerPlayer: Infinity,
-        timeLimit: 120,
-        winCondition: 'score',
-        damageDecay: true
-    },
-    chaos: {
-        name: 'Chaos Mode',
-        description: 'Maximum powerups, maximum mayhem!',
-        stocksPerPlayer: 5,
-        timeLimit: 180,
-        winCondition: 'stocks',
-        damageDecay: false,
-        powerupSpawnRate: 0.5
-    }
-};
+// GAME_MODES moved to utils/gameModes.js
 
 // ============================================
 // GAME SCENE COMPONENT
@@ -95,20 +58,24 @@ function GameScene({
     screenShake,
     knockoutTarget,
     slowmo,
-    gameMode
+    gameMode,
+    onInvincibleChange
 }) {
     return (
         <>
             {/* Environment */}
-            <Environment preset={mapData?.biome?.skybox || 'sunset'} />
-            <ambientLight intensity={0.6} />
-            <directionalLight
-                position={[10, 20, 10]}
-                intensity={1.3}
-                castShadow
-                shadow-mapSize={[2048, 2048]}
-            />
-            <fog attach="fog" args={[mapData?.biome?.fog?.color || '#d6e4ff', 20, 80]} />
+            {/* Environment & Lighting (Overhaul Phase 1) */}
+            <Environment preset="city" background={false} />
+            <ambientLight intensity={0.4} />
+            <pointLight position={[10, 20, 10]} intensity={1.5} color="#ffffff" castShadow />
+            <pointLight position={[-10, 5, -10]} intensity={0.8} color="#00d4ff" /> {/* Cyan Rim */}
+            <pointLight position={[10, 5, -10]} intensity={0.8} color="#ff006e" /> {/* Pink Rim */}
+
+            {/* Ground Shadows (Steps 6) */}
+            {/* Note: ContactShadows is imported below */}
+
+            {/* Fog (Dynamically matched to biome) */}
+            <fog attach="fog" args={[mapData?.biome?.fog?.color || '#0b0b15', 15, 60]} />
 
             {/* Dynamic Camera */}
             <DynamicCamera
@@ -120,11 +87,15 @@ function GameScene({
             />
 
             {/* Arena */}
-            {mapData ? (
-                <ProceduralArena mapData={mapData} />
-            ) : (
-                <ArenaChaos mapType={mapType} />
-            )}
+            <group>
+                {mapData ? (
+                    <ProceduralArena mapData={mapData} />
+                ) : (
+                    <ArenaChaos mapType={mapType} />
+                )}
+                <ContactShadows resolution={1024} scale={50} blur={2.5} opacity={0.6} far={4} color="#000000" />
+                <Sparkles count={400} scale={40} size={3} speed={0.4} opacity={0.4} color="#ffffff" />
+            </group>
 
             {/* Players */}
             {players.map((player, index) => (
@@ -148,6 +119,7 @@ function GameScene({
                     remoteVelocity={player.id !== localPlayerId ? player.velocity : undefined}
                     allPlayerPositions={playerPositions}
                     gameMode={gameMode}
+                    onInvincibleChange={player.id === localPlayerId ? onInvincibleChange : undefined}
                 />
             ))}
 
@@ -176,7 +148,7 @@ export default function BattleArena() {
 
     // ========== GAME STATE ==========
     const [gameMode, setGameMode] = useState('knockout');
-    const [mapSeed, setMapSeed] = useState(null);
+    // mapSeed removed, using multiplayer.seed directly
     const [localPowerups, setLocalPowerups] = useState([]);
     const [playerPositions, setPlayerPositions] = useState({});
     const [playerPowerups, setPlayerPowerups] = useState({});
@@ -194,9 +166,10 @@ export default function BattleArena() {
     const [screenShake, setScreenShake] = useState(0);
     const [slowmo, setSlowmo] = useState(false);
 
-    // Timer - FIX: Actually counts down now
+    // Timer - Timestamp based for smooth syncing
     const [gameTimer, setGameTimer] = useState(180);
-    const timerRef = useRef(null);
+    const endTimeRef = useRef(Date.now() + 180000);
+    const rafRef = useRef(null);
 
     // Stats tracking
     const [matchStats, setMatchStats] = useState({
@@ -213,6 +186,9 @@ export default function BattleArena() {
     const [activeReplay, setActiveReplay] = useState(null);
     const [showReplay, setShowReplay] = useState(false);
 
+    // Player state
+    const [isInvincible, setIsInvincible] = useState(false);
+
     // FPS tracking
     const fpsRef = useRef(0);
 
@@ -222,16 +198,21 @@ export default function BattleArena() {
 
     // ========== GENERATE MAP ==========
     const mapData = useMemo(() => {
-        if (mapSeed) {
+        if (multiplayer.seed) {
             const chaosLevel = gameMode === 'chaos' ? 0.8 : 0.5;
-            return generateMap(mapSeed, 14, chaosLevel);
+            // Use selectedMap as forcedBiomeId
+            return generateMap(multiplayer.seed, 14, chaosLevel, multiplayer.selectedMap);
         }
         return null;
-    }, [mapSeed, gameMode]);
+    }, [multiplayer.seed, multiplayer.selectedMap, gameMode]);
 
     const modeConfig = GAME_MODES[gameMode] || GAME_MODES.knockout;
 
+    const gameEndedRef = useRef(false);
+
     const checkWinCondition = useCallback((timeUp = false) => {
+        if (gameEndedRef.current) return;
+
         const mode = modeConfig;
         let winnerId = null;
 
@@ -247,6 +228,7 @@ export default function BattleArena() {
         }
 
         if (winnerId) {
+            gameEndedRef.current = true;
             if (multiplayer.connected) multiplayer.reportGameEnd?.(winnerId, playerScores, matchStats);
             if (updateMatchStats && user) {
                 updateMatchStats({
@@ -260,69 +242,72 @@ export default function BattleArena() {
         }
     }, [modeConfig, playerStocks, playerScores, multiplayer, matchStats, updateMatchStats, user]);
 
-    // ========== GAME INITIALIZATION ==========
-    useEffect(() => {
-        if (multiplayer.gameState === 'playing') {
-            logGame(`Game Started: ${gameMode} mode`);
-            // Initialize player states
-            const initialStocks = {};
-            const initialScores = {};
-            multiplayer.players.forEach(p => {
-                initialStocks[p.id] = modeConfig.stocksPerPlayer;
-                initialScores[p.id] = 0;
-            });
-            setPlayerStocks(initialStocks);
-            setPlayerScores(initialScores);
-            setPlayerDamage({});
-            setGameTimer(modeConfig.timeLimit || 180);
-            setMatchStats({ totalDamage: 0, maxCombo: 0, stomps: 0, knockouts: 0 });
-            setCombo(0);
-
-            // Set map seed
-            setMapSeed(multiplayer.seed || Math.floor(Math.random() * 1000000));
-            audio.playStart();
-
-            // Start timer - FIX: Hybrid Server/Local
-            if (modeConfig.timeLimit > 0) {
-                // If server provided timer, use it
-                if (multiplayer.timer !== null && multiplayer.timer !== undefined) {
-                    setGameTimer(multiplayer.timer);
-                }
-
-                // Run local countdown for smoothness, but sync with server on updates
-                timerRef.current = setInterval(() => {
-                    setGameTimer(prev => {
-                        // If we have a fresh server time, let the effect below handle it? 
-                        // Actually, let's just decrement locally for smoothness
-                        if (prev <= 1) {
-                            clearInterval(timerRef.current);
-                            checkWinCondition(true);
-                            return 0;
-                        }
-                        return prev - 1;
-                    });
-                }, 1000);
-            }
-        }
-
-        return () => {
-            if (timerRef.current) {
-                clearInterval(timerRef.current);
-                timerRef.current = null;
-            }
-        };
-    }, [multiplayer.gameState, multiplayer.players, multiplayer.seed, modeConfig, checkWinCondition, multiplayer.timer, gameMode]);
-
-    // ========== SYNC SERVER TIMER ==========
+    // Sync with server time
     useEffect(() => {
         if (multiplayer.timer !== null && multiplayer.timer !== undefined) {
-            // Resync local timer if it drifts too far (>2s) or just trust server?
-            // For now, hard sync to ensure everyone sees the same end time
-            if (Math.abs(gameTimer - multiplayer.timer) > 1) {
-                setGameTimer(multiplayer.timer);
+            // Calculate target end time based on server remaining time
+            const targetEndTime = Date.now() + multiplayer.timer * 1000;
+
+            // Only update if difference is significant (>500ms) to avoid jitter
+            if (Math.abs(targetEndTime - endTimeRef.current) > 500) {
+                endTimeRef.current = targetEndTime;
             }
         }
-    }, [multiplayer.timer, gameTimer]);
+    }, [multiplayer.timer]);
+
+    // Expose for testing
+    useEffect(() => {
+        if (typeof window !== 'undefined') {
+            window.__GAME_INTERNALS = {
+                multiplayer,
+                forceStart: () => {
+                    console.log('🧪 Testing: Forcing Offline Start');
+                    multiplayer.enableOfflineMode();
+                    setTimeout(() => multiplayer.setReady(true), 500);
+                }
+            };
+        }
+    }, [multiplayer]);
+
+    // Timer Loop
+    useEffect(() => {
+        if (multiplayer.gameState !== 'playing') {
+            if (rafRef.current) cancelAnimationFrame(rafRef.current);
+            return;
+        }
+
+        // Initialize end time if just starting
+        if (modeConfig.timeLimit > 0 && gameTimer === modeConfig.timeLimit) {
+            endTimeRef.current = Date.now() + modeConfig.timeLimit * 1000;
+        }
+
+        const updateTimer = () => {
+            if (modeConfig.timeLimit <= 0) return; // Infinite time
+
+            const remaining = Math.max(0, Math.ceil((endTimeRef.current - Date.now()) / 1000));
+
+            setGameTimer(prev => {
+                if (prev !== remaining) {
+                    if (remaining === 0) {
+                        checkWinCondition(true);
+                    }
+                    return remaining;
+                }
+                return prev;
+            });
+
+            if (remaining > 0) {
+                rafRef.current = requestAnimationFrame(updateTimer);
+            }
+        };
+
+        rafRef.current = requestAnimationFrame(updateTimer);
+
+        return () => {
+            if (rafRef.current) cancelAnimationFrame(rafRef.current);
+        };
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [multiplayer.gameState, modeConfig.timeLimit, checkWinCondition]);
 
     // ========== WIN CONDITION CHECK ==========
     // ========== USE ITEM HANDLER ==========
@@ -563,10 +548,16 @@ export default function BattleArena() {
     }, []);
 
     // ========== PROJECTILE HIT ==========
-    const handleProjectileHit = useCallback((projId, targetId, type) => {
+    const handleProjectileHit = useCallback((projId, targetId, type, impactSpeed) => {
         let damage = 20;
         if (type === 'rocket') damage = 35;
         if (type === 'bomb_throw') damage = 50;
+
+        // Velocity bonus
+        if (impactSpeed) {
+            if (impactSpeed > 25) damage = Math.floor(damage * 1.5);
+            else if (impactSpeed > 15) damage = Math.floor(damage * 1.2);
+        }
 
         setPlayerDamage(prev => ({
             ...prev,
@@ -679,6 +670,7 @@ export default function BattleArena() {
                         multiplayer.setReady?.(ready);
                     }}
                     selectedMap={multiplayer.selectedMap}
+                    gameMode={gameMode}
                     mapVotes={multiplayer.mapVotes}
                     onVoteMap={(mapId) => {
                         multiplayer.voteMap?.(mapId);
@@ -750,6 +742,7 @@ export default function BattleArena() {
                                     knockoutTarget={knockoutTarget}
                                     slowmo={slowmo}
                                     gameMode={gameMode}
+                                    onInvincibleChange={setIsInvincible}
                                 />
                                 <ProjectileSystem
                                     projectiles={projectiles}
@@ -787,6 +780,7 @@ export default function BattleArena() {
                     players={multiplayer.players}
                     localPlayerId={multiplayer.playerId}
                     fps={fpsRef.current}
+                    invincible={isInvincible}
                 />
             )}
 

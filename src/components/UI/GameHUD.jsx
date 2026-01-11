@@ -8,18 +8,18 @@ function DamageCounter({ value, position = 'left' }) {
     const [displayValue, setDisplayValue] = useState(value);
     const [flash, setFlash] = useState(false);
     const prevValue = useRef(value);
-    
+
     useEffect(() => {
         if (value !== prevValue.current) {
             setFlash(true);
             const timer = setTimeout(() => setFlash(false), 200);
-            
+
             // Animate number counting
             const diff = value - prevValue.current;
             const steps = Math.min(Math.abs(diff), 20);
             const stepValue = diff / steps;
             let current = prevValue.current;
-            
+
             const interval = setInterval(() => {
                 current += stepValue;
                 setDisplayValue(Math.floor(current));
@@ -28,19 +28,19 @@ function DamageCounter({ value, position = 'left' }) {
                     setDisplayValue(value);
                 }
             }, 20);
-            
+
             prevValue.current = value;
             return () => { clearInterval(interval); clearTimeout(timer); };
         }
     }, [value]);
-    
+
     const color = value < 50 ? '#ffffff' : value < 100 ? '#ffff00' : value < 150 ? '#ff8800' : '#ff0000';
     const scale = 1 + Math.min(value / 300, 0.4);
-    
+
     return (
-        <div 
+        <div
             className={`damage-counter ${flash ? 'flash' : ''} ${value > 100 ? 'critical' : ''}`}
-            style={{ 
+            style={{
                 color,
                 transform: `scale(${scale})`,
                 textAlign: position === 'left' ? 'left' : 'right'
@@ -52,19 +52,34 @@ function DamageCounter({ value, position = 'left' }) {
 }
 
 // ============================================
+// DAMAGE VIGNETTE
+// ============================================
+function DamageVignette({ intensity }) {
+    if (intensity <= 0) return null;
+    return (
+        <div
+            className="damage-vignette"
+            style={{ opacity: Math.min(intensity, 0.8) }}
+        />
+    );
+}
+
+// ============================================
 // STOCK DISPLAY
 // ============================================
-function StockDisplay({ stocks, maxStocks = 3, color }) {
+function StockDisplay({ stocks, maxStocks = 3, color, isRival }) {
     if (stocks === undefined || stocks === Infinity) return null;
-    
+
     return (
-        <div className="stock-display">
+        <div className={`stock-display ${isRival ? 'rival' : ''}`}>
             {Array.from({ length: maxStocks }).map((_, i) => (
-                <div 
+                <div
                     key={i}
-                    className={`stock-icon ${i < stocks ? 'active' : 'empty'}`}
-                    style={{ backgroundColor: i < stocks ? color : 'transparent' }}
-                />
+                    className={`stock-icon ${i < stocks ? 'active' : 'lost'}`}
+                    style={{ color: i < stocks ? color : '#444' }}
+                >
+                    {i < stocks ? '❤️' : '💀'}
+                </div>
             ))}
         </div>
     );
@@ -76,11 +91,11 @@ function StockDisplay({ stocks, maxStocks = 3, color }) {
 function LoadoutSlot({ powerupId, isActive, keyHint, cooldownPercent = 0 }) {
     const info = getPowerupInfo(powerupId);
     if (!info) return null;
-    
+
     return (
         <div className={`loadout-slot ${isActive ? 'active' : ''}`}>
-            <div 
-                className="slot-icon" 
+            <div
+                className="slot-icon"
                 style={{ backgroundColor: isActive ? info.color : '#333' }}
             >
                 {info.imagePath ? (
@@ -103,7 +118,7 @@ function GameTimer({ seconds }) {
     const minutes = Math.floor(seconds / 60);
     const secs = seconds % 60;
     const isLowTime = seconds <= 30;
-    
+
     return (
         <div className={`game-timer ${isLowTime ? 'low-time' : ''}`}>
             <span className="timer-value">
@@ -124,7 +139,7 @@ function GameModeIndicator({ mode }) {
         timed: 'TIMED MATCH',
         chaos: 'CHAOS MODE'
     };
-    
+
     return (
         <div className="game-mode-indicator">
             {modeLabels[mode] || mode?.toUpperCase()}
@@ -137,7 +152,7 @@ function GameModeIndicator({ mode }) {
 // ============================================
 function ComboCounter({ combo, lastHitTime }) {
     const [visible, setVisible] = useState(false);
-    
+
     useEffect(() => {
         if (combo > 1) {
             setVisible(true);
@@ -145,9 +160,9 @@ function ComboCounter({ combo, lastHitTime }) {
             return () => clearTimeout(timer);
         }
     }, [combo, lastHitTime]);
-    
+
     if (!visible || combo <= 1) return null;
-    
+
     return (
         <div className="combo-counter">
             <span className="combo-value">{combo}x</span>
@@ -161,7 +176,7 @@ function ComboCounter({ combo, lastHitTime }) {
 // ============================================
 function KnockoutAnnouncement({ message }) {
     if (!message) return null;
-    
+
     return (
         <div className="knockout-announcement">
             <h1>{message}</h1>
@@ -174,10 +189,10 @@ function KnockoutAnnouncement({ message }) {
 // ============================================
 function PowerupNotification({ powerup }) {
     if (!powerup) return null;
-    
+
     const info = typeof powerup === 'string' ? getPowerupInfo(powerup) : powerup;
     if (!info) return null;
-    
+
     return (
         <div className="powerup-notification" style={{ borderColor: info.color }}>
             <span className="powerup-icon">{info.icon}</span>
@@ -190,23 +205,42 @@ function PowerupNotification({ powerup }) {
 // ============================================
 // MAIN HUD COMPONENT
 // ============================================
-export default function GameHUD({ 
-    scores, 
-    timer, 
-    activePowerup, 
+export default function GameHUD({
+    scores,
+    timer,
+    activePowerup,
     loadout = [],
     damageStats,
     stocks,
-    knockoutMessage, 
+    knockoutMessage,
     gameStatus,
     gameMode = 'knockout',
     combo = 0,
     lastHitTime = 0,
     players = [],
-    localPlayerId
+    localPlayerId,
+    invincible = false // NEW PROP
 }) {
+    // Calculate vignette intensity based on damage and low stocks
+    const myDamage = damageStats?.player1 || 0;
+    const myStocks = stocks?.player1;
+    let vignetteIntensity = 0;
+
+    if (myDamage > 100) vignetteIntensity += (myDamage - 100) / 100; // 0.0 to 1.0
+    if (myStocks === 1) vignetteIntensity += 0.2; // Panic mode on last stock
+
     return (
         <div className="game-hud">
+            <DamageVignette intensity={vignetteIntensity} />
+
+            {/* Invincibility Indicator */}
+            {invincible && (
+                <div className="status-banner">
+                    <span className="shield-icon">🛡️</span>
+                    <span>INVINCIBLE</span>
+                </div>
+            )}
+
             {/* Top Bar */}
             <div className="hud-top">
                 {/* Player 1 (Local) */}
@@ -218,13 +252,13 @@ export default function GameHUD({
                     <DamageCounter value={damageStats?.player1 || 0} position="left" />
                     <StockDisplay stocks={stocks?.player1} color="#00d4ff" />
                 </div>
-                
+
                 {/* Center: Timer & Mode */}
                 <div className="center-panel">
                     <GameModeIndicator mode={gameMode} />
                     <GameTimer seconds={timer || 0} />
                 </div>
-                
+
                 {/* Player 2 (Opponent) */}
                 <div className="player-panel right">
                     <div className="player-info">
@@ -235,7 +269,7 @@ export default function GameHUD({
                     <StockDisplay stocks={stocks?.player2} color="#ff006e" />
                 </div>
             </div>
-            
+
             {/* Bottom: Loadout */}
             <div className="hud-bottom">
                 <div className="loadout-container">
@@ -248,13 +282,13 @@ export default function GameHUD({
                         />
                     ))}
                 </div>
-                
+
                 <PowerupNotification powerup={activePowerup} />
             </div>
-            
+
             {/* Combo */}
             <ComboCounter combo={combo} lastHitTime={lastHitTime} />
-            
+
             {/* Knockout overlay */}
             <KnockoutAnnouncement message={knockoutMessage} />
 
@@ -319,19 +353,55 @@ export default function GameHUD({
                     75% { transform: translateX(2px); }
                 }
                 
+                .damage-vignette {
+                    position: fixed; inset: 0;
+                    background: radial-gradient(circle at center, transparent 50%, rgba(255,0,0,0.4) 100%);
+                    pointer-events: none;
+                    z-index: 90;
+                    animation: pulse-danger 1s infinite alternate;
+                }
+                
+                @keyframes pulse-danger {
+                    from { background-size: 100% 100%; }
+                    to { background-size: 110% 110%; }
+                }
+
+                .status-banner {
+                    position: absolute; top: 100px; left: 50%; transform: translateX(-50%);
+                    background: rgba(0, 212, 255, 0.2);
+                    border: 2px solid #00d4ff;
+                    padding: 8px 20px;
+                    border-radius: 20px;
+                    color: #fff;
+                    font-weight: 900;
+                    letter-spacing: 2px;
+                    display: flex; gap: 10px; align-items: center;
+                    animation: slide-down 0.3s ease-out;
+                    z-index: 101;
+                }
+                
+                @keyframes slide-down {
+                    from { transform: translate(-50%, -20px); opacity: 0; }
+                    to { transform: translate(-50%, 0); opacity: 1; }
+                }
+
                 .stock-display {
                     display: flex;
-                    gap: 6px;
+                    gap: 8px;
+                    font-size: 1.2rem;
                 }
+                .stock-display.rival { flex-direction: row-reverse; }
+                
                 .stock-icon {
-                    width: 20px;
-                    height: 20px;
-                    border-radius: 50%;
-                    border: 2px solid currentColor;
+                    filter: drop-shadow(0 0 5px rgba(0,0,0,0.5));
                     transition: all 0.3s;
                 }
-                .stock-icon.empty {
+                .stock-icon.active {
+                    transform: scale(1);
+                }
+                .stock-icon.lost {
                     opacity: 0.3;
+                    transform: scale(0.8) grayscale(100%);
                 }
                 
                 .center-panel {
@@ -542,7 +612,7 @@ export function VictoryScreen({ winner, scores, stats, onRestart, onMenu }) {
             <div className="victory-content">
                 <h1 className="game-over-text">GAME OVER</h1>
                 <h2 className="winner-text">{winner} WINS!</h2>
-                
+
                 <div className="final-scores">
                     <div className="score-box p1">
                         <span className="score">{scores?.player1 || 0}</span>
@@ -554,7 +624,7 @@ export function VictoryScreen({ winner, scores, stats, onRestart, onMenu }) {
                         <span className="label">RIVAL</span>
                     </div>
                 </div>
-                
+
                 {stats && (
                     <div className="match-stats">
                         <div className="stat">
@@ -571,7 +641,7 @@ export function VictoryScreen({ winner, scores, stats, onRestart, onMenu }) {
                         </div>
                     </div>
                 )}
-                
+
                 <div className="victory-buttons">
                     <button className="btn-primary" onClick={onRestart}>REMATCH</button>
                     <button className="btn-secondary" onClick={onMenu}>MENU</button>

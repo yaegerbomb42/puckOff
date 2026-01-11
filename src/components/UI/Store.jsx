@@ -1,6 +1,7 @@
 import { useAuth } from '../../contexts/AuthContext';
 import { TIERS, getCollectionStats } from '../../utils/economy';
 import { audio } from '../../utils/audio';
+import SkeletonLoader from './SkeletonLoader';
 
 // Stripe Payment Links (Replace with your real URLs)
 const STRIPE_LINKS = {
@@ -10,18 +11,19 @@ const STRIPE_LINKS = {
 };
 
 export default function Store({ onClose, onOpenPack }) {
-    const { user, inventory, useFreePack: consumeFreePack } = useAuth();
+    const { user, inventory, loading, useFreePack: consumeFreePack, spendCredits } = useAuth();
     const stats = getCollectionStats(inventory?.icons || []);
 
     const handleOpenFreePack = async (type) => {
-        if (inventory.freePacks > 0) {
+        if (!user) return;
+
+        // Priority: Free Packs -> Credits
+        if (inventory?.freePacks > 0) {
             const success = await consumeFreePack();
-            if (success) {
-                onOpenPack(type);
-            }
-        } else {
-            // Redirect to purchase if no free packs
-            /* Logic for direct purchase is below */
+            if (success) onOpenPack(type);
+        } else if (inventory?.credits >= 10) {
+            const success = await spendCredits(10);
+            if (success) onOpenPack(type);
         }
     };
 
@@ -31,34 +33,54 @@ export default function Store({ onClose, onOpenPack }) {
                 <div className="header-info">
                     <h2>🎰 ICON VAULT</h2>
                     <div className="stats-row">
-                        {inventory?.freePacks > 0 && (
-                            <div className="stat-badge packs">🎁 {inventory.freePacks} Packs</div>
+                        {loading ? (
+                            <>
+                                <SkeletonLoader width="100px" height="30px" style={{ marginRight: '1rem' }} />
+                                <SkeletonLoader width="120px" height="30px" />
+                            </>
+                        ) : (
+                            <>
+                                {inventory?.freePacks > 0 && (
+                                    <div className="stat-badge packs">🎁 {inventory.freePacks} Packs</div>
+                                )}
+                                <div className="stat-badge credits">💎 {inventory?.credits || 0} Credits</div>
+                            </>
                         )}
-                        <div className="stat-badge credits">💎 {inventory?.credits || 0} Credits</div>
                     </div>
                 </div>
-                {!user && <div className="auth-nag">Sign in to save progress!</div>}
+                {!user && !loading && <div className="auth-nag">Sign in to save progress!</div>}
+
                 <div className="collection-progress">
-                    📦 {stats.owned}/{stats.total} ({stats.percentage}%)
+                    {loading ? (
+                        <SkeletonLoader width="150px" height="24px" />
+                    ) : (
+                        `📦 ${stats.owned}/${stats.total} (${stats.percentage}%)`
+                    )}
                 </div>
-                <button className="close-btn" onClick={onClose}>✕</button>
+                <button className="close-btn" onClick={() => { audio.playClick(); onClose(); }}>✕</button>
             </div>
 
             <div className="store-content">
                 {/* Tier Preview - MOVED TO TOP */}
                 <div className="tier-section top-tiers">
                     <div className="tier-grid">
-                        {Object.entries(TIERS).map(([id, tier]) => (
-                            <div
-                                key={id}
-                                className="tier-chip"
-                                style={{ borderColor: tier.color }}
-                            >
-                                <span className="tier-dot" style={{ background: tier.color }}></span>
-                                <span className="tier-name">{tier.name}</span>
-                                <span className="tier-rate">{(tier.dropRate * 100).toFixed(1)}%</span>
-                            </div>
-                        ))}
+                        {loading ? (
+                            Array(10).fill(0).map((_, i) => (
+                                <SkeletonLoader key={i} width="100px" height="30px" style={{ borderRadius: '20px' }} />
+                            ))
+                        ) : (
+                            Object.entries(TIERS).map(([id, tier]) => (
+                                <div
+                                    key={id}
+                                    className="tier-chip"
+                                    style={{ borderColor: tier.color }}
+                                >
+                                    <span className="tier-dot" style={{ background: tier.color }}></span>
+                                    <span className="tier-name">{tier.name}</span>
+                                    <span className="tier-rate">{(tier.dropRate * 100).toFixed(1)}%</span>
+                                </div>
+                            ))
+                        )}
                     </div>
                 </div>
 
@@ -76,6 +98,7 @@ export default function Store({ onClose, onOpenPack }) {
                             image="/images/packs/single_pack.png"
                             owned={user && (inventory?.freePacks > 0 || inventory?.credits >= 10)}
                             onClick={() => {
+                                audio.playClick();
                                 if (!user) return; // Should show auth modal instead?
                                 if (inventory?.freePacks > 0 || inventory?.credits >= 10) {
                                     handleOpenFreePack('single');
@@ -222,7 +245,7 @@ export default function Store({ onClose, onOpenPack }) {
                     50% { opacity: 1; box-shadow: 0 0 10px rgba(128,0,255,0.5); }
                 }
             `}</style>
-        </div>
+        </div >
     );
 }
 

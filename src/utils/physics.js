@@ -4,30 +4,30 @@
  */
 
 export const PHYSICS_CONFIG = {
-    // Gravity - Slightly floaty for fun air control
-    gravity: [0, -28, 0],
+    // Gravity - Heavier for punchy jumps
+    gravity: [0, -35, 0],
 
     // Puck properties
     puck: {
-        mass: 1,
+        mass: 1.2, // Slightly heavier
         radius: 0.5,
-        maxVelocity: 25,
-        acceleration: 26,
-        linearDamping: 0.25,
+        maxVelocity: 30, // Faster cap
+        acceleration: 32, // Snappier movement
+        linearDamping: 0.15, // Less drag = more momentum
         angularDamping: 0.4,
-        restitution: 0.65,
-        friction: 0.12,
-        airControl: 0.7, // Multiplier for air movement
-        jumpForce: 14
+        restitution: 0.5, // Less bouncy by default
+        friction: 0.1,
+        airControl: 0.6,
+        jumpForce: 16
     },
 
-    // Arena properties - FIX: Added proper blast zones
+    // Arena properties
     arena: {
         fallThreshold: -8,
         blastZones: {
-            top: 30,      // Above this Y = KO
-            side: 40,     // Beyond this X or Z = KO
-            bottom: -10   // Below this Y = KO
+            top: 30,
+            side: 45,
+            bottom: -15
         }
     },
 
@@ -42,20 +42,20 @@ export const PHYSICS_CONFIG = {
 
     // Collision and knockback (Smash Bros style)
     collision: {
-        baseForce: 12,
-        damageMultiplier: 1.0, // Force scales: Force = Base * (1 + damage/100 * multiplier)
-        minKnockbackVelocity: 3,
-        maxKnockback: 50,
-        hitstunBase: 8,
-        hitstunScaling: 0.25,
-        
+        baseForce: 15, // Higher base knockback
+        damageMultiplier: 1.4, // Steeper scaling (100% dmg = 2.4x knockback)
+        minKnockbackVelocity: 4,
+        maxKnockback: 65, // Higher cap
+        hitstunBase: 10,
+        hitstunScaling: 0.3,
+
         // DI (Directional Influence) settings
-        diStrength: 0.12,
-        
+        diStrength: 0.2, // Stronger DI for survival
+
         // Funny physics settings
-        tumbleThreshold: 18,
+        tumbleThreshold: 22,
         bounceAmplification: 1.4,
-        spinFactor: 2.0
+        spinFactor: 2.5
     },
 
     // Stomp mechanics (Mario style)
@@ -95,11 +95,11 @@ export const PHYSICS_CONFIG = {
  */
 export function calculateKnockback(baseDamage, targetDamage, weight = 1) {
     const { baseForce, damageMultiplier, maxKnockback } = PHYSICS_CONFIG.collision;
-    
+
     // Knockback scaling formula
     const damageScaling = 1 + (targetDamage / 100) * damageMultiplier;
     const weightFactor = 1 / weight;
-    
+
     const knockback = baseForce * damageScaling * weightFactor;
     return Math.min(knockback, maxKnockback);
 }
@@ -117,19 +117,19 @@ export function calculateHitstun(knockback) {
  */
 export function isInKnockoutZone(position) {
     if (!position || position.length < 3) return false;
-    
+
     const { blastZones } = PHYSICS_CONFIG.arena;
-    
+
     // Check bottom
     if (position[1] < blastZones.bottom) return true;
-    
+
     // Check top
     if (position[1] > blastZones.top) return true;
-    
+
     // Check sides (X and Z)
     if (Math.abs(position[0]) > blastZones.side) return true;
     if (Math.abs(position[2]) > blastZones.side) return true;
-    
+
     return false;
 }
 
@@ -138,22 +138,22 @@ export function isInKnockoutZone(position) {
  */
 export function canStomp(attackerPos, attackerVel, targetPos) {
     if (!attackerPos || !targetPos || !attackerVel) return false;
-    
+
     const { stomp } = PHYSICS_CONFIG;
-    
+
     // Must be falling fast enough
     if (attackerVel[1] > -stomp.minFallSpeed) return false;
-    
+
     // Must be above target
     const dy = attackerPos[1] - targetPos[1];
     if (dy < 0.3 || dy > stomp.verticalRange) return false;
-    
+
     // Must be horizontally close
     const dx = attackerPos[0] - targetPos[0];
     const dz = attackerPos[2] - targetPos[2];
     const horizontalDist = Math.sqrt(dx * dx + dz * dz);
     if (horizontalDist > stomp.horizontalRange) return false;
-    
+
     return true;
 }
 
@@ -186,7 +186,7 @@ export function getSpawnPosition(playerIndex, mapData = null) {
         const spawn = mapData.spawns[playerIndex];
         return [spawn.x || spawn[0], 2, spawn.z || spawn[2]];
     }
-    
+
     // Default positions
     const defaultPositions = [
         [-10, 2, -8],
@@ -198,7 +198,7 @@ export function getSpawnPosition(playerIndex, mapData = null) {
         [-10, 2, 0],
         [10, 2, 0]
     ];
-    
+
     return defaultPositions[playerIndex % defaultPositions.length];
 }
 
@@ -210,7 +210,7 @@ export function getRandomPowerupPosition(mapData = null) {
         const zone = mapData.powerupZones[Math.floor(Math.random() * mapData.powerupZones.length)];
         return [zone.x, 1.5, zone.z];
     }
-    
+
     return [
         (Math.random() - 0.5) * 20,
         1.5,
@@ -235,9 +235,9 @@ export function getRandomPowerupType() {
  */
 export function applyDI(knockbackVector, inputVector) {
     if (!knockbackVector || !inputVector) return knockbackVector;
-    
+
     const { diStrength } = PHYSICS_CONFIG.collision;
-    
+
     return [
         knockbackVector[0] + inputVector[0] * diStrength * Math.abs(knockbackVector[0]),
         knockbackVector[1], // No vertical DI
@@ -251,26 +251,26 @@ export function applyDI(knockbackVector, inputVector) {
  */
 export function checkFunnyPhysics(velocity, angularVelocity, damage) {
     if (!velocity) return null;
-    
-    const speed = Math.sqrt(velocity[0]**2 + velocity[1]**2 + velocity[2]**2);
-    const spin = angularVelocity ? 
-        Math.sqrt(angularVelocity[0]**2 + angularVelocity[1]**2 + angularVelocity[2]**2) : 0;
-    
+
+    const speed = Math.sqrt(velocity[0] ** 2 + velocity[1] ** 2 + velocity[2] ** 2);
+    const spin = angularVelocity ?
+        Math.sqrt(angularVelocity[0] ** 2 + angularVelocity[1] ** 2 + angularVelocity[2] ** 2) : 0;
+
     // High speed tumble (PUBG car flip moment)
     if (speed > PHYSICS_CONFIG.collision.tumbleThreshold) {
         return 'tumble';
     }
-    
+
     // Extreme spin
     if (spin > 12) {
         return 'spinout';
     }
-    
+
     // Pinball mode at high damage
     if (damage > 150 && speed > 12) {
         return 'pinball';
     }
-    
+
     return null;
 }
 
@@ -280,18 +280,18 @@ export function checkFunnyPhysics(velocity, angularVelocity, damage) {
  */
 export function calculateSurvivalChance(damage, knockback, position) {
     if (!position) return 0;
-    
+
     const { blastZones } = PHYSICS_CONFIG.arena;
-    
+
     const distanceToBlast = Math.min(
         blastZones.side - Math.abs(position[0]),
         blastZones.side - Math.abs(position[2]),
         blastZones.top - position[1],
         position[1] - blastZones.bottom
     );
-    
+
     if (distanceToBlast <= 0) return 0;
-    
+
     const survivalScore = distanceToBlast / (knockback + 1);
     return Math.max(0, Math.min(1, survivalScore));
 }

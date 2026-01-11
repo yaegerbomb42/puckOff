@@ -236,12 +236,19 @@ function generateElevationMap(rng, gridSize) {
 }
 
 // Main generation function
-export function generateMap(seed, gridSize = 12, chaosLevel = 0.5) {
+export function generateMap(seed, gridSize = 12, chaosLevel = 0.5, forcedBiomeId = null) {
     const rng = createRNG(seed);
 
     // Select biome
-    const biomeKeys = Object.keys(BIOMES);
-    const biome = BIOMES[biomeKeys[Math.floor(rng() * biomeKeys.length)]];
+    let biome;
+    const knownBiome = Object.values(BIOMES).find(b => b.id === forcedBiomeId);
+
+    if (knownBiome) {
+        biome = knownBiome;
+    } else {
+        const biomeKeys = Object.keys(BIOMES);
+        biome = BIOMES[biomeKeys[Math.floor(rng() * biomeKeys.length)]];
+    }
 
     // Initialize grid
     const elevationMap = generateElevationMap(rng, gridSize);
@@ -406,7 +413,22 @@ export function validateMap(mapData) {
         queue.push({ x: x + 1, z }, { x: x - 1, z }, { x, z: z + 1 }, { x, z: z - 1 });
     }
 
-    return spawns.every(s => visited.has(`${s.x},${s.z}`));
+    // Verify all spawn points are reachable from the first one
+    // This implies a single connected component containing all spawns
+    const allSpawnsReachable = spawns.every(s => visited.has(`${s.x},${s.z}`));
+
+    // Also ensure a reasonable percentage of the map is accessible (avoid tiny islands)
+    // Count total floor tiles
+    let totalFloorTiles = 0;
+    grid.forEach(row => row.forEach(tile => {
+        if (tile.type !== TILE_TYPES.WALL && tile.type !== TILE_TYPES.LAVA && tile.type !== TILE_TYPES.PIT) {
+            totalFloorTiles++;
+        }
+    }));
+
+    const coverage = visited.size / totalFloorTiles;
+
+    return allSpawnsReachable && coverage > 0.8; // Require 80% of floor to be accessible
 }
 
 // Generate valid map with retries

@@ -16,7 +16,7 @@ export const POWERUP_REGISTRY = {
         color: '#ff4500',
         description: 'Fires a homing missile at nearest enemy',
         damage: 25,
-        knockback: 15,
+        knockback: 22, // Buffed
         cooldown: 5000,
         rarity: 'common'
     },
@@ -113,7 +113,7 @@ export const POWERUP_REGISTRY = {
         imagePath: '/images/powerups/shield.png',
         color: '#00d4ff',
         description: 'Blocks next hit, immune to traps',
-        duration: 8000,
+        duration: 6000, // Reduced duration for skill expression
         hitsBlocked: 1,
         knockbackReduction: 0.5,
         rarity: 'common'
@@ -218,9 +218,9 @@ export const POWERUP_REGISTRY = {
         description: 'Grow huge, immune to knockback',
         duration: 10000,
         sizeMultiplier: 1.8,
-        massMultiplier: 2.5,
+        massMultiplier: 3.0, // Buffed
         knockbackResistance: 0.8,
-        speedPenalty: 0.7,
+        speedPenalty: 0.75, // Buffed (less slow)
         rarity: 'rare'
     },
 
@@ -235,8 +235,8 @@ export const POWERUP_REGISTRY = {
         description: 'Tiny and fast, harder to hit',
         duration: 12000,
         sizeMultiplier: 0.5,
-        speedBonus: 1.4,
-        knockbackIncrease: 1.3,
+        speedBonus: 1.5, // Buffed
+        knockbackIncrease: 1.5, // Nerfed (more dangerous)
         rarity: 'uncommon'
     },
 

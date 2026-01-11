@@ -379,6 +379,7 @@ export default function Puck({
     color,
     startPosition,
     isLocalPlayer = false,
+    isBot = false,
     iconPath,
     tier = 1, // Add tier prop to determine shader
     powerup,
@@ -389,6 +390,7 @@ export default function Puck({
     onCollision,
     onUseItem,
     onImpact,
+    onInvincibleChange, // NEW PROP
     isPaused,
     remotePosition,
     remoteVelocity,
@@ -450,12 +452,32 @@ export default function Puck({
         lastJumpTime: 0
     });
 
+    const [invincible, setInvincible] = useState(false);
+
+    // Notify parent of invincibility state changes
+    useEffect(() => {
+        if (isLocalPlayer) {
+            onInvincibleChange?.(invincible);
+        }
+    }, [invincible, isLocalPlayer, onInvincibleChange]);
+
     // ========== COLLISION HANDLER ==========
     const handlePhysicsCollision = useCallback((e) => {
-        if (!isLocalPlayer || isPaused) return;
+        if (!isLocalPlayer || isPaused || invincible) return;
 
         const otherBody = e.body;
         const impactVelocity = e.contact?.impactVelocity || 0;
+        const tileType = otherBody?.userData?.type;
+
+        // Lava Hazard
+        if (tileType === 'lava') {
+            api.applyImpulse([0, 25, 0], [0, 0, 0]); // Big bounce out
+            onCollision?.(30); // Heavy damage
+            audio.playKnockout(); // Burn sound
+            setIsFlashing(true);
+            setTimeout(() => setIsFlashing(false), 200);
+            return;
+        }
 
         // Player-to-player collision
         if (otherBody?.userData?.type === 'puck' && impactVelocity > 2) {
@@ -496,7 +518,6 @@ export default function Puck({
         }
 
         // Special tile interactions
-        const tileType = otherBody?.userData?.type;
         if (tileType === 'boost_pad') {
             const dir = otherBody.userData.direction || 0;
             api.applyImpulse([Math.sin(dir) * 20, 5, Math.cos(dir) * 20], [0, 0, 0]);
@@ -504,7 +525,7 @@ export default function Puck({
             api.applyImpulse([0, 35, 0], [0, 0, 0]);
             onImpact?.(5);
         }
-    }, [isLocalPlayer, isPaused, knockbackMultiplier, damage, api, onCollision, onImpact]);
+    }, [isLocalPlayer, isPaused, invincible, knockbackMultiplier, damage, api, onCollision, onImpact]);
 
     // ========== SUBSCRIBE TO PHYSICS ==========
     useEffect(() => {
@@ -521,6 +542,12 @@ export default function Puck({
     }, [api]);
 
     // ========== INPUT HANDLING - Fixed debounce ==========
+    const lastDashTime = useRef(0);
+
+    // Dash Configuration
+    const DASH_FORCE = 65;
+    const DASH_COOLDOWN_MS = 2500;
+
     useEffect(() => {
         if (!isLocalPlayer) return;
 
@@ -532,6 +559,11 @@ export default function Puck({
                 inputState.current.spacePressed = true;
                 inputState.current.spaceHeld = true;
             }
+
+            // Dash Input (Shift)
+            if (e.shiftKey) {
+                inputState.current.dashPressed = true;
+            }
         };
 
         const handleKeyUp = (e) => {
@@ -539,6 +571,9 @@ export default function Puck({
 
             if (e.code === 'Space') {
                 inputState.current.spaceHeld = false;
+            }
+            if (!e.shiftKey) {
+                inputState.current.dashPressed = false;
             }
         };
 
@@ -551,14 +586,13 @@ export default function Puck({
         };
     }, [isLocalPlayer]);
 
-    // ========== MOVEMENT UPDATE LOOP ==========
-    useEffect(() => {
-        if (!isLocalPlayer) return;
+    // ========== MOVEMENT & AI LOOP (PHYSICS STEP) ==========
+    useFrame(() => {
+        if (isPaused || isRespawning) return;
 
-        const updateMovement = () => {
-            if (isRespawning || isPaused) return;
-
-            const { keys, spacePressed } = inputState.current;
+        // --- LOCAL PLAYER INPUT ---
+        if (isLocalPlayer) {
+            const { keys, spacePressed, dashPressed } = inputState.current;
             let forceX = 0;
             let forceZ = 0;
 
@@ -580,46 +614,69 @@ export default function Puck({
             if (powerup?.id === 'speed_boost') accel *= 1.8;
             if (powerup?.id === 'shrink') accel *= 1.3;
             if (powerup?.id === 'giant') accel *= 0.7;
+            if (powerup?.id === 'cursed') { forceX *= -1; forceZ *= -1; }
 
-            // Reverse controls if cursed
-            if (powerup?.id === 'cursed') {
-                forceX *= -1;
-                forceZ *= -1;
-            }
-
-            // Air control reduction
+            // Air control
             const isInAir = position.current[1] > 1;
-            if (isInAir) {
-                accel *= PHYSICS_CONFIG.puck.airControl || 0.7;
-            }
+            if (isInAir) accel *= (PHYSICS_CONFIG.puck.airControl || 0.7);
 
-            // Apply movement force
             if (forceX !== 0 || forceZ !== 0) {
                 api.applyForce([forceX * accel, 0, forceZ * accel], [0, 0, 0]);
             }
 
-            // SPACE KEY - Use item OR jump (single press only)
-            if (spacePressed) {
-                inputState.current.spacePressed = false; // Consume the press
+            // DASH
+            const now = Date.now();
+            if (dashPressed && (now - lastDashTime.current > DASH_COOLDOWN_MS)) {
+                let dashX = forceX;
+                let dashZ = forceZ;
+                if (dashX === 0 && dashZ === 0) dashZ = -1; // Default fwd
+                api.applyImpulse([dashX * DASH_FORCE, 0, dashZ * DASH_FORCE], [0, 0, 0]);
+                audio.playJump();
+                onImpact?.(5);
+                lastDashTime.current = now;
+                inputState.current.dashPressed = false;
+            }
 
+            // JUMP / ITEM
+            if (spacePressed) {
+                inputState.current.spacePressed = false;
                 if (powerup && powerup.type !== 'buff') {
-                    // Use active powerup
                     onUseItem?.();
-                } else {
-                    // Jump (with cooldown)
-                    const now = Date.now();
-                    if (now - inputState.current.lastJumpTime > 500) {
-                        api.applyImpulse([0, 12, 0], [0, 0, 0]);
-                        inputState.current.lastJumpTime = now;
-                        audio.playJump();
-                    }
+                } else if (now - inputState.current.lastJumpTime > 600) {
+                    api.applyImpulse([0, 14, 0], [0, 0, 0]);
+                    inputState.current.lastJumpTime = now;
+                    audio.playJump();
                 }
             }
-        };
+        }
 
-        const interval = setInterval(updateMovement, 16);
-        return () => clearInterval(interval);
-    }, [api, isLocalPlayer, isRespawning, isPaused, powerup, config.acceleration, onUseItem]);
+        // --- BOT AI LOGIC ---
+        else if (isBot) {
+            // Find target (closest player)
+            let closestDist = Infinity;
+            let targetPos = null;
+
+            Object.entries(allPlayerPositions).forEach(([pid, pos]) => {
+                if (pid === playerId) return; // Self
+                const dist = new THREE.Vector3(...pos).distanceTo(new THREE.Vector3(...position.current));
+                if (dist < closestDist) {
+                    closestDist = dist;
+                    targetPos = pos;
+                }
+            });
+
+            if (targetPos) {
+                const dir = new THREE.Vector3(targetPos[0] - position.current[0], 0, targetPos[2] - position.current[2]).normalize();
+                const aiForce = config.acceleration * 0.8; // Bots are slightly slower
+                api.applyForce([dir.x * aiForce, 0, dir.z * aiForce], [0, 0, 0]);
+
+                // Bot Jump randomly if stuck or near edge?
+                if (Math.random() < 0.005) {
+                    api.applyImpulse([0, 12, 0], [0, 0, 0]);
+                }
+            }
+        }
+    });
 
     // ========== REMOTE PLAYER SYNC ==========
     useEffect(() => {
@@ -632,15 +689,22 @@ export default function Puck({
     }, [api, isLocalPlayer, remotePosition, remoteVelocity]);
 
     // ========== GAME LOGIC FRAME UPDATE ==========
-    useFrame(() => {
+    useFrame((state) => {
         if (isPaused) return;
+
+        // Flash when invincible
+        if (invincible && ref.current) {
+            ref.current.visible = Math.floor(state.clock.elapsedTime * 10) % 2 === 0;
+        } else if (ref.current && !isRespawning) {
+            ref.current.visible = true; // Ensure visibility resets
+        }
 
         // Track airborne state
         const currentlyAirborne = position.current[1] > 1;
         setIsAirborne(currentlyAirborne);
 
         // AIR STOMP DETECTION
-        if (isLocalPlayer && currentlyAirborne && velocity.current[1] < -4) {
+        if (isLocalPlayer && currentlyAirborne && velocity.current[1] < -4 && !invincible) {
             // Check for players below
             Object.entries(allPlayerPositions).forEach(([id, pos]) => {
                 if (id === playerId || !pos) return;
@@ -668,8 +732,14 @@ export default function Puck({
             onPositionUpdate?.(position.current, velocity.current);
 
             // Knockout check
-            if (!isRespawning && isInKnockoutZone(position.current)) {
-                handleKnockout();
+            if (!isRespawning) {
+                if (isInKnockoutZone(position.current)) {
+                    handleKnockout();
+                } else if (position.current[1] < -30) {
+                    // Safety net for physics glitch
+                    console.warn("Player fell out of bounds (Safety Net)");
+                    handleKnockout();
+                }
             }
         }
     });
@@ -686,6 +756,10 @@ export default function Puck({
             api.angularVelocity.set(0, 0, 0);
             trailPositions.current = [];
             setIsRespawning(false);
+
+            // Invincibility phase
+            setInvincible(true);
+            setTimeout(() => setInvincible(false), 3000);
         }, 1500);
     }, [api, onKnockout, playerId, startPosition]);
 

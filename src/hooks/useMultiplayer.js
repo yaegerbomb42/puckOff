@@ -269,8 +269,14 @@ export function useMultiplayer() {
             return;
         }
         if (!socket) return;
+
+        // Optimistic update
+        setPlayers(prev => prev.map(p =>
+            p.id === playerId ? { ...p, ready } : p
+        ));
+
         socket.emit('playerReady', { ready });
-    }, [socket, isOffline, seed]);
+    }, [socket, isOffline, seed, playerId]);
 
     const voteMap = useCallback((mapName) => {
         if (isOffline) {
@@ -278,20 +284,24 @@ export function useMultiplayer() {
             return;
         }
         if (!socket) return;
+
+        // Optimistic update (partial, waiting for server vote count)
+        setMapVotes(prev => ({
+            ...prev,
+            [playerId]: mapName // Placeholder, actual structure depends on server
+        }));
+
         socket.emit('voteMap', { mapName });
-    }, [socket, isOffline]);
+    }, [socket, isOffline, playerId]);
 
     const selectMode = useCallback((mode) => {
-        // Mode selection logic
-        // This was previously clearing state, which is fine, but needs to be consistent
-        setRoomCode(null);
-        setPlayers([]);
-        setGameState('disconnected');
-        setScores({});
-        setWinner(null);
-        setServerPowerups([]);
-        setSeed(null);
-    }, []);
+        if (!socket) return;
+
+        // Optimistic update
+        setSelectedMode(mode);
+
+        socket.emit('selectMode', { mode });
+    }, [socket]);
 
     // ========== GAME SETUP ACTIONS ==========
 

@@ -1,7 +1,9 @@
 import React, { useState, useCallback, Suspense, useRef, useEffect, useMemo } from 'react';
 import { Canvas } from '@react-three/fiber';
 import { Physics } from '@react-three/cannon';
-import { Stars, Environment, ContactShadows, Sparkles } from '@react-three/drei';
+import { Stars, Environment, ContactShadows, Sparkles, useTexture } from '@react-three/drei';
+import * as THREE from 'three';
+
 
 import ArenaChaos from './ArenaChaos';
 import Puck from './Puck';
@@ -31,6 +33,20 @@ import { generateMap } from '../utils/mapGenerator';
 import { analytics } from '../utils/analytics';
 import ReplayPlayer, { useReplayRecorder } from './ReplaySystem';
 import { GAME_MODES } from '../utils/gameModes';
+
+function LobbyEnvironment() {
+    const texture = useTexture('/images/lobby_background.png');
+    return (
+        <mesh>
+            <sphereGeometry args={[100, 64, 64]} />
+            <meshBasicMaterial
+                map={texture}
+                side={THREE.BackSide}
+                toneMapped={false}
+            />
+        </mesh>
+    );
+}
 
 // GAME_MODES moved to utils/gameModes.js
 
@@ -66,8 +82,8 @@ function GameScene({
     return (
         <>
             {/* Environment */}
+            <LobbyEnvironment />
             {/* Environment & Lighting (Overhaul Phase 1) */}
-            <Environment preset="city" background={false} />
             <ambientLight intensity={0.4} />
             <pointLight position={[10, 20, 10]} intensity={1.5} color="#ffffff" castShadow />
             <pointLight position={[-10, 5, -10]} intensity={0.8} color="#00d4ff" /> {/* Cyan Rim */}

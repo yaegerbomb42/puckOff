@@ -66,157 +66,110 @@ function DynamicCamera({
     const shakeIntensity = useRef(0);
     const dramaticZoom = useRef(0);
 
+    // State for Chase Camera
+    const chaseState = useRef({
+        currentPosition: new THREE.Vector3(0, 5, 10),
+        currentLookAt: new THREE.Vector3(0, 0, 0),
+        velocity: new THREE.Vector3(),
+        lastPlayerPos: new THREE.Vector3(),
+        rotationAngle: 0 // For when player is stationary
+    });
+
     useFrame((state, delta) => {
         const positions = Object.values(playerPositions);
         const timeScale = slowmo ? 0.3 : 1;
-        const adjustedDelta = Math.min(delta * timeScale, 0.1); // Clamp for stability
+        const adjustedDelta = Math.min(delta * timeScale, 0.1);
 
-        // Update shake
-        if (shake > shakeIntensity.current) {
-            shakeIntensity.current = shake;
-        }
+        // --- CHASE CAMERA LOGIC (If Local Player Exists) ---
+        if (localPlayerId && playerPositions[localPlayerId]) {
+            const playerPosArray = playerPositions[localPlayerId];
+            const playerPos = new THREE.Vector3(playerPosArray[0], playerPosArray[1], playerPosArray[2]);
+            const cs = chaseState.current;
 
-        // Handle knockout focus
-        if (knockoutTarget) {
-            currentMode.current = 'KNOCKOUT';
-            dramaticZoom.current = Math.min(dramaticZoom.current + adjustedDelta * 3, 1);
-        } else {
-            dramaticZoom.current = Math.max(dramaticZoom.current - adjustedDelta * 2, 0);
-        }
+            // 1. Calculate Velocity & Direction
+            // We compute velocity manually since we don't have it explicitly
+            const frameVelocity = playerPos.clone().sub(cs.lastPlayerPos);
+            // Ignore tiny movements (jitter)
+            if (frameVelocity.length() > 0.05) {
+                // Smooth velocity update
+                cs.velocity.lerp(frameVelocity.divideScalar(adjustedDelta), 0.1);
 
-        if (positions.length === 0) {
-            vectors.targetPos.set(0, 18, 15);
-            vectors.lookAtPos.set(0, 0, 0);
-        } else {
-            // Calculate center and spread
-            let centerX = 0, centerY = 0, centerZ = 0;
-            let minX = Infinity, maxX = -Infinity;
-            let minZ = Infinity, maxZ = -Infinity;
-            let maxY = 0;
+                // Update rotation angle based on movement
+                const targetAngle = Math.atan2(cs.velocity.x, cs.velocity.z);
 
-            for (let i = 0; i < positions.length; i++) {
-                const pos = positions[i];
-                if (!pos) continue;
+                // Smooth rotation avoiding the -PI/PI wrap issue
+                let angleDiff = targetAngle - cs.rotationAngle;
+                while (angleDiff > Math.PI) angleDiff -= Math.PI * 2;
+                while (angleDiff < -Math.PI) angleDiff += Math.PI * 2;
 
-                centerX += pos[0];
-                centerY += pos[1];
-                centerZ += pos[2];
-                minX = Math.min(minX, pos[0]);
-                maxX = Math.max(maxX, pos[0]);
-                minZ = Math.min(minZ, pos[2]);
-                maxZ = Math.max(maxZ, pos[2]);
-                maxY = Math.max(maxY, pos[1]);
+                cs.rotationAngle += angleDiff * adjustedDelta * 3.0; // Rotation speed
             }
+            cs.lastPlayerPos.copy(playerPos);
 
-            centerX /= positions.length;
-            centerY /= positions.length;
-            centerZ /= positions.length;
+            // 2. Determine Camera Target Position
+            // "Behind" the player based on rotationAngle
+            const distance = 9.0;
+            const height = 4.5;
 
-            // Calculate spread for dynamic zoom
-            const spreadX = maxX - minX;
-            const spreadZ = maxZ - minZ;
-            const maxSpread = Math.max(spreadX, spreadZ, 8);
-
-            // Calculate velocity for look-ahead
-            vectors.velocity.set(
-                centerX - vectors.lastCenter.x,
-                centerY - vectors.lastCenter.y,
-                centerZ - vectors.lastCenter.z
+            const offset = new THREE.Vector3(
+                Math.sin(cs.rotationAngle) * distance,
+                -height,
+                Math.cos(cs.rotationAngle) * distance
             );
-            vectors.lastCenter.set(centerX, centerY, centerZ);
 
-            // Select camera mode
-            const isIntense = maxSpread < 10 && positions.length > 1;
-            const isWide = maxSpread > 20;
+            // Camera position is Player - Offset (effectively)
+            // We want camera BEHIND, so we subtract vectors properly
+            // Actually: Position = Player - Forward * Dist + Up * Height
+            // My offset calc above is effectively Forward * Dist
 
-            if (knockoutTarget && playerPositions[knockoutTarget]) {
-                currentMode.current = 'KNOCKOUT';
-            } else if (isWide) {
-                currentMode.current = 'WIDE';
-            } else if (isIntense) {
-                currentMode.current = 'COMBAT';
-            } else {
-                currentMode.current = 'DEFAULT';
+            const targetCamPos = playerPos.clone().sub(offset);
+
+            // Add slight look-ahead to the camera Position for "Speed" feel
+            // targetCamPos.add(cs.velocity.clone().multiplyScalar(0.2));
+
+            // 3. Smooth Damping (Spring-like follow)
+            cs.currentPosition.lerp(targetCamPos, adjustedDelta * 3.5);
+
+            // 4. Look At Target
+            // Look slightly ahead of the puck
+            const lookTarget = playerPos.clone().add(new THREE.Vector3(0, 0.5, 0)); // Look a bit above ground
+            lookTarget.add(cs.velocity.clone().multiplyScalar(0.3)); // Lead the target
+
+            cs.currentLookAt.lerp(lookTarget, adjustedDelta * 4.0);
+
+            // 5. Knockout / Screen Shake
+            if (shake > shakeIntensity.current) shakeIntensity.current = shake;
+
+            if (shakeIntensity.current > 0.005) {
+                const s = shakeIntensity.current;
+                cs.currentPosition.x += (Math.random() - 0.5) * s;
+                cs.currentPosition.y += (Math.random() - 0.5) * s * 0.5;
+                cs.currentPosition.z += (Math.random() - 0.5) * s * 0.3;
+                shakeIntensity.current *= 0.90;
             }
 
-            const mode = CAMERA_MODES[currentMode.current];
+            // Apply to Camera
+            camera.position.copy(cs.currentPosition);
+            camera.lookAt(cs.currentLookAt);
 
-            // Calculate look-ahead offset
-            const lookAheadX = vectors.velocity.x * mode.lookAheadFactor * 8;
-            const lookAheadZ = vectors.velocity.z * mode.lookAheadFactor * 8;
-
-            // Dynamic height and distance
-            const spreadFactor = Math.min(maxSpread / 15, 2);
-            const dynamicHeight = mode.height + spreadFactor * 4;
-            const dynamicDistance = mode.distance + spreadFactor * 3;
-
-            // Special knockout focus
-            if (knockoutTarget && playerPositions[knockoutTarget]) {
-                const targetPosition = playerPositions[knockoutTarget];
-                vectors.targetPos.set(
-                    targetPosition[0] * 0.8,
-                    8 + dramaticZoom.current * 3,
-                    targetPosition[2] + 6 + dramaticZoom.current * 3
-                );
-                vectors.lookAtPos.set(
-                    targetPosition[0],
-                    targetPosition[1],
-                    targetPosition[2]
-                );
-            } else {
-                // Standard tracking
-                vectors.targetPos.set(
-                    centerX * 0.5 + lookAheadX,
-                    dynamicHeight,
-                    centerZ * 0.4 + dynamicDistance + lookAheadZ
-                );
-                vectors.lookAtPos.set(
-                    centerX * 0.8 + lookAheadX * 0.5,
-                    Math.max(centerY * 0.3, 0),
-                    centerZ * 0.8 + lookAheadZ * 0.5
-                );
-            }
         }
+        // --- FALLBACK / SPECTATOR LOGIC (Old Logic) ---
+        else if (positions.length > 0) {
+            // ... (Condensed version of old logic for spectator) ...
+            // Calculate center
+            let centerX = 0, centerY = 0, centerZ = 0;
+            positions.forEach(p => { centerX += p[0]; centerY += p[1]; centerZ += p[2]; });
+            centerX /= positions.length; centerY /= positions.length; centerZ /= positions.length;
 
-        // Clamp camera position to stadium bounds (prevent clipping through dome)
-        const MAX_RADIUS = 60;
-        const MAX_HEIGHT = 45;
-        const currentRadius = Math.sqrt(vectors.targetPos.x ** 2 + vectors.targetPos.z ** 2);
-
-        if (currentRadius > MAX_RADIUS) {
-            const ratio = MAX_RADIUS / currentRadius;
-            vectors.targetPos.x *= ratio;
-            vectors.targetPos.z *= ratio;
+            const targetPos = new THREE.Vector3(centerX, 18, centerZ + 15);
+            camera.position.lerp(targetPos, adjustedDelta * 2);
+            camera.lookAt(centerX, 0, centerZ);
         }
-        vectors.targetPos.y = Math.min(Math.max(vectors.targetPos.y, 2), MAX_HEIGHT);
-
-        // Smooth camera movement
-        const smoothFactor = CAMERA_MODES[currentMode.current].followSpeed * adjustedDelta;
-        camera.position.lerp(vectors.targetPos, smoothFactor);
-
-        // Apply screen shake
-        if (shakeIntensity.current > 0.005) {
-            const shakeAmount = shakeIntensity.current;
-            camera.position.x += (Math.random() - 0.5) * shakeAmount;
-            camera.position.y += (Math.random() - 0.5) * shakeAmount * 0.5;
-            camera.position.z += (Math.random() - 0.5) * shakeAmount * 0.3;
-
-            // Decay shake
-            shakeIntensity.current *= 0.92;
-        }
-
-        // Smooth look-at using temp vector
-        camera.getWorldDirection(vectors.tempLookAt);
-        vectors.tempLookAt.multiplyScalar(10).add(camera.position);
-        vectors.tempLookAt.lerp(vectors.lookAtPos, smoothFactor * 1.5);
-        camera.lookAt(vectors.tempLookAt);
-
-        // Subtle camera roll during intense moments
-        const rollAmount = Math.sin(state.clock.elapsedTime * 0.5) * 0.008 * (shakeIntensity.current + 0.1);
-        camera.rotation.z = rollAmount;
     });
 
     return null;
 }
+
+
 
 export default DynamicCamera;

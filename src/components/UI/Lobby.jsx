@@ -4,7 +4,7 @@ import PackOpener from './PackOpener';
 import LoadoutMenu from './LoadoutMenu';
 import IconChooser from './IconChooser';
 import AdminDashboard from './AdminDashboard';
-import { SKIN_DEFINITIONS } from '../../utils/skins';
+import { getIconById } from '../../utils/economy';
 import { DEFAULT_LOADOUT } from '../../utils/powerups';
 import { useAuth } from '../../contexts/AuthContext';
 import { audio } from '../../utils/audio';
@@ -107,7 +107,7 @@ export default function Lobby({
             {showIcons && (
                 <IconChooser
                     ownedIcons={inventory?.icons || []}
-                    equippedIcon={inventory?.equippedIcon}
+                    equippedIcon={inventory?.equippedSkin}
                     loading={loading}
                     onClose={() => setShowIcons(false)}
                     onSelect={(icon) => {
@@ -246,17 +246,24 @@ export default function Lobby({
                             <button className="btn btn-store" onClick={() => { audio.playClick(); setShowStore(true); }}>
                                 🛒 STORE
                             </button>
-                            <div className="skin-selector">
-                                <select
-                                    value={inventory?.equippedSkin || 'skin_1'}
-                                    onChange={(e) => equipSkin(e.target.value)}
-                                >
-                                    {SKIN_DEFINITIONS.filter(s => (inventory?.skins || []).includes(s.id) || s.rarity === 'common').map(skin => (
-                                        <option key={skin.id} value={skin.id}>
-                                            {skin.name} ({skin.rarity})
-                                        </option>
-                                    ))}
-                                </select>
+
+                            {/* Replaced old skin selector with proper Icon Selector UI */}
+                            <div className="equipped-icon-preview">
+                                <button className="btn-icon-select" onClick={() => { audio.playClick(); setShowIcons(true); }}>
+                                    <div className="current-icon">
+                                        {/* Show currently equipped icon or default to Standard Issue (logo) */}
+                                        <img
+                                            src={getIconById(inventory?.equippedSkin)?.imageUrl || '/images/logo.png'}
+                                            alt="Equipped Icon"
+                                            onError={(e) => e.target.src = '/images/logo.png'}
+                                        />
+                                    </div>
+                                    <div className="icon-select-label">
+                                        <span>EQUIPPED ICON</span>
+                                        <strong>{getIconById(inventory?.equippedSkin)?.name || 'Standard Issue'}</strong>
+                                    </div>
+                                    <div className="icon-arrow">Change ▼</div>
+                                </button>
                             </div>
                         </div>
                     </div>

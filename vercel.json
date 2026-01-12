@@ -1,0 +1,7 @@
+{
+    "build": {
+        "env": {
+            "REACT_APP_SERVER_URL": "https://puck-battle-arena-backend.onrender.com"
+        }
+    }
+}

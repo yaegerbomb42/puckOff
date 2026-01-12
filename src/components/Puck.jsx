@@ -902,39 +902,73 @@ export default function Puck({
 
             {/* Main puck */}
             <group ref={ref} visible={!isRespawning} scale={[puckScale, puckScale, puckScale]}>
-                {/* Main Body - Metallic Cylinder */}
-                <mesh castShadow receiveShadow>
-                    <cylinderGeometry args={[bodyRadius, bodyRadius, bodyHeight, 32]} />
-                    <meshStandardMaterial
-                        color={isFlashing ? "#ffffff" : "#111111"}
-                        metalness={0.9}
-                        roughness={0.1}
-                        emissive={isFlashing ? "#ffffff" : "#000000"}
-                        emissiveIntensity={isFlashing ? 2 : 0}
-                    />
-                </mesh>
+                {/* === HIGH-TECH PUCK MODEL === */}
 
-                {/* Neon Side Trim - The Glowing Strip */}
-                <mesh position={[0, 0, 0]}>
-                    <cylinderGeometry args={[bodyRadius + 0.01, bodyRadius + 0.01, 0.05, 32]} />
+                {/* 1. Inner Glowing Core (Visible through gaps) */}
+                <mesh>
+                    <cylinderGeometry args={[bodyRadius * 0.95, bodyRadius * 0.95, bodyHeight * 0.9, 32]} />
                     <meshStandardMaterial
                         color={color}
                         emissive={color}
-                        emissiveIntensity={1.5}
+                        emissiveIntensity={2}
+                        toneMapped={false}
                     />
                 </mesh>
 
-                {/* Top Face - Armor Plate with Icon */}
+                {/* 2. Main Chassis (Dark Metal) */}
+                <mesh castShadow receiveShadow>
+                    <cylinderGeometry args={[bodyRadius * 0.85, bodyRadius * 0.85, bodyHeight, 32]} />
+                    <meshStandardMaterial
+                        color={isFlashing ? "#ffffff" : "#111111"}
+                        metalness={0.9}
+                        roughness={0.2}
+                        emissive={isFlashing ? "#ffffff" : "#000000"}
+                    />
+                </mesh>
+
+                {/* 3. Segmented Armor Plates (6 Segments) */}
+                {[0, 60, 120, 180, 240, 300].map((angle, i) => (
+                    <group key={i} rotation={[0, angle * Math.PI / 180, 0]}>
+                        <mesh position={[0, 0, 0]}>
+                            <cylinderGeometry
+                                args={[bodyRadius + 0.02, bodyRadius + 0.02, bodyHeight * 0.85, 16, 1, false, -Math.PI / 6 + 0.1, Math.PI / 3 - 0.2]}
+                            />
+                            <meshStandardMaterial
+                                color={isFlashing ? "#fff" : "#2a2a2a"}
+                                metalness={0.8}
+                                roughness={0.3}
+                                envMapIntensity={1}
+                            />
+                        </mesh>
+                        {/* Detail vents on plates */}
+                        <mesh position={[bodyRadius + 0.015, 0, 0]} rotation={[0, -Math.PI / 6 + 0.1, 0]}>
+                            <boxGeometry args={[0.05, bodyHeight * 0.5, 0.02]} />
+                            <meshStandardMaterial color="#111" />
+                        </mesh>
+                    </group>
+                ))}
+
+                {/* 4. Top/Bottom Neon Rims (Circuit Lines) */}
+                <mesh position={[0, bodyHeight / 2 - 0.02, 0]} rotation={[Math.PI / 2, 0, 0]}>
+                    <torusGeometry args={[bodyRadius, 0.04, 16, 64]} />
+                    <meshBasicMaterial color={color} toneMapped={false} />
+                </mesh>
+                <mesh position={[0, -bodyHeight / 2 + 0.02, 0]} rotation={[Math.PI / 2, 0, 0]}>
+                    <torusGeometry args={[bodyRadius, 0.04, 16, 64]} />
+                    <meshBasicMaterial color={color} toneMapped={false} />
+                </mesh>
+
+                {/* 5. Top Face - Armor Plate with Icon */}
                 <group position={[0, bodyHeight / 2 + 0.01, 0]} rotation={[-Math.PI / 2, 0, 0]}>
-                    {/* The "Armor" Plate */}
+                    {/* Metal Frame Ring */}
                     <mesh>
-                        <circleGeometry args={[bodyRadius, 32]} />
-                        <meshStandardMaterial color="#222222" metalness={0.8} roughness={0.2} />
+                        <ringGeometry args={[bodyRadius * 0.85, bodyRadius * 1.1, 64]} />
+                        <meshStandardMaterial color="#222" metalness={0.9} roughness={0.2} />
                     </mesh>
 
-                    {/* The Icon - Fills 90% of the interior */}
+                    {/* The Icon Surface */}
                     <mesh position={[0, 0, 0.01]}>
-                        <circleGeometry args={[bodyRadius * 0.9, 32]} />
+                        <circleGeometry args={[bodyRadius * 0.85, 32]} />
                         {isMystery ? (
                             <mysteryMaterial ref={shaderRef} map={iconTexture} transparent />
                         ) : isDivine ? (
@@ -958,12 +992,22 @@ export default function Puck({
                             />
                         )}
                     </mesh>
+
+                    {/* Circuit Overlays on Top */}
+                    <mesh position={[0, 0, 0.02]}>
+                        <ringGeometry args={[bodyRadius * 0.8, bodyRadius * 0.82, 64]} />
+                        <meshBasicMaterial color={color} transparent opacity={0.5} />
+                    </mesh>
                 </group>
 
-                {/* High-tech Bottom Detail */}
+                {/* 6. Bottom Detail */}
                 <mesh position={[0, -bodyHeight / 2 - 0.01, 0]} rotation={[Math.PI / 2, 0, 0]}>
-                    <circleGeometry args={[bodyRadius * 0.8, 32]} />
-                    <meshStandardMaterial color={color} emissive={color} emissiveIntensity={0.5} />
+                    <circleGeometry args={[bodyRadius * 0.6, 32]} />
+                    <meshStandardMaterial color="#111" metalness={0.8} />
+                </mesh>
+                <mesh position={[0, -bodyHeight / 2 - 0.02, 0]} rotation={[Math.PI / 2, 0, 0]}>
+                    <ringGeometry args={[bodyRadius * 0.6, bodyRadius * 0.9, 32]} />
+                    <meshBasicMaterial color={color} transparent opacity={0.2} />
                 </mesh>
             </group>
         </group>

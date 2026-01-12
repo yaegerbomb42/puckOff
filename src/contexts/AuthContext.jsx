@@ -17,8 +17,9 @@ export function useAuth() {
 
 // Default inventory structure
 const DEFAULT_INVENTORY = {
-    icons: [],
-    equippedIcon: null,
+    icons: [1001, 1002, 1003, 1004, 1005, 1006, 1007, 1008, 1009, 1010], // Users start with all standard colors
+    username: null, // [NEW] Added username field
+    equippedIcon: 1001, // Default to Red
     skins: [],
     equippedSkin: null,
     credits: 0,
@@ -370,6 +371,7 @@ export function AuthProvider({ children }) {
         loginWithEmail,
         signupWithEmail,
         logout,
+        updateUsername: (name) => saveInventory({ username: name }), // [NEW] Expose updateUsername
 
         // Icons
         addIcons,

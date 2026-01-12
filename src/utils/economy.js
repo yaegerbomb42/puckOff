@@ -16,6 +16,20 @@ export const TIERS = {
     10: { id: 10, name: 'Divine', color: '#ffffff', dropRate: 0.005, theme: 'Utility Grails', isMystery: true, hasBonus: true }
 };
 
+// ============ STANDARD COLORS (Free for all) ============
+export const STANDARD_COLORS = [
+    { id: 1001, name: 'Classic Red', color: '#ff0000', tier: 0, imageUrl: '/images/pucks/standard_red.png' },
+    { id: 1002, name: 'Classic Blue', color: '#0000ff', tier: 0, imageUrl: '/images/pucks/standard_blue.png' },
+    { id: 1003, name: 'Classic Green', color: '#00ff00', tier: 0, imageUrl: '/images/pucks/standard_green.png' },
+    { id: 1004, name: 'Classic Yellow', color: '#ffff00', tier: 0, imageUrl: '/images/pucks/standard_yellow.png' },
+    { id: 1005, name: 'Classic Orange', color: '#ffa500', tier: 0, imageUrl: '/images/pucks/standard_orange.png' },
+    { id: 1006, name: 'Classic Purple', color: '#800080', tier: 0, imageUrl: '/images/pucks/standard_purple.png' },
+    { id: 1007, name: 'Classic Pink', color: '#ffc0cb', tier: 0, imageUrl: '/images/pucks/standard_pink.png' },
+    { id: 1008, name: 'Classic Cyan', color: '#00ffff', tier: 0, imageUrl: '/images/pucks/standard_cyan.png' },
+    { id: 1009, name: 'Classic White', color: '#ffffff', tier: 0, imageUrl: '/images/pucks/standard_white.png' },
+    { id: 1010, name: 'Classic Black', color: '#111111', tier: 0, imageUrl: '/images/pucks/standard_black.png' }
+];
+
 // ============ PRICING ============
 export const PACK_PRICES = {
     single: { price: 0.50, slots: 3, stripeLink: 'https://buy.stripe.com/YOUR_SINGLE_PACK' },
@@ -89,17 +103,19 @@ export function openPack(packType = 'single') {
 const ICON_DATABASE = rawIconData;
 
 export function getRandomIconFromTier(tier) {
+    if (tier === 0) return STANDARD_COLORS[Math.floor(Math.random() * STANDARD_COLORS.length)];
     const iconsInTier = Object.values(ICON_DATABASE).filter(icon => icon.tier === tier);
     if (iconsInTier.length === 0) return null;
     return iconsInTier[Math.floor(Math.random() * iconsInTier.length)];
 }
 
 export function getIconById(id) {
+    if (id > 1000) return STANDARD_COLORS.find(c => c.id === id) || null;
     return ICON_DATABASE[id] || null;
 }
 
 export function getAllIcons() {
-    return Object.values(ICON_DATABASE);
+    return [...Object.values(ICON_DATABASE), ...STANDARD_COLORS];
 }
 
 export function getIconsByTier(tier) {

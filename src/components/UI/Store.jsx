@@ -116,6 +116,23 @@ export default function Store({ onClose, onOpenPack }) {
                             badge="SAVE 40%"
                             onClick={() => window.open(STRIPE_LINKS.bundle10, '_blank')}
                         />
+                        {/* [NEW] Added Missing 99.99 Pack */}
+                        {(() => {
+                            const ownedBaseIcons = inventory.icons.filter(id => id <= 150).length;
+                            const isUnlocked = ownedBaseIcons >= 150;
+                            return (
+                                <PackCard
+                                    name="UNLOCK ALL"
+                                    price={isUnlocked ? "OWNED" : "$99.99"}
+                                    slots={isUnlocked ? 0 : 150}
+                                    color={isUnlocked ? "#333" : "#ffd700"}
+                                    image="/images/packs/bundle_10.png"
+                                    badge={isUnlocked ? "COMPLETED" : "BEST VALUE"}
+                                    onClick={() => !isUnlocked && window.open(STRIPE_LINKS.unlockAll, '_blank')}
+                                    style={isUnlocked ? { filter: 'grayscale(1) brightness(0.5)', cursor: 'default' } : {}}
+                                />
+                            );
+                        })()}
                     </div>
                 </div>
             </div>

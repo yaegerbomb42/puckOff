@@ -8,7 +8,7 @@ import { getIconById } from '../../utils/economy';
 import { DEFAULT_LOADOUT } from '../../utils/powerups';
 import { useAuth } from '../../contexts/AuthContext';
 import { audio } from '../../utils/audio';
-import SkeletonLoader from './SkeletonLoader';
+
 import { getBiomeList } from '../../utils/mapGenerator';
 import { GAME_MODES } from '../../utils/gameModes';
 
@@ -30,7 +30,7 @@ export default function Lobby({
     onSelectMode,
     mapVotes
 }) {
-    const { user, inventory, loading, loginWithGoogle, loginWithEmail, signupWithEmail, logout, equipIcon, equipSkin, updateLoadout, setActiveLoadout } = useAuth();
+    const { user, inventory, loginWithGoogle, loginWithEmail, signupWithEmail, logout, equipIcon, updateLoadout, setActiveLoadout, updateUsername } = useAuth();
 
     const [showStore, setShowStore] = useState(false);
     const [showLoadout, setShowLoadout] = useState(false);
@@ -44,6 +44,33 @@ export default function Lobby({
 
     const [openingPack, setOpeningPack] = useState(null);
     const [playerName, setPlayerName] = useState(user?.displayName || '');
+
+    // [NEW] Sync username from inventory if available
+    React.useEffect(() => {
+        if (inventory?.username) {
+            setPlayerName(inventory.username);
+        } else if (user?.displayName) {
+            setPlayerName(user.displayName);
+        }
+    }, [inventory?.username, user]);
+
+    // [NEW] Auto-close auth modal when signed in
+    React.useEffect(() => {
+        if (user && showAuthModal) {
+            setShowAuthModal(false);
+        }
+    }, [user, showAuthModal]);
+
+    // [NEW] Save username on blur or enter
+    const handleNameChange = (e) => {
+        setPlayerName(e.target.value);
+    };
+
+    const saveName = () => {
+        if (user && playerName !== inventory?.username) {
+            updateUsername(playerName);
+        }
+    };
 
     const handleAuth = async (e) => {
         e.preventDefault();
@@ -162,24 +189,15 @@ export default function Lobby({
 
             <div className="lobby-container">
                 {/* User Bar */}
-                <div className="user-bar">
-                    {loading ? (
-                        <div style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
-                            <SkeletonLoader width="150px" height="24px" />
-                            <SkeletonLoader width="80px" height="24px" />
-                        </div>
-                    ) : user ? (
-                        <>
-                            <span className="user-email">👤 {user.email}</span>
-                            <span className="user-packs">🎁 {inventory?.freePacks || 0} Packs</span>
-                            <button className="btn-small" onClick={logout}>Logout</button>
-                        </>
-                    ) : (
-                        <button className="btn-small btn-login" onClick={() => setShowAuthModal(true)}>
-                            🔐 Sign In / Sign Up
+                {/* User Bar - SIMPLIFIED/REMOVED as requested "show elsewhere" */}
+                {/* Keeping only Admin gear for now, hidden */}
+                <div style={{ position: 'absolute', top: '1rem', right: '1rem' }}>
+                    <button className="btn-admin-hidden" onClick={() => { audio.playClick(); setShowAdmin(true); }}>⚙️</button>
+                    {user && (
+                        <button className="btn-small" onClick={logout} style={{ marginLeft: '1rem', opacity: 0.7 }}>
+                            Logout
                         </button>
                     )}
-                    <button className="btn-admin-hidden" onClick={() => { audio.playClick(); setShowAdmin(true); }}>⚙️</button>
                 </div>
 
                 <div className="logo-container">
@@ -202,13 +220,27 @@ export default function Lobby({
                     </div>
                 ) : !roomCode ? (
                     <div className="menu-options">
-                        <input
-                            type="text"
-                            placeholder="ENTER YOUR NAME"
-                            className="name-input"
-                            value={playerName}
-                            onChange={(e) => setPlayerName(e.target.value)}
-                        />
+                        {/* NEW: Profile Integration in Name Input */}
+                        <div className="name-input-container">
+                            {user ? (
+                                <div className="logged-in-badge">
+                                    <span className="status-dot"></span>
+                                    LOGGED IN AS
+                                </div>
+                            ) : (
+                                <button className="btn-text-link" onClick={() => setShowAuthModal(true)}>
+                                    Login to Save Progress
+                                </button>
+                            )}
+                            <input
+                                type="text"
+                                placeholder="ENTER YOUR NAME"
+                                className={`name-input ${user ? 'verified' : ''}`}
+                                value={playerName}
+                                onChange={handleNameChange}
+                                onBlur={saveName} // Save on blur
+                            />
+                        </div>
 
                         <div className="main-buttons">
                             <button className="btn btn-primary btn-large shimmer" onClick={() => { audio.playClick(); onQuickJoin(playerName, user?.email); }}>
@@ -216,6 +248,9 @@ export default function Lobby({
                             </button>
                             <button className="btn btn-secondary btn-large" onClick={() => { audio.playClick(); onCreateRoom(playerName, user?.email); }}>
                                 🏠 CREATE ROOM
+                            </button>
+                            <button className="btn btn-secondary btn-large sandbox" onClick={() => { audio.playClick(); onJoinRoom('sandbox'); }}>
+                                🧪 SANDBOX
                             </button>
                         </div>
 
@@ -350,12 +385,7 @@ export default function Lobby({
                 )}
 
                 {/* OpenArt Attribution */}
-                <div className="openart-credit">
-                    <span>🎨 Game icons created with </span>
-                    <a href="https://openart.ai/home/?via=cloudCompute" target="_blank" rel="noopener noreferrer">
-                        OpenArt.ai
-                    </a>
-                </div>
+                {/* OpenArt Attribution REMOVED as requested */}
             </div>
 
             <style>{`
@@ -434,13 +464,28 @@ export default function Lobby({
                     display: flex; flex-direction: column; gap: 1rem; 
                     align-items: center;
                 }
+                .name-input-container {
+                    width: 100%; max-width: 300px;
+                    display: flex; flex-direction: column; align-items: center; gap: 0.3rem;
+                }
                 .name-input { 
                     padding: 12px 20px; background: rgba(0,0,0,0.5); 
                     border: 2px solid #333; color: white; text-align: center;
-                    border-radius: 30px; width: 100%; max-width: 300px;
-                    font-size: 1rem;
+                    border-radius: 30px; width: 100%;
+                    font-size: 1rem; transition: all 0.3s;
                 }
                 .name-input:focus { border-color: #00d4ff; outline: none; }
+                .name-input.verified { border-color: #00ff87; box-shadow: 0 0 10px rgba(0,255,135,0.2); }
+                
+                .logged-in-badge {
+                    font-size: 0.6rem; color: #00ff87; letter-spacing: 1px;
+                    display: flex; align-items: center; gap: 0.3rem;
+                }
+                .status-dot { width: 6px; height: 6px; background: #00ff87; border-radius: 50%; box-shadow: 0 0 5px #00ff87; }
+                .btn-text-link {
+                    background: none; border: none; color: #ff006e; font-size: 0.7rem;
+                    cursor: pointer; text-decoration: underline; padding: 0;
+                }
 
                 .main-buttons { 
                     display: flex; flex-direction: column; gap: 0.8rem; 

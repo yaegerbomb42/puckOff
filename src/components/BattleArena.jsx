@@ -12,6 +12,7 @@ import KnockoutEffects from './KnockoutEffects';
 import PostProcessing from './effects/PostProcessing';
 import GameHUD, { VictoryScreen } from './UI/GameHUD';
 import Lobby from './UI/Lobby';
+import SandboxControls from './UI/SandboxControls';
 import DynamicCamera from './DynamicCamera';
 import LoadingScreen from './UI/LoadingScreen';
 import ProjectileSystem from './ProjectileSystem';
@@ -741,6 +742,50 @@ export default function BattleArena() {
                     onRestart={() => multiplayer.requestRematch?.()}
                     onMenu={multiplayer.leaveRoom}
                 />
+            );
+        }
+
+        // [NEW] Sandbox UI
+        if (multiplayer.roomCode === 'sandbox' && multiplayer.gameState === 'playing') {
+            return (
+                <>
+                    {/* Minimal HUD for Sandbox */}
+                    <div style={{ position: 'absolute', top: 20, left: 20, color: 'white', zIndex: 10 }}>
+                        <h2>🧪 SANDBOX MODE</h2>
+                        <p style={{ opacity: 0.7 }}>Experiment with physics and powerups</p>
+                    </div>
+
+                    <SandboxControls
+                        debugMode={isAdmin} // Reusing isAdmin state for debug toggle visually
+                        onToggleDebug={() => { /* Toggle debug visual if we had one */ }}
+                        onReset={() => {
+                            // Reset local player
+                            setPlayerDamage({});
+                            setPlayerStocks({});
+                            setLocalPowerups([]);
+                            // Respawn
+                            const startPos = getSpawnPosition(0, mapData);
+                            setPlayerPositions({ [multiplayer.playerId]: startPos });
+                            multiplayer.sendPosition?.(startPos, [0, 0, 0], 0);
+                        }}
+                        onSpawnPowerup={(type) => {
+                            setLocalPowerups(prev => [...prev, {
+                                id: `sandbox_${getNextId()}`,
+                                type: type,
+                                position: getRandomPowerupPosition(mapData)
+                            }]);
+                        }}
+                    />
+
+                    {/* Overlay Navigation */}
+                    <button
+                        style={{ position: 'absolute', top: 20, right: 20, zIndex: 100 }}
+                        className="btn btn-small"
+                        onClick={multiplayer.leaveRoom}
+                    >
+                        EXIT SANDBOX
+                    </button>
+                </>
             );
         }
 

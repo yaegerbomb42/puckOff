@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { TIERS, getAllIcons } from '../../utils/economy';
 import SkeletonLoader from './SkeletonLoader';
+import PuckPreview from './PuckPreview';
 
 // Get all 150 icons from the centralized database
 const ICON_SLOTS = getAllIcons().sort((a, b) => a.id - b.id);
@@ -28,11 +29,9 @@ export default function IconChooser({ ownedIcons = [], onClose, onSelect, equipp
                     <div className="preview-puck">
                         {previewIcon ? (
                             <>
-                                <img
-                                    src={previewIcon.imageUrl}
-                                    alt={previewIcon.name}
-                                    className="preview-image"
-                                />
+                                <div className="preview-container" style={{ width: '280px', height: '280px', position: 'relative' }}>
+                                    <PuckPreview icon={previewIcon} size={280} />
+                                </div>
                                 <div className="preview-info">
                                     <div className="preview-name">{previewIcon.name}</div>
                                     <div

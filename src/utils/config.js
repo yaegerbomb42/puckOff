@@ -6,7 +6,7 @@
 // Server URL - Prioritize Environment Variable, fallback to Render URL or localhost
 const SERVER_URL = process.env.REACT_APP_SERVER_URL ||
     (process.env.NODE_ENV === 'production'
-        ? 'https://puck-battle-arena-server.onrender.com' // Replace with your actual Render URL if known
+        ? 'https://puck-battle-arena-backend.onrender.com'
         : 'http://localhost:3002');
 
 export const CONFIG = {

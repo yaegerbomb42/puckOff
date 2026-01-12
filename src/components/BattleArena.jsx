@@ -14,6 +14,7 @@ import DynamicCamera from './DynamicCamera';
 import LoadingScreen from './UI/LoadingScreen';
 import ProjectileSystem from './ProjectileSystem';
 import ProceduralArena from './ProceduralArena';
+import ExplosionParticles from './ExplosionParticles';
 import { useMultiplayer } from '../hooks/useMultiplayer';
 import { useAuth } from '../contexts/AuthContext';
 import { audio } from '../utils/audio';
@@ -59,7 +60,8 @@ function GameScene({
     knockoutTarget,
     slowmo,
     gameMode,
-    onInvincibleChange
+    onInvincibleChange,
+    explosionEvent
 }) {
     return (
         <>
@@ -133,8 +135,18 @@ function GameScene({
             {/* Effects */}
             <KnockoutEffects effects={effects} onEffectComplete={onEffectComplete} />
 
+            {/* Explosion Particles */}
+            {explosionEvent && (
+                <ExplosionParticles
+                    key={explosionEvent.timestamp}
+                    position={explosionEvent.position}
+                    color="#ff006e"
+                    count={150}
+                />
+            )}
+
             {/* Post-processing */}
-            <PostProcessing />
+            <PostProcessing impactIntensity={screenShake} />
         </>
     );
 }
@@ -160,6 +172,7 @@ export default function BattleArena() {
     const [effects, setEffects] = useState([]);
     const [knockoutMessage, setKnockoutMessage] = useState(null);
     const [knockoutTarget, setKnockoutTarget] = useState(null);
+    const [explosionEvent, setExplosionEvent] = useState(null); // { position, force, timestamp }
 
     // Visual effects
     const [isPaused, setIsPaused] = useState(false);
@@ -441,8 +454,22 @@ export default function BattleArena() {
         const color = player?.color || '#ffffff';
 
         // Dramatic effects
-        setSlowmo(true);
+
+        // HIT STOP: Brief freeze-frame for impact
+        setIsPaused(true);
+        setTimeout(() => {
+            setIsPaused(false);
+            setSlowmo(true);
+        }, 80); // 80ms freeze
+
         setKnockoutTarget(knockedOutPlayerId);
+
+        // TRIGGER EXPLOSION PHYSICS
+        setExplosionEvent({
+            position: pos,
+            force: 60, // Massive force
+            timestamp: Date.now()
+        });
 
         setTimeout(() => {
             setSlowmo(false);
@@ -743,6 +770,7 @@ export default function BattleArena() {
                                     slowmo={slowmo}
                                     gameMode={gameMode}
                                     onInvincibleChange={setIsInvincible}
+                                    explosionEvent={explosionEvent} // NEW PROP
                                 />
                                 <ProjectileSystem
                                     projectiles={projectiles}

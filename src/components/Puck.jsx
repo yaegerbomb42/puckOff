@@ -395,7 +395,8 @@ export default function Puck({
     remotePosition,
     remoteVelocity,
     allPlayerPositions = {},
-    gameMode = 'knockout'
+    gameMode = 'knockout',
+    explosionEvent // NEW PROP
 }) {
     const config = PHYSICS_CONFIG.puck;
 
@@ -676,7 +677,29 @@ export default function Puck({
                 }
             }
         }
+
+
     });
+
+    // ========== EXPLOSION HANDLING ==========
+    const lastExplosionTime = useRef(0);
+    useEffect(() => {
+        if (!explosionEvent || !isLocalPlayer || explosionEvent.timestamp <= lastExplosionTime.current) return;
+
+        const { position: expPos, force } = explosionEvent;
+        const myPos = position.current;
+        const dist = new THREE.Vector3(myPos[0] - expPos[0], myPos[1] - expPos[1], myPos[2] - expPos[2]).length();
+
+        if (dist < 30) { // Blast radius
+            const dir = new THREE.Vector3(myPos[0] - expPos[0], myPos[1] - expPos[1] + 5, myPos[2] - expPos[2]).normalize();
+            const power = force * (1 - dist / 30);
+            api.applyImpulse([dir.x * power, dir.y * power, dir.z * power], [0, 0, 0]);
+            audio.playImpact(10); // Reuse impact sound
+            onImpact?.(20); // Massive shake
+        }
+
+        lastExplosionTime.current = explosionEvent.timestamp;
+    }, [explosionEvent, isLocalPlayer, api, onImpact]);
 
     // ========== REMOTE PLAYER SYNC ==========
     useEffect(() => {

@@ -1,4 +1,4 @@
-import React, { useRef, useMemo } from 'react';
+import { useRef, useMemo } from 'react';
 import { useFrame, useThree } from '@react-three/fiber';
 import * as THREE from 'three';
 
@@ -43,15 +43,15 @@ const CAMERA_MODES = {
     }
 };
 
-function DynamicCamera({ 
-    playerPositions, 
+function DynamicCamera({
+    playerPositions,
     localPlayerId,
-    shake = 0, 
+    shake = 0,
     knockoutTarget = null,
     slowmo = false
 }) {
     const { camera } = useThree();
-    
+
     // OPTIMIZATION: Reuse vectors instead of creating new ones each frame
     const vectors = useMemo(() => ({
         targetPos: new THREE.Vector3(0, 18, 15),
@@ -60,7 +60,7 @@ function DynamicCamera({
         lastCenter: new THREE.Vector3(),
         tempLookAt: new THREE.Vector3()
     }), []);
-    
+
     // State refs
     const currentMode = useRef('DEFAULT');
     const shakeIntensity = useRef(0);
@@ -70,12 +70,12 @@ function DynamicCamera({
         const positions = Object.values(playerPositions);
         const timeScale = slowmo ? 0.3 : 1;
         const adjustedDelta = Math.min(delta * timeScale, 0.1); // Clamp for stability
-        
+
         // Update shake
         if (shake > shakeIntensity.current) {
             shakeIntensity.current = shake;
         }
-        
+
         // Handle knockout focus
         if (knockoutTarget) {
             currentMode.current = 'KNOCKOUT';
@@ -97,7 +97,7 @@ function DynamicCamera({
             for (let i = 0; i < positions.length; i++) {
                 const pos = positions[i];
                 if (!pos) continue;
-                
+
                 centerX += pos[0];
                 centerY += pos[1];
                 centerZ += pos[2];
@@ -116,7 +116,7 @@ function DynamicCamera({
             const spreadX = maxX - minX;
             const spreadZ = maxZ - minZ;
             const maxSpread = Math.max(spreadX, spreadZ, 8);
-            
+
             // Calculate velocity for look-ahead
             vectors.velocity.set(
                 centerX - vectors.lastCenter.x,
@@ -128,7 +128,7 @@ function DynamicCamera({
             // Select camera mode
             const isIntense = maxSpread < 10 && positions.length > 1;
             const isWide = maxSpread > 20;
-            
+
             if (knockoutTarget && playerPositions[knockoutTarget]) {
                 currentMode.current = 'KNOCKOUT';
             } else if (isWide) {
@@ -140,16 +140,16 @@ function DynamicCamera({
             }
 
             const mode = CAMERA_MODES[currentMode.current];
-            
+
             // Calculate look-ahead offset
             const lookAheadX = vectors.velocity.x * mode.lookAheadFactor * 8;
             const lookAheadZ = vectors.velocity.z * mode.lookAheadFactor * 8;
-            
+
             // Dynamic height and distance
             const spreadFactor = Math.min(maxSpread / 15, 2);
             const dynamicHeight = mode.height + spreadFactor * 4;
             const dynamicDistance = mode.distance + spreadFactor * 3;
-            
+
             // Special knockout focus
             if (knockoutTarget && playerPositions[knockoutTarget]) {
                 const targetPosition = playerPositions[knockoutTarget];
@@ -178,6 +178,18 @@ function DynamicCamera({
             }
         }
 
+        // Clamp camera position to stadium bounds (prevent clipping through dome)
+        const MAX_RADIUS = 60;
+        const MAX_HEIGHT = 45;
+        const currentRadius = Math.sqrt(vectors.targetPos.x ** 2 + vectors.targetPos.z ** 2);
+
+        if (currentRadius > MAX_RADIUS) {
+            const ratio = MAX_RADIUS / currentRadius;
+            vectors.targetPos.x *= ratio;
+            vectors.targetPos.z *= ratio;
+        }
+        vectors.targetPos.y = Math.min(Math.max(vectors.targetPos.y, 2), MAX_HEIGHT);
+
         // Smooth camera movement
         const smoothFactor = CAMERA_MODES[currentMode.current].followSpeed * adjustedDelta;
         camera.position.lerp(vectors.targetPos, smoothFactor);
@@ -188,7 +200,7 @@ function DynamicCamera({
             camera.position.x += (Math.random() - 0.5) * shakeAmount;
             camera.position.y += (Math.random() - 0.5) * shakeAmount * 0.5;
             camera.position.z += (Math.random() - 0.5) * shakeAmount * 0.3;
-            
+
             // Decay shake
             shakeIntensity.current *= 0.92;
         }

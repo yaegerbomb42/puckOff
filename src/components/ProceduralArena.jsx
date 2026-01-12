@@ -4,6 +4,7 @@ import { useFrame } from '@react-three/fiber';
 import { MeshReflectorMaterial, Float } from '@react-three/drei';
 import * as THREE from 'three';
 import { TILE_TYPES, gridToWorld } from '../utils/mapGenerator';
+import StadiumCrowd from './StadiumCrowd';
 
 const TILE_SIZE = 3;
 const TILE_HEIGHT = 0.5;
@@ -420,6 +421,40 @@ function StadiumDome({ biome }) {
                 />
             </mesh>
 
+            {/* LED Ribbon Ring */}
+            <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, 25, 0]}>
+                <torusGeometry args={[80, 0.5, 8, 64]} />
+                <meshStandardMaterial
+                    color={biome?.colors?.accent || '#00d4ff'}
+                    emissive={biome?.colors?.accent || '#00d4ff'}
+                    emissiveIntensity={3}
+                    toneMapped={false}
+                />
+            </mesh>
+
+            {/* Spotlights pointing down at arena */}
+            {[...Array(4)].map((_, i) => {
+                const angle = (i / 4) * Math.PI * 2;
+                return (
+                    <group key={`spotlight-${i}`} position={[Math.sin(angle) * 50, 50, Math.cos(angle) * 50]}>
+                        <spotLight
+                            color={biome?.colors?.glow || '#ffffff'}
+                            intensity={10}
+                            angle={Math.PI / 6}
+                            penumbra={0.5}
+                            distance={100}
+                            target-position={[0, 0, 0]}
+                            castShadow
+                        />
+                        {/* Light housing */}
+                        <mesh>
+                            <boxGeometry args={[2, 1, 2]} />
+                            <meshStandardMaterial color="#222" metalness={0.8} roughness={0.2} />
+                        </mesh>
+                    </group>
+                );
+            })}
+
             {/* Floating Crowd / Lights placeholder */}
             <Float speed={5} rotationIntensity={0.2} floatIntensity={0.5} floatingRange={[20, 30]}>
                 <group position={[0, 0, 0]}>
@@ -449,25 +484,129 @@ function ReflectiveBase({ color }) {
         <mesh position={[0, -0.6, 0]} rotation={[-Math.PI / 2, 0, 0]}>
             <planeGeometry args={[300, 300]} />
             <MeshReflectorMaterial
-                blur={[100, 100]} // Reduced blur heavily
-                resolution={512}  // Halved resolution
-                mixBlur={0.2}     // Less complex mixing
-                mixStrength={10}  // Subtle reflection
-                roughness={0.5}
+                blur={[400, 100]}
+                resolution={256}  // Ultra-low res for safety regarding freeze
+                mixBlur={1.0}     // High mix blur hides low res
+                mixStrength={5}   // Subtle reflection
+                roughness={0.6}   // Rougher floor
                 depthScale={1}
                 minDepthThreshold={0.5}
                 maxDepthThreshold={1.4}
                 color={color || "#151515"}
                 metalness={0.5}
-                mirror={0.5}      // Explicit mirror prop
+                mirror={0.25}
             />
         </mesh>
     );
 }
 
+// ============================================
+// CENTER COURT DECAL
+// ============================================
+function CenterCourtDecal({ color }) {
+    return (
+        <group position={[0, 0.01, 0]}>
+            {/* Center Circle */}
+            <mesh rotation={[-Math.PI / 2, 0, 0]}>
+                <ringGeometry args={[8, 10, 64]} />
+                <meshStandardMaterial
+                    color={color || '#00d4ff'}
+                    emissive={color || '#00d4ff'}
+                    emissiveIntensity={1}
+                    transparent
+                    opacity={0.6}
+                    toneMapped={false}
+                />
+            </mesh>
+
+            {/* Center Dot */}
+            <mesh rotation={[-Math.PI / 2, 0, 0]}>
+                <circleGeometry args={[2, 32]} />
+                <meshStandardMaterial
+                    color={color || '#00d4ff'}
+                    emissive={color || '#00d4ff'}
+                    emissiveIntensity={2}
+                    toneMapped={false}
+                />
+            </mesh>
+
+            {/* Goal Lines (X-axis markers) */}
+            <mesh position={[-30, 0, 0]} rotation={[-Math.PI / 2, 0, 0]}>
+                <planeGeometry args={[2, 25]} />
+                <meshStandardMaterial
+                    color="#ff006e"
+                    emissive="#ff006e"
+                    emissiveIntensity={1}
+                    transparent
+                    opacity={0.5}
+                />
+            </mesh>
+            <mesh position={[30, 0, 0]} rotation={[-Math.PI / 2, 0, 0]}>
+                <planeGeometry args={[2, 25]} />
+                <meshStandardMaterial
+                    color="#ff006e"
+                    emissive="#ff006e"
+                    emissiveIntensity={1}
+                    transparent
+                    opacity={0.5}
+                />
+            </mesh>
+        </group>
+    );
+}
+
+// ============================================
+// STADIUM COLLIDER (Invisible Walls)
+// ============================================
+function StadiumCollider() {
+    // Octagonal wall layout approx radius 65
+    // 8 walls, rotated 45 degrees each
+    const WALL_DIST = 65;
+    const WALL_HEIGHT = 40;
+
+    // Ceiling
+    useBox(() => ({
+        type: 'Static',
+        position: [0, 50, 0],
+        args: [140, 2, 140],
+        material: { friction: 0, restitution: 0.5 }
+    }));
+
+    // Side Walls (Invisible)
+    const walls = [];
+    for (let i = 0; i < 8; i++) {
+        const angle = (i / 8) * Math.PI * 2;
+        walls.push(
+            <StadiumWall
+                key={i}
+                position={[Math.sin(angle) * WALL_DIST, WALL_HEIGHT / 2, Math.cos(angle) * WALL_DIST]}
+                rotation={[0, angle, 0]}
+            />
+        );
+    }
+    return <group>{walls}</group>;
+}
+
+function StadiumWall({ position, rotation }) {
+    useBox(() => ({
+        type: 'Static',
+        position,
+        rotation,
+        args: [55, 40, 2], // Width connects the octagon
+        material: { friction: 0, restitution: 0.8 } // Bouncy walls
+    }));
+    return null; // Invisible
+}
+
 export default function ProceduralArena({ mapData }) {
     const tiles = useMemo(() => {
         if (!mapData?.grid) return [];
+        // ... (rest of tiles logic)
+
+        // Inside return of ProceduralArena:
+
+
+
 
         const result = [];
         const { grid, gridSize, biome } = mapData;
@@ -602,8 +741,11 @@ export default function ProceduralArena({ mapData }) {
             {decorations}
 
             <ArenaDecorations />
+            <StadiumCollider />
+            <StadiumCrowd biome={biome} count={2000} />
             <StadiumDome biome={biome} />
             <ReflectiveBase color={biome?.colors?.floor} />
+            <CenterCourtDecal color={biome?.colors?.accent} />
 
             {/* Note: Main lighting is now handled by GameScene for better global control.
                 Only simple biome accent light remains here. */}

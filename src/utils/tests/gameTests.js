@@ -1,8 +1,8 @@
 
 import { generateMap, validateMap, BIOMES } from '../mapGenerator';
-import { PHYSICS_CONFIG, calculateKnockback, checkFunnyPhysics } from '../physics';
+import { calculateKnockback, checkFunnyPhysics } from '../physics';
 import { POWERUP_REGISTRY, validateLoadout } from '../powerups';
-import * as THREE from 'three';
+
 
 /**
  * Game System Test Suite

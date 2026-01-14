@@ -94,7 +94,7 @@ export default function IconChooser({ ownedIcons = [], onClose, onSelect, equipp
                         ) : (
                             Object.entries(groupedByTier).map(([tier, icons]) => {
                                 // ... existing rendering logic ...
-                                const tierData = TIERS[tier];
+                                const tierData = TIERS[tier] || { color: '#555', name: 'Unknown' };
                                 const ownedInTier = icons.filter(i => ownedSet.has(i.id)).length;
 
                                 return (

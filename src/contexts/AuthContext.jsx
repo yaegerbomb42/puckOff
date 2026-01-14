@@ -8,7 +8,7 @@ import {
 } from 'firebase/auth';
 import { doc, getDoc, setDoc, updateDoc, increment, arrayUnion } from 'firebase/firestore';
 import { auth, googleProvider, db } from '../firebase';
-import { getLevelFromXp, XP_WIN_BONUS, XP_KNOCKOUT, XP_STOMP } from '../utils/leveling';
+import { XP_WIN_BONUS, XP_KNOCKOUT, XP_STOMP } from '../utils/leveling';
 
 const AuthContext = createContext();
 

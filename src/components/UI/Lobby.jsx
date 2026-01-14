@@ -31,7 +31,7 @@ export default function Lobby({
     onSelectMode,
     mapVotes
 }) {
-    const { user, inventory, loginWithGoogle, loginWithEmail, signupWithEmail, logout, equipIcon, updateLoadout, setActiveLoadout, updateUsername } = useAuth();
+    const { user, inventory, loginWithGoogle, loginWithEmail, signupWithEmail, logout, equipIcon, updateLoadout, setActiveLoadout, updateUsername, loading } = useAuth();
 
     const [showStore, setShowStore] = useState(false);
     const [showLoadout, setShowLoadout] = useState(false);
@@ -263,7 +263,7 @@ export default function Lobby({
                                 🏠 CREATE ROOM
                             </button>
                             <button className="btn btn-secondary btn-large sandbox" onClick={() => { audio.playClick(); onJoinRoom('sandbox'); }}>
-                                🧪 SANDBOX
+                                🎮 FREE PLAY
                             </button>
                         </div>
 

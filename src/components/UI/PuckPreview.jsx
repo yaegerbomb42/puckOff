@@ -9,7 +9,10 @@ extend({ LegendaryMaterial, CosmicMaterial, DivineMaterial, MysteryMaterial });
 
 function PreviewPuckModel({ icon }) {
     const meshRef = useRef();
-    const texture = useTexture(icon?.imageUrl || '/images/logo.png');
+
+    // Only load texture for non-tier-0 icons
+    const hasTexture = icon?.tier !== 0 && icon?.imageUrl;
+    const texture = useTexture(hasTexture ? icon.imageUrl : '/images/logo.png');
 
     // Animate rotation
     useFrame((state, delta) => {
@@ -20,13 +23,27 @@ function PreviewPuckModel({ icon }) {
         }
     });
 
-    const tier = icon?.tier || 1;
+    const tier = icon?.tier ?? 1;
+
+    // For Standard Colors (tier 0), use solid color instead of texture
+    const puckColor = icon?.color || '#ffffff';
 
     return (
         <mesh ref={meshRef} castShadow>
             <sphereGeometry args={[1.5, 64, 64]} />
+
+            {/* Tier 0: Standard Colors - Solid color puck with slight metallic sheen */}
+            {tier === 0 && (
+                <meshStandardMaterial
+                    color={puckColor}
+                    metalness={0.6}
+                    roughness={0.3}
+                    envMapIntensity={0.8}
+                />
+            )}
+
             {/* Standard Tier (1-5) */}
-            {tier <= 5 && (
+            {tier >= 1 && tier <= 5 && (
                 <meshStandardMaterial
                     map={texture}
                     metalness={0.4}

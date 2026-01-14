@@ -4,6 +4,7 @@
 import rawIconData from './icons.json';
 
 export const TIERS = {
+    0: { id: 0, name: 'Standard', color: '#6b7280', dropRate: 0, theme: 'Basic Colors', isMystery: false },
     1: { id: 1, name: 'Common', color: '#9ca3af', dropRate: 0.40, theme: 'Textured Materials', isMystery: false },
     2: { id: 2, name: 'Uncommon', color: '#22c55e', dropRate: 0.20, theme: 'Clean Objects', isMystery: false },
     3: { id: 3, name: 'Rare', color: '#3b82f6', dropRate: 0.12, theme: 'VFX & Energy', isMystery: false },

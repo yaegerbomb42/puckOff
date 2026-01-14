@@ -1,5 +1,5 @@
 import { useState, useCallback, useRef, useEffect } from 'react';
-import { PHYSICS_CONFIG, POWERUP_TYPES, getRandomPowerupType, getRandomPowerupPosition } from '../utils/physics';
+import { PHYSICS_CONFIG, getRandomPowerupType, getRandomPowerupPosition } from '../utils/physics';
 
 // Initial game state
 const initialState = {

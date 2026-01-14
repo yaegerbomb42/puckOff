@@ -348,6 +348,7 @@ const io = new Server(server, {
 // Game state
 const rooms = new Map();
 const playerRooms = new Map();
+const playerInventories = new Map();
 
 // Generate random room code
 function generateRoomCode() {
@@ -750,7 +751,7 @@ app.get('/', (req, res) => {
     res.json({ status: 'ok', rooms: rooms.size });
 });
 
-const PORT = process.env.PORT || 3002;
+const PORT = process.env.SERVER_PORT || process.env.PORT || 3002;
 server.listen(PORT, () => {
     console.log(`🎮 Puck Arena Server running on port ${PORT} `);
 });

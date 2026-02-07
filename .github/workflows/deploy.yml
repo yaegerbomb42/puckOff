@@ -1,0 +1,28 @@
+name: Deploy to Oracle VPS
+
+on:
+  push:
+    branches: [ "main" ]
+
+jobs:
+  deploy:
+    name: 🚀 Deploy to Oracle
+    runs-on: ubuntu-latest
+    steps:
+      - name: 🚚 Deploy via SSH
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.ORACLE_HOST }}
+          username: ubuntu
+          key: ${{ secrets.ORACLE_SSH_KEY }}
+          port: 22
+          script: |
+            echo "Connected to Oracle Cloud..."
+            cd puck-battle-arena
+            echo "⬇️ Pulling latest code..."
+            git pull
+            echo "🐳 Rebuilding containers..."
+            sudo docker compose up -d --build --remove-orphans
+            echo "🧹 Cleaning up..."
+            sudo docker image prune -f
+            echo "✅ Deployment Complete!"

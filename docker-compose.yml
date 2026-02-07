@@ -1,7 +1,21 @@
 version: '3.8'
 
 services:
+  # The Traffic Controller
+  npm:
+    image: 'jc21/nginx-proxy-manager:latest'
+    container_name: traffic-controller
+    restart: unless-stopped
+    ports:
+      - '80:80'
+      - '81:81'
+      - '443:443'
+    volumes:
+      - ./npm-data:/data
+      - ./npm-letsencrypt:/etc/letsencrypt
+
   backend:
+    container_name: puckoff-backend
     build:
       context: ./server
       dockerfile: Dockerfile
@@ -12,13 +26,15 @@ services:
     restart: always
 
   frontend:
+    container_name: puckoff-frontend
     build:
       context: .
       dockerfile: Dockerfile
       args:
         - REACT_APP_SERVER_URL=${REACT_APP_SERVER_URL}
-    ports:
-      - "80:80" # Maps VPS 80 to container 80
+    # Port 80 is now internal only (accessed by traffic-controller)
+    expose:
+      - "80"
     depends_on:
       - backend
     restart: always

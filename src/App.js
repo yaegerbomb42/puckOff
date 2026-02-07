@@ -35,6 +35,9 @@ function App() {
       )}
       <BattleArena />
       {showTester && <AutoTester onClose={() => setShowTester(false)} />}
+      <footer style={{ position: 'fixed', bottom: 10, right: 10, color: '#666', fontSize: '12px', zIndex: 9999 }}>
+        v1.1.0 (Auto-Deployed)
+      </footer>
     </>
   );
 }

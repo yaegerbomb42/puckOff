@@ -18,7 +18,7 @@ services:
       args:
         - REACT_APP_SERVER_URL=${REACT_APP_SERVER_URL}
     ports:
-      - "8080:80" # Maps local 8080 to container 80
+      - "80:80" # Maps VPS 80 to container 80
     depends_on:
       - backend
     restart: always

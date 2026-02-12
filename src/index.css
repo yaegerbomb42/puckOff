@@ -295,7 +295,7 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 .score-label {
-  font-size: 12px;
+  font-size: clamp(10px, 1.5vmin, 14px);
   text-transform: uppercase;
   letter-spacing: 3px;
   color: var(--text-secondary);
@@ -304,7 +304,7 @@ h1, h2, h3, h4, h5, h6 {
 
 .score-value {
   font-family: 'Orbitron', sans-serif;
-  font-size: 48px;
+  font-size: clamp(36px, 8vmin, 80px);
   font-weight: 900;
   line-height: 1;
 }
@@ -339,7 +339,7 @@ h1, h2, h3, h4, h5, h6 {
 
 .timer {
   font-family: 'Orbitron', sans-serif;
-  font-size: 24px;
+  font-size: clamp(20px, 4vmin, 36px);
   font-weight: 600;
   padding: var(--spacing-sm) var(--spacing-lg);
 }
@@ -365,8 +365,8 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 .powerup-slot {
-  width: 60px;
-  height: 60px;
+  width: clamp(50px, 8vmin, 80px);
+  height: clamp(50px, 8vmin, 80px);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -379,7 +379,7 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 .powerup-icon {
-  font-size: 28px;
+  font-size: clamp(24px, 4vmin, 40px);
 }
 
 /* Knockout Banner */
@@ -441,7 +441,7 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 .game-title {
-  font-size: clamp(48px, 8vw, 96px);
+  font-size: clamp(40px, 10vmin, 120px);
   margin-bottom: var(--spacing-xl);
   background: linear-gradient(135deg, var(--primary-blue), var(--primary-purple), var(--primary-pink));
   -webkit-background-clip: text;

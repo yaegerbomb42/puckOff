@@ -716,6 +716,7 @@ export default function Puck({
                     />
                 </mesh>
 
+
                 {/* 3. Segmented Armor Plates (6 Segments) */}
                 {[0, 60, 120, 180, 240, 300].map((angle, i) => (
                     <group key={i} rotation={[0, angle * Math.PI / 180, 0]}>
@@ -723,11 +724,12 @@ export default function Puck({
                             <cylinderGeometry
                                 args={[bodyRadius + 0.02, bodyRadius + 0.02, bodyHeight * 0.85, 16, 1, false, -Math.PI / 6 + 0.1, Math.PI / 3 - 0.2]}
                             />
+                            {/* USE TEXTURE ON SIDES */}
                             <meshStandardMaterial
-                                color={isFlashing ? "#fff" : "#2a2a2a"}
-                                metalness={0.8}
-                                roughness={0.3}
-                                envMapIntensity={1}
+                                map={iconTexture}
+                                color={isFlashing ? "#fff" : "#ffffff"}
+                                metalness={0.5}
+                                roughness={0.4}
                             />
                         </mesh>
                         {/* Detail vents on plates */}
@@ -790,10 +792,16 @@ export default function Puck({
                     </mesh>
                 </group>
 
-                {/* 6. Bottom Detail */}
+                {/* 6. Bottom Detail - NOW WITH TEXTURE */}
                 <mesh position={[0, -bodyHeight / 2 - 0.01, 0]} rotation={[Math.PI / 2, 0, 0]}>
-                    <circleGeometry args={[bodyRadius * 0.6, 32]} />
-                    <meshStandardMaterial color="#111" metalness={0.8} />
+                    <circleGeometry args={[bodyRadius * 0.85, 32]} />
+                    {/* Apply texture to bottom too */}
+                    <meshStandardMaterial
+                        map={iconTexture}
+                        color="#bbbbbb"
+                        metalness={0.5}
+                        roughness={0.3}
+                    />
                 </mesh>
                 <mesh position={[0, -bodyHeight / 2 - 0.02, 0]} rotation={[Math.PI / 2, 0, 0]}>
                     <ringGeometry args={[bodyRadius * 0.6, bodyRadius * 0.9, 32]} />

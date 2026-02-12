@@ -31,11 +31,35 @@ export const STANDARD_COLORS = [
     { id: 1010, name: 'Classic Black', color: '#111111', tier: 0, imageUrl: '/images/pucks/standard_black.png' }
 ];
 
-// ============ PRICING ============
-export const PACK_PRICES = {
-    single: { price: 0.50, slots: 3, stripeLink: 'https://buy.stripe.com/YOUR_SINGLE_PACK' },
-    bundle10: { price: 3.00, slots: 30, stripeLink: 'https://buy.stripe.com/YOUR_10_PACK' },
-    unlockAll: { price: 99.99, slots: 150, stripeLink: 'https://buy.stripe.com/YOUR_UNLOCK_ALL' }
+// ============ ZOINS ECONOMY ============
+export const ZOIN_BUNDLES = {
+    // "Fuel" Concept: "Golden Friction" Math (Target ~80% leftover of a High Roller)
+    pouch: { id: 'pouch', zoins: 900, price: 4.99, stripeLink: 'PLACEHOLDER_LINK_POUCH', name: 'Starter Fuel' }, // 900 - 500 = 400 Left (80% of next bet) -> PAIN
+    cache: { id: 'cache', zoins: 3800, price: 19.99, stripeLink: 'PLACEHOLDER_LINK_CACHE', name: 'Pro Stash' }, // 3800 - (500*7) = 300 Left -> PAIN
+    vault: { id: 'vault', zoins: 16000, price: 49.99, stripeLink: 'PLACEHOLDER_LINK_VAULT', name: 'Whale Vault' }
+};
+
+export const BETTING_OPTS = {
+    // "Almost There" Trap: 
+    standard: { cost: 100, multiplier: 1.0, name: 'Standard Bet' },
+    high_roller: { cost: 500, multiplier: 1.5, name: 'High Roller' }, // Anchor Price
+    whale: { cost: 2500, multiplier: 3.0, name: 'Whale Bet' }
+};
+
+// ============ REWARDS ============
+// "Golden Friction": Generous but calculated to keep you playing
+export const GAME_REWARDS = {
+    WIN: 48, // Win 2 games (96) -> ALMOST enough for Standard (100) -> PAIN
+    LOSS: 12, // Loss 9 games (108) -> Pity grind
+    KILL: 10, // Round number
+    MATCH_COMPLETE: 10,
+    DAILY_LOGIN: 25 // Quarter of a pack
+};
+
+export const PENALTIES = {
+    RAGE_QUIT: -10, // Slap needed
+    BAN_PROGRESSION: [1, 5, 30, 60, 1440],
+    BAN_REMOVE_COST: 100 // Almost a full pack
 };
 
 // ============ CONSTANTS ============
@@ -43,25 +67,19 @@ export const FREE_PACK_REROLL_CHANCE = 0.025; // 2.5%
 export const BURN_FREE_PACK_CHANCE = 0.50; // 50% chance when burning 2 identical
 export const TOTAL_ICONS = 150;
 
-// ============ REWARDS & PENALTIES ============
-export const REWARDS = {
-    GAME_COMPLETE: { min: 2, max: 3 },
-    WIN_BONUS: 1,
-    PACK_COST: 10
-};
-
-export const PENALTIES = {
-    RAGE_QUIT: -1,
-    BAN_PROGRESSION: [1, 5, 30, 60, 1440] // Minutes
-};
-
 // ============ PACK OPENING ============
-export function rollTier() {
+export function rollTier(luckMultiplier = 1.0) {
     const rand = Math.random();
     let cumulative = 0;
 
     for (const [tierId, tier] of Object.entries(TIERS)) {
-        cumulative += tier.dropRate;
+        // Apply luck multiplier to drop rates of Uncommon+
+        let adjustedRate = tier.dropRate;
+        if (parseInt(tierId) > 1) {
+            adjustedRate *= luckMultiplier;
+        }
+
+        cumulative += adjustedRate;
         if (rand < cumulative) {
             return parseInt(tierId);
         }
@@ -69,24 +87,26 @@ export function rollTier() {
     return 1; // Fallback to Common
 }
 
-export function openPack(packType = 'single') {
-    const pack = PACK_PRICES[packType];
-    if (!pack) return null;
+export function openPack(betAmount = 100) {
+    // Find multiplier based on bet amount
+    const betTier = Object.values(BETTING_OPTS).find(b => b.cost === betAmount) || BETTING_OPTS.standard;
+    const luckMultiplier = betTier.multiplier;
 
     const slots = [];
-    const slotsToOpen = packType === 'single' ? 3 : pack.slots;
+    // Standard pack is always 3 items
+    const slotsToOpen = 3;
 
     for (let i = 0; i < slotsToOpen; i++) {
-        // Check for free pack reroll
-        if (Math.random() < FREE_PACK_REROLL_CHANCE) {
+        // Check for free pack reroll (Luck applies slightly here too?)
+        if (Math.random() < (FREE_PACK_REROLL_CHANCE * luckMultiplier)) {
             slots.push({
-                type: 'free_pack_token',
+                type: 'free_pack_token', // Converts to 100 Zoins maybe? Or just a free Standard Bet
                 tier: null,
                 iconId: null,
                 isReroll: true
             });
         } else {
-            const tier = rollTier();
+            const tier = rollTier(luckMultiplier);
             slots.push({
                 type: 'icon',
                 tier: tier,

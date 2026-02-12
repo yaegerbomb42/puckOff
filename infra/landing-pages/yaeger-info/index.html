@@ -1,0 +1,383 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>YAEGER | EXPLORE</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Antonio:wght@100;700&family=Roboto+Mono:wght@300;500&display=swap');
+
+        :root {
+            --bg: #000;
+            --text: #fff;
+            --accent: #fff;
+            /* Stark white like SpaceX */
+            --overlay: rgba(0, 0, 0, 0.3);
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: var(--bg);
+            color: var(--text);
+            font-family: 'Antonio', sans-serif;
+            /* SpaceX-like font */
+            overflow-x: hidden;
+            font-size: 16px;
+        }
+
+        /* Full Screen Hero Video/Image Placeholder */
+        .hero {
+            height: 100vh;
+            width: 100%;
+            position: relative;
+            background: url('https://images.unsplash.com/photo-1451187580459-43490279c0fa?q=80&w=2672&auto=format&fit=crop') no-repeat center center/cover;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        .hero::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(180deg, rgba(0, 0, 0, 0.4) 0%, rgba(0, 0, 0, 0) 50%, rgba(0, 0, 0, 0.8) 100%);
+            z-index: 1;
+        }
+
+        /* Navigation */
+        nav {
+            position: absolute;
+            top: 0;
+            width: 100%;
+            padding: 2rem 3rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 10;
+        }
+
+        .logo {
+            font-size: 2rem;
+            font-weight: 700;
+            letter-spacing: 4px;
+            text-transform: uppercase;
+        }
+
+        .menu {
+            display: flex;
+            gap: 2rem;
+            font-family: 'Roboto Mono', monospace;
+            font-size: 0.9rem;
+            text-transform: uppercase;
+        }
+
+        .menu a {
+            color: #fff;
+            text-decoration: none;
+            opacity: 0.7;
+            transition: opacity 0.3s;
+        }
+
+        .menu a:hover {
+            opacity: 1;
+        }
+
+        /* Hero Content */
+        .hero-content {
+            position: relative;
+            z-index: 5;
+            padding: 0 4rem 4rem;
+            max-width: 800px;
+        }
+
+        .hero-subtitle {
+            font-family: 'Roboto Mono', monospace;
+            font-size: 1.1rem;
+            margin-bottom: 1rem;
+            opacity: 0.8;
+            letter-spacing: 2px;
+        }
+
+        h1 {
+            font-size: 5rem;
+            margin: 0;
+            text-transform: uppercase;
+            line-height: 0.9;
+            margin-bottom: 2rem;
+        }
+
+        .btn {
+            display: inline-block;
+            border: 2px solid #fff;
+            padding: 1rem 2.5rem;
+            color: #fff;
+            text-decoration: none;
+            text-transform: uppercase;
+            font-weight: 700;
+            font-family: 'Roboto Mono', monospace;
+            letter-spacing: 1px;
+            transition: all 0.3s;
+            position: relative;
+            overflow: hidden;
+            background: transparent;
+        }
+
+        .btn:hover {
+            background: #fff;
+            color: #000;
+        }
+
+        /* Sections */
+        .grid-section {
+            background: #000;
+            color: #fff;
+            padding: 4rem 2rem;
+        }
+
+        .grid-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1px;
+            /* Thin lines effect */
+            background: #333;
+            /* Line color */
+            border: 1px solid #333;
+        }
+
+        .grid-item {
+            background: #000;
+            aspect-ratio: 16/9;
+            position: relative;
+            overflow: hidden;
+            group: hover;
+            transition: background 0.3s;
+        }
+
+        .grid-item iframe {
+            width: 200%;
+            height: 200%;
+            border: none;
+            transform: scale(0.5);
+            transform-origin: 0 0;
+            opacity: 0.4;
+            transition: opacity 0.5s, transform 0.5s;
+            pointer-events: none;
+            filter: grayscale(100%);
+        }
+
+        .grid-item:hover iframe {
+            opacity: 0.8;
+            filter: grayscale(0%);
+            transform: scale(0.51);
+        }
+
+        .item-overlay {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            padding: 2rem;
+            background: linear-gradient(0deg, rgba(0, 0, 0, 0.9), transparent);
+            pointer-events: none;
+        }
+
+        .item-title {
+            font-size: 1.5rem;
+            text-transform: uppercase;
+            font-weight: 700;
+            margin: 0;
+        }
+
+        .item-sub {
+            font-family: 'Roboto Mono', monospace;
+            font-size: 0.8rem;
+            margin-top: 0.5rem;
+            opacity: 0.7;
+            text-transform: uppercase;
+        }
+
+        .grid-link {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 10;
+        }
+
+        .section-header {
+            padding: 2rem 0;
+            font-family: 'Roboto Mono', monospace;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            font-size: 0.9rem;
+            opacity: 0.6;
+        }
+    </style>
+</head>
+
+<body>
+
+    <header class="hero">
+        <nav>
+            <div class="logo">YAEGER</div>
+            <div class="menu">
+                <a href="https://raidball.com" target="_blank">Raidball</a>
+                <a href="https://mynow.online" target="_blank">MyNow</a>
+                <a href="https://swarmagents.codes" target="_blank">Swarm</a>
+                <a href="https://turbotoolbox.me" target="_blank">Turbo</a>
+            </div>
+        </nav>
+
+        <div class="hero-content">
+            <div class="hero-subtitle">SYSTEM STATUS: ACTIVE</div>
+            <h1>Advancing<br>The Future</h1>
+            <a href="#projects" class="btn">View Missions</a>
+        </div>
+    </header>
+
+    <div class="grid-section" id="projects">
+        <div class="section-header">/// MISSION PAYLOADS</div>
+
+        <div class="grid-container">
+
+            <!-- Raidball -->
+            <div class="grid-item">
+                <iframe src="https://raidball.com" loading="lazy"></iframe>
+                <div class="item-overlay">
+                    <h3 class="item-title">Raidball</h3>
+                    <div class="item-sub">Official // Gaming</div>
+                </div>
+                <a href="https://raidball.com" class="grid-link" target="_blank"></a>
+            </div>
+
+            <!-- MyNow -->
+            <div class="grid-item">
+                <iframe src="https://mynow.online" loading="lazy"></iframe>
+                <div class="item-overlay">
+                    <h3 class="item-title">MyNow</h3>
+                    <div class="item-sub">Official // Timeline</div>
+                </div>
+                <a href="https://mynow.online" class="grid-link" target="_blank"></a>
+            </div>
+
+            <!-- SwarmAgents -->
+            <div class="grid-item">
+                <iframe src="https://swarmagents.codes" loading="lazy"></iframe>
+                <div class="item-overlay">
+                    <h3 class="item-title">SwarmAgents</h3>
+                    <div class="item-sub">Official // AI Force</div>
+                </div>
+                <a href="https://swarmagents.codes" class="grid-link" target="_blank"></a>
+            </div>
+
+            <!-- TurboToolbox -->
+            <div class="grid-item">
+                <iframe src="https://turbotoolbox.me" loading="lazy"></iframe>
+                <div class="item-overlay">
+                    <h3 class="item-title">TurboToolbox</h3>
+                    <div class="item-sub">Official // Utilities</div>
+                </div>
+                <a href="https://turbotoolbox.me" class="grid-link" target="_blank"></a>
+            </div>
+
+            <!-- SwarmConnect -->
+            <div class="grid-item">
+                <iframe src="https://swarmconnect.site" loading="lazy"></iframe>
+                <div class="item-overlay">
+                    <h3 class="item-title">SwarmConnect</h3>
+                    <div class="item-sub">Official // Network</div>
+                </div>
+                <a href="https://swarmconnect.site" class="grid-link" target="_blank"></a>
+            </div>
+
+            <!-- YaegsCal -->
+            <div class="grid-item">
+                <iframe src="https://yaegscal.vercel.app/" loading="lazy"></iframe>
+                <div class="item-overlay">
+                    <h3 class="item-title">YaegsCal</h3>
+                    <div class="item-sub">App // Schedule</div>
+                </div>
+                <a href="https://yaegscal.vercel.app/" class="grid-link" target="_blank"></a>
+            </div>
+
+            <!-- Timeline4Ever -->
+            <div class="grid-item">
+                <iframe src="https://timeline4ever.vercel.app/" loading="lazy"></iframe>
+                <div class="item-overlay">
+                    <h3 class="item-title">Timeline4Ever</h3>
+                    <div class="item-sub">App // History</div>
+                </div>
+                <a href="https://timeline4ever.vercel.app/" class="grid-link" target="_blank"></a>
+            </div>
+
+            <!-- YaegsBucket -->
+            <div class="grid-item">
+                <iframe src="https://yaegsbucket.vercel.app/" loading="lazy"></iframe>
+                <div class="item-overlay">
+                    <h3 class="item-title">YaegsBucket</h3>
+                    <div class="item-sub">App // Storage</div>
+                </div>
+                <a href="https://yaegsbucket.vercel.app/" class="grid-link" target="_blank"></a>
+            </div>
+
+            <!-- JustGoals -->
+            <div class="grid-item">
+                <iframe src="https://justgoals.vercel.app/" loading="lazy"></iframe>
+                <div class="item-overlay">
+                    <h3 class="item-title">JustGoals</h3>
+                    <div class="item-sub">App // Productivity</div>
+                </div>
+                <a href="https://justgoals.vercel.app/" class="grid-link" target="_blank"></a>
+            </div>
+
+            <!-- GameWithFam -->
+            <div class="grid-item">
+                <iframe src="https://gamewithfam.vercel.app/" loading="lazy"></iframe>
+                <div class="item-overlay">
+                    <h3 class="item-title">GameWithFam</h3>
+                    <div class="item-sub">App // Family</div>
+                </div>
+                <a href="https://gamewithfam.vercel.app/" class="grid-link" target="_blank"></a>
+            </div>
+
+            <!-- AdaptiveLearn -->
+            <div class="grid-item">
+                <iframe src="https://adaptivelearn-ai.vercel.app/" loading="lazy"></iframe>
+                <div class="item-overlay">
+                    <h3 class="item-title">AdaptiveLearn AI</h3>
+                    <div class="item-sub">App // Education</div>
+                </div>
+                <a href="https://adaptivelearn-ai.vercel.app/" class="grid-link" target="_blank"></a>
+            </div>
+
+            <!-- Golden PDF -->
+            <div class="grid-item">
+                <iframe src="https://golden-pdf-github-io.vercel.app/" loading="lazy"></iframe>
+                <div class="item-overlay">
+                    <h3 class="item-title">Golden PDF</h3>
+                    <div class="item-sub">App // Document</div>
+                </div>
+                <a href="https://golden-pdf-github-io.vercel.app/" class="grid-link" target="_blank"></a>
+            </div>
+
+        </div>
+
+        <div
+            style="text-align: center; padding: 4rem 0; font-family: 'Roboto Mono', monospace; font-size: 0.8rem; opacity: 0.5;">
+            YAEGER AEROSPACE // EST 2026
+        </div>
+    </div>
+
+</body>
+
+</html>

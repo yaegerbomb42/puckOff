@@ -23,9 +23,10 @@ const DEFAULT_INVENTORY = {
     equippedIcon: 1001, // Default to Red
     skins: [],
     equippedSkin: null,
-    credits: 0,
+    credits: 0, // Legacy
+    zoins: 0, // [NEW] Premium Currency
     freePacks: 1,
-    packCredits: 0,
+    packCredits: 0, // Legacy
     banUntil: null,
     consecutiveQuits: 0,
     xp: 0, // [NEW] Experience Points
@@ -55,6 +56,7 @@ export function AuthProvider({ children }) {
     const [error, setError] = useState(null);
     const [inventory, setInventory] = useState(DEFAULT_INVENTORY);
     const [isAdmin, setIsAdmin] = useState(false);
+    const [currentWager, setCurrentWager] = useState(0); // [NEW] Wager State
 
     const clearError = useCallback(() => setError(null), []);
 
@@ -188,32 +190,43 @@ export function AuthProvider({ children }) {
 
     // ========== ECONOMY MANAGEMENT ==========
 
-    const addCredits = useCallback(async (amount) => {
+    const addZoins = useCallback(async (amount) => {
         if (!user) return;
         try {
             await updateDoc(doc(db, 'users', user.uid), {
-                credits: increment(amount)
+                zoins: increment(amount)
             });
-            setInventory(prev => ({ ...prev, credits: (prev.credits || 0) + amount }));
+            setInventory(prev => ({ ...prev, zoins: (prev.zoins || 0) + amount }));
         } catch (error) {
-            console.error('Error adding credits:', error);
+            console.error('Error adding Zoins:', error);
         }
     }, [user]);
 
-    const spendCredits = useCallback(async (amount) => {
-        if (!user || (inventory.credits || 0) < amount) return false;
+    const spendZoins = useCallback(async (amount) => {
+        if (!user || (inventory.zoins || 0) < amount) return false;
         try {
             await updateDoc(doc(db, 'users', user.uid), {
-                credits: increment(-amount)
+                zoins: increment(-amount)
             });
-            setInventory(prev => ({ ...prev, credits: (prev.credits || 0) - amount }));
+            setInventory(prev => ({ ...prev, zoins: (prev.zoins || 0) - amount }));
             return true;
         } catch (error) {
-            console.error('Error spending credits:', error);
-            setError("Transaction failed. Credits not deducted.");
+            console.error('Error spending Zoins:', error);
+            setError("Transaction failed. Zoins not deducted.");
             return false;
         }
-    }, [user, inventory.credits]);
+    }, [user, inventory.zoins]);
+
+    const joinWagerMatch = useCallback(async (amount) => {
+        if (!user || (inventory.zoins || 0) < amount) return false;
+        // Deduct entry fee immediately (The "Ante")
+        const success = await spendZoins(amount);
+        if (success) {
+            setCurrentWager(amount);
+            return true;
+        }
+        return false;
+    }, [user, inventory.zoins, spendZoins]);
 
     const applyPenalty = useCallback(async (penaltyType) => {
         // ... (no change needed for logic, but error handling)
@@ -281,14 +294,35 @@ export function AuthProvider({ children }) {
 
     // ========== STATS MANAGEMENT ==========
 
+    // Wrap updateMatchStats to include XP calculation & Wager Payout
     const updateMatchStats = useCallback(async (matchResult) => {
         if (!user) return;
 
         const { won, knockouts, damageDealt, stomps, maxCombo } = matchResult;
 
-        try {
-            const creditsEarned = won ? 3 : 2;
+        // Calculate XP Rewards
+        let xpEarned = 0;
+        if (won) xpEarned += XP_WIN_BONUS;
+        xpEarned += (knockouts || 0) * XP_KNOCKOUT;
+        xpEarned += (stomps || 0) * XP_STOMP;
 
+        try {
+            // Psychological Rewards (Messy Numbers)
+            const participationReward = 9;
+            const winReward = won ? 53 : 0;
+            const killReward = (knockouts || 0) * 7;
+
+            // [NEW] Wager Payout Logic
+            let wagerWinnings = 0;
+            if (won && currentWager > 0) {
+                // Winner takes 90% of pot (2x Ante)
+                // e.g. 100 in -> 180 out.
+                wagerWinnings = Math.floor(currentWager * 2 * 0.9);
+            }
+
+            const totalZoinsEarned = participationReward + winReward + killReward + wagerWinnings;
+
+            // Perform single atomic update for Stats + Zoins + XP
             await updateDoc(doc(db, 'users', user.uid), {
                 'stats.gamesPlayed': increment(1),
                 'stats.wins': increment(won ? 1 : 0),
@@ -296,14 +330,17 @@ export function AuthProvider({ children }) {
                 'stats.damageDealt': increment(Math.floor(damageDealt || 0)),
                 'stats.stomps': increment(stomps || 0),
                 'stats.highestCombo': Math.max(inventory.stats.highestCombo, maxCombo || 0),
-                credits: increment(creditsEarned),
-                consecutiveQuits: 0
+                zoins: increment(totalZoinsEarned),
+                consecutiveQuits: 0,
+                // Add XP atomically
+                xp: increment(xpEarned)
             });
 
             setInventory(prev => ({
                 ...prev,
-                credits: (prev.credits || 0) + creditsEarned,
+                zoins: (prev.zoins || 0) + totalZoinsEarned,
                 consecutiveQuits: 0,
+                xp: (prev.xp || 0) + xpEarned,
                 stats: {
                     ...prev.stats,
                     gamesPlayed: prev.stats.gamesPlayed + 1,
@@ -315,13 +352,15 @@ export function AuthProvider({ children }) {
                 }
             }));
 
-            return { creditsEarned };
+            // Reset Wager
+            if (currentWager > 0) setCurrentWager(0);
+
+            return { zoinsEarned: totalZoinsEarned, xpEarned, wagerWinnings };
         } catch (error) {
             console.error('Error updating match stats:', error);
-            // Don't error prompt for background stats update
             return null;
         }
-    }, [user, inventory.stats.highestCombo]);
+    }, [user, inventory.stats.highestCombo, currentWager]); // Added currentWager dependency
 
     // ========== XP & PROGRESSION ==========
 
@@ -364,57 +403,27 @@ export function AuthProvider({ children }) {
         return () => clearInterval(interval);
     }, [user]);
 
-    // Wrap updateMatchStats to include XP calculation
-    const updateMatchStatsWithXp = useCallback(async (matchResult) => {
-        if (!user) return;
-
-        const { won, knockouts, damageDealt, stomps, maxCombo } = matchResult;
-
-        // Calculate XP Rewards
-        let xpEarned = 0;
-        if (won) xpEarned += XP_WIN_BONUS;
-        xpEarned += (knockouts || 0) * XP_KNOCKOUT;
-        xpEarned += (stomps || 0) * XP_STOMP;
-
+    // ========== BAN MANAGEMENT ==========
+    const removeBan = useCallback(async () => {
+        if (!user || (inventory.zoins || 0) < 75) return false;
         try {
-            const creditsEarned = won ? 3 : 2;
-
-            // Perform single atomic update for Stats + Credits + XP + Playtime(optional but good practice)
             await updateDoc(doc(db, 'users', user.uid), {
-                'stats.gamesPlayed': increment(1),
-                'stats.wins': increment(won ? 1 : 0),
-                'stats.knockouts': increment(knockouts || 0),
-                'stats.damageDealt': increment(Math.floor(damageDealt || 0)),
-                'stats.stomps': increment(stomps || 0),
-                'stats.highestCombo': Math.max(inventory.stats.highestCombo, maxCombo || 0),
-                credits: increment(creditsEarned),
-                consecutiveQuits: 0,
-                // Add XP atomically
-                xp: increment(xpEarned)
+                zoins: increment(-75),
+                banUntil: null,
+                consecutiveQuits: 0
             });
-
             setInventory(prev => ({
                 ...prev,
-                credits: (prev.credits || 0) + creditsEarned,
-                consecutiveQuits: 0,
-                xp: (prev.xp || 0) + xpEarned,
-                stats: {
-                    ...prev.stats,
-                    gamesPlayed: prev.stats.gamesPlayed + 1,
-                    wins: prev.stats.wins + (won ? 1 : 0),
-                    knockouts: prev.stats.knockouts + (knockouts || 0),
-                    damageDealt: prev.stats.damageDealt + Math.floor(damageDealt || 0),
-                    stomps: prev.stats.stomps + (stomps || 0),
-                    highestCombo: Math.max(prev.stats.highestCombo, maxCombo || 0)
-                }
+                zoins: (prev.zoins || 0) - 75,
+                banUntil: null,
+                consecutiveQuits: 0
             }));
-
-            return { creditsEarned, xpEarned };
+            return true;
         } catch (error) {
-            console.error('Error updating match stats:', error);
-            return null;
+            console.error('Error removing ban:', error);
+            return false;
         }
-    }, [user, inventory.stats.highestCombo]);
+    }, [user, inventory.zoins]);
 
     // ========== ACHIEVEMENTS ==========
 
@@ -475,17 +484,19 @@ export function AuthProvider({ children }) {
         resetIcons,
 
         // Economy
-        addCredits,
-        spendCredits,
+        addZoins,
+        spendZoins,
         useFreePack,
         applyPenalty,
+        removeBan,
+        joinWagerMatch,
 
         // Loadouts
         updateLoadout,
         setActiveLoadout,
 
         // Stats
-        updateMatchStats: updateMatchStatsWithXp, // Use the wrapper
+        updateMatchStats, // Used to be updateMatchStatsWithXp wrapper, now integrated
         unlockAchievement,
 
         // Progression

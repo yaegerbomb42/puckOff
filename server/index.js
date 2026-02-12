@@ -20,6 +20,28 @@ app.get('/ping', (req, res) => res.status(200).send('pong'));
 app.use(cors());
 app.use(express.json());
 
+// --- MAINTENANCE ENDPOINT (For GitHub Actions) ---
+app.post('/api/admin/maintenance', (req, res) => {
+    const { secret, duration } = req.body;
+
+    // Simple hardcoded secret for now (Professional: use process.env.DEPLOY_SECRET)
+    if (secret !== process.env.DEPLOY_SECRET && secret !== 'puckoff_deploy_secret_2026') {
+        console.warn('⚠️ Maintenance Warning REJECTED: Invalid Secret'); // Log unauthorized attempts
+        return res.status(403).json({ error: 'Unauthorized' });
+    }
+
+    console.log(`📢 Broadcasting Maintenance Warning: ${duration} minutes`);
+
+    // Broadcast to all connected clients
+    io.emit('server_message', {
+        type: 'maintenance',
+        duration: duration || 10,
+        message: `⚠️ Server Restarting in ${duration || 10} minutes for Updates!`
+    });
+
+    res.json({ success: true, message: 'Broadcast sent' });
+});
+
 // ============ FIREBASE ADMIN SETUP ============
 const admin = require('firebase-admin');
 const { getFirestore } = require('firebase-admin/firestore');
@@ -123,17 +145,23 @@ async function fulfillPurchase(email, packType) {
         const docSnap = await userRef.get();
 
         let userData = docSnap.exists ? docSnap.data() : {
-            email, icons: [], freePacks: 0, packCredits: 0
+            email, icons: [], zoins: 0 // Default 0 Zoins
         };
 
-        const packsToAdd = packType === 'bundle10' ? 10 : (packType === 'single' ? 1 : 0);
+        let zoinsToAdd = 0;
+        if (packType === 'pouch') zoinsToAdd = 500;
+        else if (packType === 'cache') zoinsToAdd = 2500;
+        else if (packType === 'vault') zoinsToAdd = 10000;
+        else if (packType === 'bundle10') zoinsToAdd = 2500; // Legacy mapping
+        else if (packType === 'single') zoinsToAdd = 500; // Legacy mapping
 
         if (packType === 'unlockAll') {
             userData.icons = Array.from({ length: 150 }, (_, i) => i + 1);
+            userData.zoins = (userData.zoins || 0) + 50000; // Bonus for whale
             console.log(`🐋 Whale unlock complete for ${email}`);
         } else {
-            userData.freePacks = (userData.freePacks || 0) + packsToAdd;
-            console.log(`🎁 Granted ${packsToAdd} packs to ${email}`);
+            userData.zoins = (userData.zoins || 0) + zoinsToAdd;
+            console.log(`🎁 Granted ${zoinsToAdd} Zoins to ${email}`);
         }
 
         const paymentData = {
@@ -169,7 +197,7 @@ app.post('/api/admin/grant-pack', verifyAdmin, async (req, res) => {
     // This endpoint is hit by the AdminDashboard
     // For now, the dashboard updates Firestore directly, so this isn't strictly needed for the client tools.
     // But if you want server-side validity:
-    const { userId, count } = req.body;
+    // const { userId, count } = req.body;
     // ... logic to update firestore ...
     res.json({ success: true });
 });
@@ -314,7 +342,7 @@ app.post('/api/claim-packs', (req, res) => {
 });
 
 // ============ ADMIN API ENDPOINTS ============
-app.get('/api/admin/rooms', (req, res) => {
+app.get('/api/admin/rooms', async (req, res) => {
     const roomsList = [];
     for (const [code, room] of rooms) {
         roomsList.push({
@@ -330,10 +358,22 @@ app.get('/api/admin/rooms', (req, res) => {
         playersOnline += room.players?.size || 0;
     }
 
+    // Fetch global stats
+    let totalTimePlayedSeconds = 0;
+    try {
+        const statsDoc = await db.collection('stats').doc('global').get();
+        if (statsDoc.exists) {
+            totalTimePlayedSeconds = statsDoc.data().totalTimePlayedSeconds || 0;
+        }
+    } catch (e) {
+        console.log('Error fetching global stats:', e.message);
+    }
+
     res.json({
         rooms: roomsList,
-        playersOnline,
-        totalRooms: rooms.size
+        playersOnline: io.engine.clientsCount, // Use accurate socket count
+        totalRooms: rooms.size,
+        totalTimePlayedSeconds
     });
 });
 
@@ -418,6 +458,19 @@ io.on('connection', (socket) => {
         joinRoom(socket, roomCode, playerName, userEmail, callback);
     });
 
+    // ============ ANALYTICS TRACKING ============
+    // Track connection time
+    socket.data.connectTime = Date.now();
+
+    // Broadcast player count to all clients periodically
+    // We do this throttled to avoid spam
+    if (!global.playerCountInterval) {
+        global.playerCountInterval = setInterval(() => {
+            const count = io.engine.clientsCount;
+            io.emit('serverStats', { playersOnline: count });
+        }, 5000);
+    }
+
     // Handle player ready
     socket.on('playerReady', ({ isReady, loadout }) => {
         const roomCode = playerRooms.get(socket.id);
@@ -438,17 +491,11 @@ io.on('connection', (socket) => {
             io.to(roomCode).emit('roomUpdate', { players: playersList });
 
             if (allReady && room.players.size >= 1) { // Allow 1 player start for testing
-                room.gameState = 'playing';
-                const seed = Math.floor(Math.random() * 1000000); // Generate seed
-                room.currentSeed = seed; // Store seed in room
-                io.to(roomCode).emit('gameStart', {
-                    players: playersList,
-                    selectedMap: room.selectedMap || 'SAWBLADE CITY',
-                    seed: seed // Send seed to clients
-                });
+                startGame(roomCode);
             }
         }
     });
+
 
     // Handle Map Vote
     socket.on('voteMap', ({ mapName }) => {
@@ -559,8 +606,35 @@ io.on('connection', (socket) => {
     });
 
     // Disconnect
-    socket.on('disconnect', () => {
+    socket.on('disconnect', async () => {
         console.log(`Player disconnected: ${socket.id} `);
+
+        // --- TIME TRACKING ---
+        const durationSession = Date.now() - (socket.data.connectTime || Date.now());
+        const durationSeconds = Math.floor(durationSession / 1000);
+
+        // IP Exclusion Logic
+        const clientIp = socket.handshake.headers['x-forwarded-for'] || socket.request.connection.remoteAddress;
+        const adminIps = (process.env.ADMIN_IPS || '').split(',').map(ip => ip.trim());
+
+        // Check if IP is excluded (Admin)
+        const isExcluded = adminIps.some(adminIp => clientIp.includes(adminIp)) || clientIp === '::1'; // Localhost often ::1
+
+        if (!isExcluded && durationSeconds > 0) {
+            try {
+                // Update global stats in Firestore
+                const statsRef = db.collection('stats').doc('global');
+                await statsRef.set({
+                    totalTimePlayedSeconds: admin.firestore.FieldValue.increment(durationSeconds),
+                    lastUpdated: admin.firestore.FieldValue.serverTimestamp()
+                }, { merge: true });
+                console.log(`⏱️ Logged ${durationSeconds}s play time (IP: ${clientIp})`);
+            } catch (err) {
+                console.error('Error logging time:', err.message);
+            }
+        } else {
+            console.log(`🛡️ Admin/Localhost IP (${clientIp}) - Time not tracked.`);
+        }
 
         const roomCode = playerRooms.get(socket.id);
         if (roomCode) {
@@ -699,9 +773,17 @@ io.on('connection', (socket) => {
             }
 
             try {
-                // Determine reward
+                // Determine reward (Zoins)
                 const isWinner = playerId === winnerId;
-                const creditEarned = isWinner ? 1.0 : 0.5;
+                // Base reward for match completion
+                let zoinReward = 10;
+
+                // Win Bonus
+                if (isWinner) zoinReward += 50;
+
+                // Kill Bonus (using score as proxy for kills)
+                const kills = player.score || 0;
+                zoinReward += (kills * 5);
 
                 // Get user doc
                 const userQuery = await admin.auth().getUserByEmail(player.email).catch(() => null);
@@ -711,30 +793,20 @@ io.on('connection', (socket) => {
 
                 await db.runTransaction(async (t) => {
                     const doc = await t.get(userRef);
-                    if (!doc.exists) return; // Should exist if they logged in
+                    if (!doc.exists) return;
 
                     const data = doc.data();
-                    let currentCredits = (data.packCredits || 0) + creditEarned;
-                    let packsEarned = 0;
-
-                    // Convert credits to packs (every 1.0 credit = 1 pack)
-                    if (currentCredits >= 1) {
-                        const newPacks = Math.floor(currentCredits);
-                        currentCredits -= newPacks;
-                        packsEarned = newPacks;
-                    }
+                    const currentZoins = (data.zoins || 0) + zoinReward;
 
                     t.update(userRef, {
-                        packCredits: currentCredits,
-                        freePacks: (data.freePacks || 0) + packsEarned
+                        zoins: currentZoins
                     });
 
-                    console.log(`🎁 ${player.email}: +${creditEarned} credit -> ${packsEarned} packs earned.`);
+                    console.log(`🎁 ${player.email}: Earned ${zoinReward} Zoins.`);
 
                     // Notify client of reward
                     io.to(playerId).emit('rewardEarned', {
-                        packs: packsEarned,
-                        credits: creditEarned,
+                        zoins: zoinReward,
                         isWinner
                     });
                 });

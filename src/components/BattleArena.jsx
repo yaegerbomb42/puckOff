@@ -15,6 +15,8 @@ import Lobby from './UI/Lobby';
 import SandboxControls from './UI/SandboxControls';
 import DynamicCamera from './DynamicCamera';
 import LoadingScreen from './UI/LoadingScreen';
+import ControllerHints from './UI/ControllerHints';
+import MaintenanceOverlay from './UI/MaintenanceOverlay'; // [NEW]
 import ProjectileSystem from './ProjectileSystem';
 import ProceduralArena from './ProceduralArena';
 import ExplosionParticles from './ExplosionParticles';
@@ -167,6 +169,7 @@ function GameScene({
         </>
     );
 }
+
 
 // ============================================
 // MAIN BATTLE ARENA COMPONENT
@@ -792,9 +795,18 @@ export default function BattleArena() {
         return null;
     };
 
+
+
+    // ... (in render)
     return (
         <div className="game-container">
+            {/* Maintenance Overlay - Always Visible if Active */}
+            {multiplayer.serverMessage && multiplayer.serverMessage.type === 'maintenance' && (
+                <MaintenanceOverlay message={multiplayer.serverMessage} />
+            )}
+
             {isAdmin && <DebugLogger visible={true} />}
+            <ControllerHints />
             {renderOverlay()}
 
             <Canvas

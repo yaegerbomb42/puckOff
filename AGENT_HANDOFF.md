@@ -1,171 +1,102 @@
-# puckOFF - Agent Handoff Document
+# puckOFF - Agent Orientation Guide
 
-> **Last Updated**: 2026-01-10 21:28 CST
 > **Project Status**: Active Development
 > **Dev Server**: `npm start` → <http://localhost:3000>
 
 ---
 
-## 🎮 Project Overview
+## 1. Project Philosophy
 
-**puckOFF** is a multiplayer physics-based arena combat game built with:
+**puckOFF** is a high-octane multiplayer physics arena game.
 
-- **React** + **React Three Fiber** (3D rendering)
-- **@react-three/cannon** (physics)
-- **Firebase** (auth + Firestore for user data)
-- **Socket.IO** (multiplayer)
-- **Web Audio API** (synthetic sound effects)
-
-Players control glowing pucks in a procedurally generated arena, using powerups to knock opponents off the stage. Think Super Smash Bros meets air hockey.
+* **Aesthetic**: "Cyber-sport" / Tron-like. High contrast, neon, glassmorphism.
+* **User Preferences**:
+  * **Premium Quality**: No MVPs. Features must be polished and "wow" the user.
+  * **Creative Engineering**: Don't just make a button; make it glow, hum, and react.
+  * **Minimal Browser Usage**: Don't open tabs unless necessary.
 
 ---
 
-## 📁 Key Files & Architecture
+## 2. Core Architecture
 
-```
-src/
-├── components/
-│   ├── BattleArena.jsx      # Main game orchestrator
-│   ├── Puck.jsx             # Player puck (3D model + physics)
-│   ├── ReplaySystem.jsx     # NEW: Killcam/replay system
-│   ├── ProceduralArena.jsx  # Tile-based arena renderer
-│   └── UI/
-│       ├── Lobby.jsx        # Main menu + matchmaking
-│       ├── LoadoutMenu.jsx  # Powerup selection (3 slots)
-│       ├── Store.jsx        # Icon pack shop
-│       └── IconChooser.jsx  # Icon collection viewer
-├── utils/
-│   ├── audio.js             # Synthetic audio manager
-│   ├── analytics.js         # NEW: FPS/gameplay tracking
-│   ├── economy.js           # Credits, packs, tiers
-│   ├── powerups.js          # Powerup definitions
-│   └── mapGenerator.js      # Procedural arena generation
-├── contexts/
-│   └── AuthContext.jsx      # Firebase auth + inventory
-└── hooks/
-    └── useMultiplayer.js    # Socket.IO game state
-```
+* **Frontend**: React + Three.js (`@react-three/fiber`) + Cannon.js (Physics).
+* **Backend**: Node.js + Socket.IO (Real-time state).
+* **Data**: Firebase (Auth + Firestore).
+* **Economy**: "Zoins" (Integer-based currency).
+
+### Key Files
+
+* `src/components/BattleArena.jsx`: The main game loop and orchestrator.
+* `src/components/Puck.jsx`: The player character. Contains complex material shaders and input handling.
+* `src/utils/economy.js`: Constants for monetization and betting.
+* `src/contexts/AuthContext.jsx`: Global state for User, Inventory, and Wagers.
 
 ---
 
-## 🔧 Recent Changes (This Session)
+## 3. Critical Context & "Gotchas"
 
-### Completed
-
-1. **Enhanced Audio System** (`src/utils/audio.js`)
-   - Added `startAmbient()` - droning pad with LFO
-   - Added `playPositional(x, z, intensity)` - spatial stereo panning
-   - Added `playReveal(tier)` - pack opening sounds
-   - Added volume controls: `setMasterVolume()`, `setMusicVolume()`, `setSfxVolume()`, `toggleMute()`
-
-2. **Replay/Killcam System** (`src/components/ReplaySystem.jsx`)
-   - Records last 10 seconds in circular buffer
-   - Triggers on knockout
-   - Slow-motion playback with player color tracking
-
-3. **Analytics System** (`src/utils/analytics.js`)
-   - FPS tracking
-   - Knockout/powerup usage tracking
-   - Session stats
-
-4. **Loadout Persistence**
-   - Now supports 3 loadout slots
-   - Added slot selector UI in `LoadoutMenu.jsx`
-   - Integrated with Firebase via `updateLoadout()` and `setActiveLoadout()`
-
-5. **Visual Updates**
-   - New arena background image (`public/images/lobby_background.png`)
-   - Mystery icon for unrevealed items (`public/images/mystery_icon.png`)
-   - Fixed `emissiveIntensity` bug in Puck.jsx (was using `Date.now()`)
-
-### Known Issues
-
-- **Google Login COOP Policy**: May fail in some browsers (cross-origin isolation)
-- **theme-color lint warning**: Browser compatibility warning, not a real error
+* **API Keys**: Firebase Config is in `.env` (Source of Truth).
+* **Audio**: Browser autoplay policies require a user gesture before `audio.init()` works.
+* **Input**: `useGamepad.js` handles **both** Xbox/PS4 controllers and Keyboard inputs for the local player.
+* **Shaders**: `Puck.jsx` uses custom shaders for high-tier icons (Legendary/Divine). Be careful editing materials.
 
 ---
 
-## 📋 TODO List (See `/TODO.md`)
+## 5. Infrastructure & Nginx
 
-**Completed (10/22)**:
+* **Server IP**: `147.224.158.118` (Oracle Cloud)
+* **SSH User**: `ubuntu`
+* **SSH Key**: `ssh-key-2026-02-07private.key`
+* **Nginx Proxy Manager (NPM)**:
+  * **URL**: `http://147.224.158.118:81`
+  * **Container**: `traffic-controller` (in `~/puckOff`)
+  * **Restart Command**: `docker restart traffic-controller`
+* **Static Sites (Landing Pages)**:
+  * **Container**: `static-landings` (in `~/infra`)
+  * **SwarmConnect**: Port `8081` (Internal/Host)
+  * **Yaeger.info**: Port `8082` (Internal/Host)
+  * **Raidball**: Port `8083` (Internal/Host)
+  * **MyNow.online**: Port `8084` (Internal/Host)
+  * **SwarmAgents.codes**: Port `8085` (Internal/Host)
+  * **TurboToolbox.me**: Port `8086` (Internal/Host)
 
-- ✅ Ambient audio layers
-- ✅ Spatial audio
-- ✅ Pack reveal sounds
-- ✅ Loadout persistence
-- ✅ Mystery icon asset
-- ✅ Analytics system
-- ✅ Replay/killcam system
-- ✅ Arena background image
+## 6. Deployment Workflow (How to Update Sites)
 
-**Remaining**:
+### Updating Landing Pages
 
-- [ ] Server timer interpolation (smoother countdown)
-- [ ] Projectile velocity tracking
-- [ ] Firebase retry logic for error handling
-- [ ] Loading skeleton screens
-- [ ] Ranked matchmaking
-- [ ] Tournament mode
-- [ ] Controller support
+1. **Edit Locally**: Modify files in `infra/landing-pages/` (e.g., `raidball/index.html`).
+2. **Push to Server**: Run this command from your terminal:
 
----
+    ```bash
+    scp -o StrictHostKeyChecking=no -i ssh-key-2026-02-07private.key -r infra/landing-pages ubuntu@147.224.158.118:~/infra/
+    ```
 
-## 🚀 Quick Commands
+    *No restart required. Changes are live immediately.*
+
+### Fetching Files FROM Server (Downloading)
+
+If you made changes on the server and want to pull them down:
 
 ```bash
-# Start dev server
-npm start
-
-# Start multiplayer server
-cd server && node index.js
-
-# Build for production
-npm run build
+scp -o StrictHostKeyChecking=no -i ssh-key-2026-02-07private.key -r ubuntu@147.224.158.118:~/infra/landing-pages/* infra/landing-pages/
 ```
 
----
+### Updating Nginx Configuration (Ports/Domains)
 
-## 💡 Tips for Next Agent
+1. **Edit Locally**: Modify `infra/nginx.conf` or `docker-compose.yml`.
+2. **Push Configs**:
 
-1. **Puck.jsx is complex** - It has custom shaders for legendary/divine icons. Be careful with materials.
+    ```bash
+    scp -o StrictHostKeyChecking=no -i ssh-key-2026-02-07private.key infra/nginx.conf infra/docker-compose.yml ubuntu@147.224.158.118:~/infra/
+    ```
 
-2. **Audio requires user gesture** - Browser policies require `audio.init()` to be called after user interaction (handled in App.js).
+3. **Restart Container**:
 
-3. **The replay system is basic** - Currently shows a 2D mini-view. Could be enhanced to show actual 3D replay.
+    ```bash
+    ssh -o StrictHostKeyChecking=no -i ssh-key-2026-02-07private.key ubuntu@147.224.158.118 "cd ~/infra && docker compose up -d --force-recreate"
+    ```
 
-4. **Firebase structure**:
-   - Users: `/users/{uid}` contains inventory, loadouts, stats
-   - Economy uses `credits` not coins
+## 7. Current Focus
 
-5. **Map generation** - `mapGenerator.js` handles procedural arenas with biomes (Neon City, Volcanic Forge, etc.)
-
-6. **Icon Tiers** - 10 tiers from Common to Divine. Tier 8+ are "mystery" and masked until owned.
-
----
-
-## 🔗 External Integrations
-
-- **Firebase**: Auth + Firestore (configured in `src/firebase.js`)
-- **Stripe**: Payment links in `Store.jsx` (replace with real URLs)
-- **Google AdSense**: Script added to `public/index.html`
-
----
-
-## 📸 Assets
-
-- Logo: `/public/images/logo.png` (puckOFF branding)
-- Icons: `/public/icons/Tier_X_Name/icon_N.png` (150 collectibles)
-- Powerups: `/public/powerups/` (gameplay abilities)
-
----
-
-## 🎯 User's Style Preferences
-
-- Prefers **minimal browser automation** (don't open many pages)
-- Wants **premium, neon-tech aesthetic**
-- Likes **comprehensive implementations** over minimal MVPs
-- Values **clear progress tracking** (TODO.md)
-
----
-
-Good luck, future agent! 🚀
+We are currently polishing the "Golden Friction" economy and adding "Juice" (visual/audio feedback).
+Refer to `core_todos.md` for the active task list.

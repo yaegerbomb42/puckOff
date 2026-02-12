@@ -25,6 +25,7 @@ export function useMultiplayer() {
     // Offline / Error State (Missing in previous version)
     const [isOffline, setIsOffline] = useState(false);
     const [connectionError, setConnectionError] = useState(null);
+    const [serverMessage, setServerMessage] = useState(null); // { type, message, duration }
 
     // Spectator Mode
     const [isSpectating, setIsSpectating] = useState(false);
@@ -198,6 +199,21 @@ export function useMultiplayer() {
 
         newSocket.on('timerUpdate', (timeRemaining) => {
             setTimer(timeRemaining);
+        });
+
+        newSocket.on('timerUpdate', (timeRemaining) => {
+            setTimer(timeRemaining);
+        });
+
+        // Maintenance / Server Messages
+        newSocket.on('server_message', (msg) => {
+            console.log('📢 Server Message:', msg);
+            setServerMessage(msg);
+
+            // Auto-clear notification after some time if it's not permanent
+            if (msg.duration && msg.type !== 'maintenance') {
+                setTimeout(() => setServerMessage(null), msg.duration * 1000);
+            }
         });
 
         return () => {
@@ -408,9 +424,11 @@ export function useMultiplayer() {
         timer, // <--- Exposed to component
 
         // Offline / Error status
+        // Offline / Error status
         connectionError,
         isOffline,
         enableOfflineMode,
+        serverMessage, // <--- Exposed
 
         // Spectator Mode
         isSpectating,

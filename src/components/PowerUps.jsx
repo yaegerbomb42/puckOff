@@ -1,6 +1,6 @@
-import React, { useRef, useEffect } from 'react';
+import React, { useRef } from 'react';
 import { useFrame } from '@react-three/fiber';
-import { Billboard, Text, useTexture } from '@react-three/drei';
+import { useTexture } from '@react-three/drei';
 import { PHYSICS_CONFIG, POWERUP_TYPES, distance3D } from '../utils/physics';
 import { getPowerupInfo } from '../utils/powerups';
 
@@ -47,41 +47,80 @@ export function PowerUp({ powerup, playerPositions, onCollect }) {
 
     return (
         <group position={position}>
-            {/* Visual power-up Icon */}
+            {/* 3D Rotating Puck Powerup */}
             <group ref={meshRef}>
-                <Billboard follow={true} lockX={false} lockY={false} lockZ={false}>
-                    <PowerupIcon texturePath={imagePath} color={color} />
-                </Billboard>
+                <RotatingPuck texturePath={imagePath} color={color} />
             </group>
 
-            {/* Glow sphere */}
+            {/* Glow Halo (kept as sphere for ambient effect) */}
             <mesh ref={glowRef}>
-                <sphereGeometry args={[0.7, 16, 16]} />
-                <meshBasicMaterial color={color} transparent opacity={0.3} />
+                <sphereGeometry args={[PHYSICS_CONFIG.powerups.pickupRadius * 0.6, 16, 16]} />
+                <meshBasicMaterial color={color} transparent opacity={0.15} wireframe />
             </mesh>
 
             {/* Ground indicator */}
             <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, -position[1] + 0.05, 0]}>
-                <circleGeometry args={[0.6, 32]} />
-                <meshBasicMaterial color={color} transparent opacity={0.2} />
-            </mesh>
-
-            {/* Pickup radius indicator */}
-            <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, -position[1] + 0.02, 0]}>
-                <ringGeometry args={[PHYSICS_CONFIG.powerups.pickupRadius - 0.1, PHYSICS_CONFIG.powerups.pickupRadius, 32]} />
-                <meshBasicMaterial color={color} transparent opacity={0.15} />
+                <circleGeometry args={[0.5, 32]} />
+                <meshBasicMaterial color={color} transparent opacity={0.3} />
             </mesh>
         </group>
     );
 }
 
-function PowerupIcon({ texturePath, color }) {
+function RotatingPuck({ texturePath, color }) {
     const texture = useTexture(texturePath);
+    const puckRef = useRef();
+
+    useFrame((state) => {
+        if (puckRef.current) {
+            // Rotate the puck
+            puckRef.current.rotation.y += 0.02;
+            puckRef.current.rotation.x = Math.sin(state.clock.elapsedTime * 2) * 0.1; // Gentle tilt
+        }
+    });
+
+    const bodyRadius = 0.5;
+    const bodyHeight = 0.2;
+
     return (
-        <mesh>
-            <planeGeometry args={[1, 1]} />
-            <meshStandardMaterial map={texture} transparent alphaTest={0.5} emissive={color} emissiveIntensity={0.5} />
-        </mesh>
+        <group ref={puckRef}>
+            {/* Dark Side/Bottom */}
+            <mesh position={[0, -0.01, 0]}>
+                <cylinderGeometry args={[bodyRadius, bodyRadius, bodyHeight, 32]} />
+                <meshStandardMaterial color="#222" metalness={0.8} roughness={0.3} />
+            </mesh>
+
+            {/* Colored Rim */}
+            <mesh>
+                <cylinderGeometry args={[bodyRadius + 0.01, bodyRadius + 0.01, bodyHeight * 0.6, 32, 1, true]} />
+                <meshBasicMaterial color={color} transparent opacity={0.8} side={2} />
+            </mesh>
+
+            {/* Top Face with Icon */}
+            <mesh position={[0, bodyHeight / 2 + 0.001, 0]} rotation={[-Math.PI / 2, 0, 0]}>
+                <circleGeometry args={[bodyRadius * 0.85, 32]} />
+                <meshBasicMaterial
+                    map={texture}
+                    transparent
+                    color={color} // Tint the icon slightly with powerup color
+                    emissive={color}
+                    emissiveIntensity={0.5}
+                />
+            </mesh>
+
+            {/* Glass Cap */}
+            <mesh position={[0, bodyHeight / 2 + 0.01, 0]} rotation={[-Math.PI / 2, 0, 0]}>
+                <circleGeometry args={[bodyRadius, 32]} />
+                <meshPhysicalMaterial
+                    color="#fff"
+                    transmission={0.5}
+                    opacity={0.3}
+                    transparent
+                    roughness={0}
+                    clearcoat={1}
+                />
+            </mesh>
+        </group>
     );
 }
 

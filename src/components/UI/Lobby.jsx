@@ -31,7 +31,7 @@ export default function Lobby({
     onSelectMode,
     mapVotes
 }) {
-    const { user, inventory, loginWithGoogle, loginWithEmail, signupWithEmail, logout, equipIcon, updateLoadout, setActiveLoadout, updateUsername, loading } = useAuth();
+    const { user, inventory, loginWithGoogle, loginWithEmail, signupWithEmail, logout, equipIcon, updateLoadout, setActiveLoadout, updateUsername, loading, joinWagerMatch } = useAuth();
 
     const [showStore, setShowStore] = useState(false);
     const [showLoadout, setShowLoadout] = useState(false);
@@ -43,8 +43,49 @@ export default function Lobby({
     const [authPassword, setAuthPassword] = useState('');
     const [authError, setAuthError] = useState('');
 
+    const [isWagerMode, setIsWagerMode] = useState(false);
+    const [wagerAmount, setWagerAmount] = useState(100);
+
     const [openingPack, setOpeningPack] = useState(null);
     const [playerName, setPlayerName] = useState(user?.displayName || '');
+    const [activePlayers, setActivePlayers] = useState(0);
+
+    // [NEW] Force Loadout Selection if empty
+    React.useEffect(() => {
+        if (connected && inventory) {
+            const currentLoadout = inventory.loadouts?.[inventory.activeLoadout || 0];
+            const isValid = currentLoadout && currentLoadout.length === 3 && currentLoadout.every(p => p !== null);
+
+            if (!isValid && !showLoadout) {
+                // Determine if we should set default or prompt user
+                // User asked for "panel pop up for them to select 3"
+                // But also "maybe having 3 default ones"
+                // Let's set a default IF it's completely empty, otherwise show menu
+
+                if (!currentLoadout || currentLoadout.length === 0) {
+                    // Auto-equip default if completely missing
+                    updateLoadout(0, DEFAULT_LOADOUT);
+                } else {
+                    // If partially filled or invalid, show menu
+                    setShowLoadout(true);
+                }
+            }
+        }
+    }, [connected, inventory, showLoadout, updateLoadout]);
+
+    // [NEW] Listen for server stats
+    React.useEffect(() => {
+        const { socket } = require('../../services/socket'); // Import here to avoid circular dep issues if any
+
+        const onServerStats = (data) => {
+            if (data?.playersOnline) setActivePlayers(data.playersOnline);
+        };
+
+        socket.on('serverStats', onServerStats);
+        return () => {
+            socket.off('serverStats', onServerStats);
+        };
+    }, []);
 
     // [NEW] Sync username from inventory if available
     React.useEffect(() => {
@@ -190,14 +231,38 @@ export default function Lobby({
 
             <div className="lobby-container">
                 {/* User Bar */}
-                {/* User Bar - SIMPLIFIED/REMOVED as requested "show elsewhere" */}
-                {/* Keeping only Admin gear for now, hidden */}
-                <div style={{ position: 'absolute', top: '1rem', right: '1rem' }}>
+                <div style={{ position: 'absolute', top: '1rem', right: '1rem', display: 'flex', alignItems: 'center', gap: '1rem' }}>
+                    <div className="active-players-pill" title="Players Online">
+                        <span className="live-dot">●</span>
+                        {activePlayers} Online
+                    </div>
                     <button className="btn-admin-hidden" onClick={() => { audio.playClick(); setShowAdmin(true); }}>⚙️</button>
                     {user && (
-                        <button className="btn-small" onClick={logout} style={{ marginLeft: '1rem', opacity: 0.7 }}>
-                            Logout
-                        </button>
+                        <>
+                            <div className="zoin-display" style={{
+                                background: 'rgba(0,0,0,0.4)',
+                                padding: '0.4rem 0.8rem',
+                                borderRadius: '20px',
+                                border: '1px solid #ffd700',
+                                color: '#ffd700',
+                                fontWeight: 'bold',
+                                fontSize: '0.9rem',
+                                display: 'flex',
+                                alignItems: 'center',
+                                gap: '0.4rem'
+                            }}>
+                                <span style={{
+                                    background: '#ffd700', color: 'black',
+                                    width: '18px', height: '18px', borderRadius: '50%',
+                                    display: 'flex', alignItems: 'center', justifyContent: 'center',
+                                    fontSize: '0.7rem'
+                                }}>Z</span>
+                                {inventory?.zoins || 0}
+                            </div>
+                            <button className="btn-small" onClick={logout} style={{ opacity: 0.7 }}>
+                                Logout
+                            </button>
+                        </>
                     )}
                 </div>
 
@@ -256,8 +321,52 @@ export default function Lobby({
                         </div>
 
                         <div className="main-buttons">
-                            <button className="btn btn-primary btn-large shimmer" onClick={() => { audio.playClick(); onQuickJoin(playerName, user?.email); }}>
-                                ⚡ QUICK PLAY
+                            {/* [NEW] Wager Selector */}
+                            <div className="wager-selector" style={{ marginBottom: '1rem', width: '100%', maxWidth: '300px' }}>
+                                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.5rem' }}>
+                                    <label style={{ fontSize: '0.9rem', color: '#ffd700', fontWeight: 'bold' }}>
+                                        <input
+                                            type="checkbox"
+                                            checked={isWagerMode}
+                                            onChange={(e) => setIsWagerMode(e.target.checked)}
+                                            style={{ marginRight: '0.5rem' }}
+                                        />
+                                        High Stakes Mode
+                                    </label>
+                                    {isWagerMode && (
+                                        <select
+                                            value={wagerAmount}
+                                            onChange={(e) => setWagerAmount(Number(e.target.value))}
+                                            style={{ background: '#333', color: '#ffd700', border: '1px solid #ffd700', borderRadius: '5px', padding: '2px 5px' }}
+                                        >
+                                            <option value={100}>100 Z</option>
+                                            <option value={500}>500 Z</option>
+                                            <option value={1000}>1000 Z</option>
+                                        </select>
+                                    )}
+                                </div>
+                                {isWagerMode && (
+                                    <div style={{ fontSize: '0.75rem', color: '#aaa', textAlign: 'center' }}>
+                                        Winner Takes: <span style={{ color: '#00ff87' }}>{Math.floor(wagerAmount * 2 * 0.9)} Z</span> (10% House Fee)
+                                    </div>
+                                )}
+                            </div>
+
+                            <button className={`btn btn-large shimmer ${isWagerMode ? 'btn-wager' : 'btn-primary'}`} onClick={async () => {
+                                audio.playClick();
+                                if (isWagerMode) {
+                                    if ((inventory?.zoins || 0) < wagerAmount) {
+                                        // Show store or alert
+                                        alert("Low Fuel! Top up Zoins at the Store.");
+                                        setShowStore(true);
+                                        return;
+                                    }
+                                    const joined = await joinWagerMatch(wagerAmount);
+                                    if (!joined) return;
+                                }
+                                onQuickJoin(playerName, user?.email);
+                            }}>
+                                {isWagerMode ? `⚔️ WAGER ${wagerAmount} Z` : '⚡ QUICK PLAY'}
                             </button>
                             <button className="btn btn-secondary btn-large" onClick={() => { audio.playClick(); onCreateRoom(playerName, user?.email); }}>
                                 🏠 CREATE ROOM
@@ -436,11 +545,26 @@ export default function Lobby({
                     border-radius: 20px; cursor: pointer; color: white;
                 }
                 .btn-login { background: linear-gradient(45deg, #00d4ff, #00ff87); color: #000; }
+                .btn-wager { background: linear-gradient(45deg, #ff006e, #ffd700); color: #000; border: none; cursor: pointer; animation: pulse 1.5s infinite; }
                 .btn-admin-hidden {
                     opacity: 0.3; background: none; border: none; cursor: pointer;
                     font-size: 1rem; padding: 0.5rem;
                 }
                 .btn-admin-hidden:hover { opacity: 1; }
+
+                .active-players-pill {
+                    background: rgba(0, 0, 0, 0.4);
+                    border: 1px solid #333;
+                    padding: 0.4rem 0.8rem;
+                    border-radius: 20px;
+                    font-size: 0.75rem;
+                    color: #aaa;
+                    display: flex;
+                    align-items: center;
+                    gap: 0.4rem;
+                }
+                .live-dot { color: #00ff87; font-size: 0.6rem; animation: pulse 2s infinite; }
+                @keyframes pulse { 0% { opacity: 0.5; } 50% { opacity: 1; } 100% { opacity: 0.5; } }
 
                 .logo-container {
                     display: flex; flex-direction: column; align-items: center; margin-bottom: 0.5rem;

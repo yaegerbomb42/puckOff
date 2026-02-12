@@ -52,7 +52,11 @@ export default function AdminDashboard({ onClose }) {
                 if (roomsRes?.ok) {
                     const roomsData = await roomsRes.json();
                     setRooms(roomsData.rooms || []);
-                    setMetrics(prev => ({ ...prev, playersOnline: roomsData.playersOnline || 0 }));
+                    setMetrics(prev => ({
+                        ...prev,
+                        playersOnline: roomsData.playersOnline || 0,
+                        totalTimePlayedSeconds: roomsData.totalTimePlayedSeconds || 0
+                    }));
                 }
 
                 if (revenueRes?.ok) {
@@ -266,6 +270,13 @@ export default function AdminDashboard({ onClose }) {
                             <div className="metric-card">
                                 <div className="metric-value">{users.length}</div>
                                 <div className="metric-label">Total Users</div>
+                            </div>
+                            {/* NEW: Total Time Played */}
+                            <div className="metric-card extended">
+                                <div className="metric-value" style={{ fontSize: '2rem' }}>
+                                    {Math.floor((metrics.totalTimePlayedSeconds || 0) / 3600)}h {Math.floor(((metrics.totalTimePlayedSeconds || 0) % 3600) / 60)}m
+                                </div>
+                                <div className="metric-label">Total Playtime (Global)</div>
                             </div>
                         </div>
                     )}

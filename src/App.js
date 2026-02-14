@@ -41,7 +41,7 @@ function App() {
     return <LoadingScreen />;
   }
 
-  // Auth Wall
+  // Auth Wall — must login or play offline
   if (!user && !offlineMode) {
     return (
       <AuthScreen

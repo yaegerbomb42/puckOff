@@ -132,15 +132,30 @@ export default function IconChooser({ ownedIcons = [], onClose, onSelect, equipp
                                                         {showIcon ? (
                                                             <>
                                                                 <div className="icon-visual">
-                                                                    <img
-                                                                        src={icon.imageUrl}
-                                                                        alt={icon.name}
-                                                                        className="icon-img"
-                                                                        style={{
-                                                                            filter: owned ? 'none' : 'grayscale(1) brightness(0.3) contrast(1.2)',
-                                                                            opacity: owned ? 1 : 0.6
-                                                                        }}
-                                                                    />
+                                                                    {icon.color && icon.tier === 0 ? (
+                                                                        <div
+                                                                            className="icon-color-circle"
+                                                                            style={{
+                                                                                background: `radial-gradient(circle at 35% 35%, ${icon.color}cc, ${icon.color})`,
+                                                                                width: '100%',
+                                                                                height: '100%',
+                                                                                borderRadius: '50%',
+                                                                                boxShadow: `inset 0 -4px 8px rgba(0,0,0,0.4), inset 0 2px 4px rgba(255,255,255,0.2), 0 0 12px ${icon.color}44`,
+                                                                                filter: owned ? 'none' : 'grayscale(1) brightness(0.3)',
+                                                                                opacity: owned ? 1 : 0.6
+                                                                            }}
+                                                                        />
+                                                                    ) : (
+                                                                        <img
+                                                                            src={icon.imageUrl}
+                                                                            alt={icon.name}
+                                                                            className="icon-img"
+                                                                            style={{
+                                                                                filter: owned ? 'none' : 'grayscale(1) brightness(0.3) contrast(1.2)',
+                                                                                opacity: owned ? 1 : 0.6
+                                                                            }}
+                                                                        />
+                                                                    )}
                                                                 </div>
                                                                 {isEquipped && <div className="equipped-badge">✓</div>}
                                                                 {!owned && <div className="lock-icon">🔒</div>}

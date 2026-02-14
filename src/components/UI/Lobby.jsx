@@ -417,11 +417,25 @@ export default function Lobby({
                                 <button className="btn-icon-select" onClick={() => { audio.playClick(); setShowIcons(true); }}>
                                     <div className="current-icon">
                                         {/* Show currently equipped icon or default to Standard Issue (logo) */}
-                                        <img
-                                            src={getIconById(inventory?.equippedSkin)?.imageUrl || '/images/logo.png'}
-                                            alt="Equipped Icon"
-                                            onError={(e) => e.target.src = '/images/logo.png'}
-                                        />
+                                        {(() => {
+                                            const equippedIcon = getIconById(inventory?.equippedSkin);
+                                            if (equippedIcon?.tier === 0 && equippedIcon?.color) {
+                                                return (
+                                                    <div style={{
+                                                        width: 48, height: 48, borderRadius: '50%',
+                                                        background: `radial-gradient(circle at 35% 35%, ${equippedIcon.color}cc, ${equippedIcon.color})`,
+                                                        boxShadow: `0 0 12px ${equippedIcon.color}66`
+                                                    }} />
+                                                );
+                                            }
+                                            return (
+                                                <img
+                                                    src={equippedIcon?.imageUrl || '/images/logo.png'}
+                                                    alt="Equipped Icon"
+                                                    onError={(e) => e.target.src = '/images/logo.png'}
+                                                />
+                                            );
+                                        })()}
                                     </div>
                                     <div className="icon-select-label">
                                         <span>EQUIPPED ICON</span>

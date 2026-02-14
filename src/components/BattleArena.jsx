@@ -158,9 +158,16 @@ function GameScene({
 // ============================================
 // MAIN BATTLE ARENA COMPONENT
 // ============================================
-export default function BattleArena() {
+export default function BattleArena({ forceOffline }) {
     const multiplayer = useMultiplayer();
     const { user, updateMatchStats, isAdmin } = useAuth() || {};
+
+    // [NEW] Force Offline Mode from App.js (Auth Wall)
+    useEffect(() => {
+        if (forceOffline) {
+            multiplayer.enableOfflineMode();
+        }
+    }, [forceOffline, multiplayer]);
 
     // ========== GAME STATE ==========
     const [gameMode, setGameMode] = useState('knockout');

@@ -18,7 +18,7 @@ jobs:
           port: 22
           script: |
             echo "📢 Triggering Maintenance Alert on Server..."
-            curl -X POST http://localhost:3002/api/admin/maintenance \
+            curl -v -X POST http://localhost:3002/api/admin/maintenance \
             -H "Content-Type: application/json" \
             -d '{"secret": "puckoff_deploy_secret_2026", "duration": 10}' || echo "⚠️ Failed to announce, but continuing..."
       

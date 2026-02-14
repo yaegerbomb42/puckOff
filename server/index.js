@@ -21,6 +21,8 @@ app.use(cors());
 app.use(express.json());
 
 // --- MAINTENANCE ENDPOINT (For GitHub Actions) ---
+let activeMaintenance = null; // Store active state { endTime, duration, message }
+
 app.post('/api/admin/maintenance', (req, res) => {
     const { secret, duration } = req.body;
 
@@ -30,14 +32,25 @@ app.post('/api/admin/maintenance', (req, res) => {
         return res.status(403).json({ error: 'Unauthorized' });
     }
 
-    console.log(`📢 Broadcasting Maintenance Warning: ${duration} minutes`);
+    const durationMin = duration || 10;
+    console.log(`📢 Broadcasting Maintenance Warning: ${durationMin} minutes`);
+
+    const message = {
+        type: 'maintenance',
+        duration: durationMin,
+        message: `⚠️ Server Restarting in ${durationMin} minutes for Updates!`,
+        startTime: Date.now()
+    };
+
+    activeMaintenance = message;
 
     // Broadcast to all connected clients
-    io.emit('server_message', {
-        type: 'maintenance',
-        duration: duration || 10,
-        message: `⚠️ Server Restarting in ${duration || 10} minutes for Updates!`
-    });
+    io.emit('server_message', message);
+
+    // Auto-clear after duration (plus buffer)
+    setTimeout(() => {
+        activeMaintenance = null;
+    }, durationMin * 60 * 1000 + 5000);
 
     res.json({ success: true, message: 'Broadcast sent' });
 });
@@ -357,11 +370,11 @@ app.get('/api/admin/rooms', async (req, res) => {
         });
     }
 
-    // Count total players online
-    let playersOnline = 0;
-    for (const room of rooms.values()) {
-        playersOnline += room.players?.size || 0;
-    }
+    // Count total players online - DEPRECATED (Using io.engine.clientsCount)
+    // let playersOnline = 0;
+    // for (const room of rooms.values()) {
+    //     playersOnline += room.players?.size || 0;
+    // }
 
     // Fetch global stats
     let totalTimePlayedSeconds = 0;
@@ -405,6 +418,21 @@ const PLAYER_COLORS = ['#00d4ff', '#ff006e', '#00ff87', '#9d4edd'];
 
 io.on('connection', (socket) => {
     console.log(`Player connected: ${socket.id} `);
+
+    // 📢 Send Maintenance Warning to new connections if active
+    if (activeMaintenance) {
+        // Recalculate remaining duration to be accurate
+        const elapsedMinutes = (Date.now() - activeMaintenance.startTime) / 1000 / 60;
+        const remainingDuration = Math.max(0, activeMaintenance.duration - elapsedMinutes);
+
+        if (remainingDuration > 0) {
+            socket.emit('server_message', {
+                ...activeMaintenance,
+                duration: remainingDuration, // Update duration for client timer
+                message: `⚠️ Server Restarting in ${Math.ceil(remainingDuration)} minutes!`
+            });
+        }
+    }
 
     // Create a new room
     socket.on('createRoom', ({ playerName, userEmail }, callback) => {

@@ -32,17 +32,56 @@ export const STANDARD_COLORS = [
 ];
 
 // ============ ZOINS ECONOMY ============
-export const ZOIN_BUNDLES = {
-    // "Fuel" Concept: "Golden Friction" Math (Target ~80% leftover of a High Roller)
-    pouch: { id: 'pouch', zoins: 900, price: 4.99, stripeLink: 'PLACEHOLDER_LINK_POUCH', name: 'Starter Fuel' }, // 900 - 500 = 400 Left (80% of next bet) -> PAIN
-    cache: { id: 'cache', zoins: 3800, price: 19.99, stripeLink: 'PLACEHOLDER_LINK_CACHE', name: 'Pro Stash' }, // 3800 - (500*7) = 300 Left -> PAIN
-    vault: { id: 'vault', zoins: 16000, price: 49.99, stripeLink: 'PLACEHOLDER_LINK_VAULT', name: 'Whale Vault' }
+export const ZOIN_BUNDLES = { // Micro-Transactions "Fuel"
+    pouch: {
+        id: 'pouch',
+        zoins: 1000,
+        price: 0.99,
+        stripeLink: 'https://buy.stripe.com/00w6oz1NbaVIfEV3ydaIM09', // Real Link
+        name: 'Starter Fuel',
+        desc: 'Enough for a quick boost.'
+    },
+    cache: {
+        id: 'cache',
+        zoins: 4000,
+        price: 2.99,
+        stripeLink: 'https://buy.stripe.com/3cI9AL2RfaVIeAR3ydaIM0c', // Real Link
+        name: 'Pro Stash',
+        desc: 'Best value for active players.'
+    },
+    vault: {
+        id: 'vault',
+        zoins: 17000,
+        price: 4.99,
+        stripeLink: 'https://buy.stripe.com/dRmbITbnLe7U50h0m1aIM0b', // Real Link
+        name: 'Whale Vault',
+        desc: 'Stockpile for the long haul.'
+    }
 };
+
+// USER REQUEST OVERRIDE:
+// Starter Fuel: $4.99 -> 900 Zoins
+// Pro Stash: $19.99 -> 3800 Zoins
+// Whale Vault: $49.99 -> 16000 Zoins
+// WAIT. User said: "change the cost structure to be very cheap, $1 -$3 $5... update the game numbers... 900/3800/16000"
+// So:
+// $0.99 -> 900 Zoins
+// $2.99 -> 3,800 Zoins
+// $4.99 -> 16,000 Zoins
+export const MICRO_BUNDLES = {
+    pouch: { id: 'pouch', zoins: 900, price: 0.99, stripeLink: 'https://buy.stripe.com/00w6oz1NbaVIfEV3ydaIM09', name: 'Starter Fuel' },
+    cache: { id: 'cache', zoins: 3800, price: 2.99, stripeLink: 'https://buy.stripe.com/3cI9AL2RfaVIeAR3ydaIM0c', name: 'Pro Stash' },
+    vault: { id: 'vault', zoins: 16000, price: 4.99, stripeLink: 'https://buy.stripe.com/dRmbITbnLe7U50h0m1aIM0b', name: 'Whale Vault' }
+};
+
+// Override the export
+Object.assign(ZOIN_BUNDLES, MICRO_BUNDLES);
+
 
 export const BETTING_OPTS = {
     // "Almost There" Trap: 
     standard: { cost: 100, multiplier: 1.0, name: 'Standard Bet' },
-    high_roller: { cost: 500, multiplier: 1.5, name: 'High Roller' }, // Anchor Price
+    high_roller: { cost: 500, multiplier: 1.5, name: 'High Roller' },
     whale: { cost: 2500, multiplier: 3.0, name: 'Whale Bet' }
 };
 

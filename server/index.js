@@ -149,9 +149,10 @@ async function fulfillPurchase(email, packType) {
         };
 
         let zoinsToAdd = 0;
-        if (packType === 'pouch') zoinsToAdd = 500;
-        else if (packType === 'cache') zoinsToAdd = 2500;
-        else if (packType === 'vault') zoinsToAdd = 10000;
+        // UPDATED VALUES TO MATCH ECONOMY.JS
+        if (packType === 'pouch') zoinsToAdd = 900;
+        else if (packType === 'cache') zoinsToAdd = 3800;
+        else if (packType === 'vault') zoinsToAdd = 16000;
         else if (packType === 'bundle10') zoinsToAdd = 2500; // Legacy mapping
         else if (packType === 'single') zoinsToAdd = 500; // Legacy mapping
 
@@ -170,7 +171,8 @@ async function fulfillPurchase(email, packType) {
             packType,
             amount: packType === 'unlockAll' ? 9999 : (packType === 'bundle10' ? 300 : 50),
             timestamp: admin.firestore.FieldValue.serverTimestamp(),
-            status: 'completed'
+            status: 'completed',
+            method: 'admin_bypass'
         };
         await db.collection('payments').add(paymentData);
         console.log('💰 Payment recorded in history');
@@ -188,18 +190,21 @@ async function fulfillPurchase(email, packType) {
 const verifyAdmin = (req, res, next) => {
     // In a real app, verify ID token. For this demo, we'll assume the request comes from a trusted admin client
     // or checks a shared secret header if you implemented one. 
-    // Since we didn't implement a secure token flow for admin actions from client yet, 
-    // we allow the requests but ideally you'd verify `req.headers['authorization']`
     next();
 };
 
-app.post('/api/admin/grant-pack', verifyAdmin, async (req, res) => {
-    // This endpoint is hit by the AdminDashboard
-    // For now, the dashboard updates Firestore directly, so this isn't strictly needed for the client tools.
-    // But if you want server-side validity:
-    // const { userId, count } = req.body;
-    // ... logic to update firestore ...
-    res.json({ success: true });
+// [NEW] Admin Purchase Simulation
+app.post('/api/admin/simulate-purchase', verifyAdmin, async (req, res) => {
+    const { email, packId } = req.body;
+    console.log(`👑 Admin simulating purchase for ${email}: ${packId}`);
+
+    try {
+        await fulfillPurchase(email, packId);
+        res.json({ success: true });
+    } catch (err) {
+        console.error("Admin purchase failed:", err);
+        res.status(500).json({ success: false, error: err.message });
+    }
 });
 
 app.get('/api/admin/rooms', (req, res) => {
@@ -266,7 +271,7 @@ app.get('/payment/success', (req, res) => {
             <div class="card">
                 <h1>Purchase Successful! 🎉</h1>
                 <p>Your packs have been added to your inventory.</p>
-                <a href="${process.env.CLIENT_URL || '/'}" class="btn">Return to Arena</a>
+                <a href="${process.env.CLIENT_URL || 'http://localhost:3000'}" class="btn">Return to Arena</a>
             </div>
         </body>
         </html>
@@ -313,7 +318,7 @@ app.get('/payment/cancel', (req, res) => {
             <div class="card">
                 <h1>Payment Cancelled</h1>
                 <p>No charge was made.</p>
-                <a href="${process.env.CLIENT_URL || '/'}" class="btn">Return to Store</a>
+                <a href="${process.env.CLIENT_URL || 'http://localhost:3000'}" class="btn">Return to Store</a>
             </div>
         </body>
         </html>

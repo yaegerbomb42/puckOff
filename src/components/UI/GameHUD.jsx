@@ -1,5 +1,6 @@
 import React, { useEffect, useState, useRef } from 'react';
 import { getPowerupInfo } from '../../utils/powerups';
+import RewardPopup from './RewardPopup';
 
 // ============================================
 // ANIMATED DAMAGE COUNTER
@@ -607,6 +608,9 @@ export default function GameHUD({
 // VICTORY SCREEN
 // ============================================
 export function VictoryScreen({ winner, scores, stats, onRestart, onMenu }) {
+    const [showReward, setShowReward] = useState(true);
+    const reward = stats?.rewardZoins > 0 ? { amount: stats.rewardZoins, reason: winner === 'YOU' ? 'VICTORY BONUS' : 'PARTICIPATION' } : null;
+
     return (
         <div className="victory-screen">
             <div className="victory-content">
@@ -647,6 +651,11 @@ export function VictoryScreen({ winner, scores, stats, onRestart, onMenu }) {
                     <button className="btn-secondary" onClick={onMenu}>MENU</button>
                 </div>
             </div>
+
+            {/* Premium Reward Popup */}
+            {reward && showReward && (
+                <RewardPopup reward={reward} onClose={() => setShowReward(false)} />
+            )}
 
             <style jsx>{`
                 .victory-screen {

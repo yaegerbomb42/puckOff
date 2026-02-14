@@ -50,6 +50,54 @@ function ParticleBurst({ color = "#00d4ff", count = 100 }) {
     );
 }
 
+// Camera Shake Component
+function CameraShake({ intensity = 0 }) {
+    useFrame((state) => {
+        if (intensity > 0) {
+            const shake = intensity * 0.1;
+            state.camera.position.x = (Math.random() - 0.5) * shake;
+            state.camera.position.y = (Math.random() - 0.5) * shake;
+        } else {
+            state.camera.position.x = 0;
+            state.camera.position.y = 0;
+        }
+    });
+    return null;
+}
+
+// God Rays / Light Beams
+function LightBeams({ color = "#ffffff", opacity = 0 }) {
+    const beams = useRef();
+
+    useFrame((state) => {
+        if (beams.current) {
+            beams.current.rotation.z += 0.01; // Slow spin
+            beams.current.scale.setScalar(1 + Math.sin(state.clock.elapsedTime * 2) * 0.1);
+        }
+    });
+
+    if (opacity <= 0) return null;
+
+    return (
+        <group ref={beams} position={[0, 0, -1]}>
+            {Array.from({ length: 8 }).map((_, i) => (
+                <mesh key={i} rotation={[0, 0, (i / 8) * Math.PI * 2]}>
+                    <planeGeometry args={[0.5, 15]} />
+                    <meshBasicMaterial
+                        color={color}
+                        transparent
+                        opacity={opacity}
+                        side={THREE.DoubleSide}
+                        blending={THREE.AdditiveBlending}
+                        depthWrite={false}
+                    />
+                </mesh>
+            ))}
+        </group>
+    );
+}
+
+
 // 3D Pack Component
 function Pack3D({ onClick, color = "#00d4ff", opening }) {
     const mesh = useRef();
@@ -59,9 +107,9 @@ function Pack3D({ onClick, color = "#00d4ff", opening }) {
         const t = state.clock.getElapsedTime();
 
         if (opening) {
-            mesh.current.rotation.x += 0.2;
-            mesh.current.rotation.y += 0.2;
-            mesh.current.scale.multiplyScalar(1.05);
+            mesh.current.rotation.x += 0.5; // Faster spin on open
+            mesh.current.rotation.y += 0.5;
+            mesh.current.scale.setScalar(1 + Math.sin(t * 20) * 0.1); // Pulse
         } else {
             // Floating animation
             mesh.current.position.y = Math.sin(t * 2) * 0.2;
@@ -78,12 +126,12 @@ function Pack3D({ onClick, color = "#00d4ff", opening }) {
                 metalness={0.9}
                 roughness={0.2}
                 emissive={color}
-                emissiveIntensity={0.2}
+                emissiveIntensity={opening ? 2 : 0.2} // Glow up on open
             />
             {/* Edge highlights */}
             <lineSegments>
                 <edgesGeometry args={[new THREE.BoxGeometry(1, 1, 1)]} />
-                <lineBasicMaterial color="white" />
+                <lineBasicMaterial color="white" linewidth={2} />
             </lineSegments>
         </mesh>
     );
@@ -106,10 +154,13 @@ export default function PackOpener({ packType = 'single', onClose, onClaimReward
         if (step !== 'sealed') return;
         audio.playClick();
         setStep('opening');
+
+        // Explosion sequence
         setTimeout(() => {
+            // WHAM
             setStep('revealing');
             revealNextSlot();
-        }, 1500);
+        }, 2000);
     };
 
     const revealNextSlot = useCallback(() => {
@@ -120,6 +171,9 @@ export default function PackOpener({ packType = 'single', onClose, onClaimReward
                 next[unrevealedIdx].revealed = true;
                 const tier = next[unrevealedIdx].tier ? TIERS[next[unrevealedIdx].tier] : null;
                 if (tier) setActiveColor(tier.color);
+
+                // Play reveal sound here if possible
+                // audio.playReveal(); 
             }
             return next;
         });
@@ -136,6 +190,7 @@ export default function PackOpener({ packType = 'single', onClose, onClaimReward
     }, [revealedCount, slots.length, step, revealNextSlot]);
 
     const handleClaim = () => {
+        // Collect rewards logic
         const rewards = slots.filter(s => s.type === 'icon').map(s => s.iconId);
         const freePackCount = slots.filter(s => s.type === 'free_pack_token').length;
         if (onClaimRewards) {
@@ -149,21 +204,27 @@ export default function PackOpener({ packType = 'single', onClose, onClaimReward
             <div className={`background-canvas ${step !== 'sealed' ? 'blur' : ''}`}>
                 <Canvas shadows dpr={[1, 2]}>
                     <PerspectiveCamera makeDefault position={[0, 0, 5]} />
+
+                    {/* Dynamic Shake */}
+                    <CameraShake intensity={step === 'opening' ? 5 : 0} />
+
                     <Stars radius={100} depth={50} count={5000} factor={4} saturation={0} fade speed={1} />
                     <ambientLight intensity={0.5} />
                     <pointLight position={[10, 10, 10]} intensity={1} color={activeColor} />
-                    <pointLight position={[-10, -10, -5]} intensity={0.5} color="white" />
+
+                    {/* Light Beams */}
+                    <LightBeams color={activeColor} opacity={step === 'opening' ? 0.8 : 0} />
 
                     {step === 'sealed' || step === 'opening' ? (
                         <>
-                            <Float speed={2} rotationIntensity={0.5} floatIntensity={0.5}>
+                            <Float speed={step === 'opening' ? 10 : 2} rotationIntensity={0.5} floatIntensity={0.5}>
                                 <Pack3D
                                     onClick={handleOpen}
                                     color={activeColor}
                                     opening={step === 'opening'}
                                 />
                             </Float>
-                            <ParticleBurst color={activeColor} count={50} />
+                            <ParticleBurst color={activeColor} count={step === 'opening' ? 500 : 50} />
                         </>
                     ) : (
                         <ParticleBurst color={activeColor} count={200} />
@@ -197,9 +258,11 @@ export default function PackOpener({ packType = 'single', onClose, onClaimReward
                         </div>
 
                         {step === 'complete' && (
-                            <button className="premium-claim-btn" onClick={handleClaim}>
-                                CLAIM REWARDS
-                            </button>
+                            <div className="action-row">
+                                <button className="premium-claim-btn" onClick={handleClaim}>
+                                    CLAIM REWARDS
+                                </button>
+                            </div>
                         )}
                     </div>
                 )}
@@ -217,7 +280,7 @@ export default function PackOpener({ packType = 'single', onClose, onClaimReward
                     z-index: 10;
                     transition: filter 0.5s;
                 }
-                .background-canvas.blur { filter: blur(5px) brightness(0.5); }
+                .background-canvas.blur { filter: blur(10px) brightness(0.4); }
                 
                 .content-layer { position: relative; z-index: 20; width: 100%; text-align: center; pointer-events: none; }
                 .reveal-stage { pointer-events: auto; }
@@ -227,11 +290,16 @@ export default function PackOpener({ packType = 'single', onClose, onClaimReward
                     width: 100%;
                 }
 
-                .glitch-text { margin-top: 3rem; animation: glitch 1s infinite alternate; }
+                .glitch-text { margin-top: 3rem; animation: glitch 1s infinite alternate; font-size: 1.5rem; letter-spacing: 5px; }
 
                 /* Reveal Stage */
                 .reveal-stage { width: 100%; max-width: 1200px; margin: 0 auto; padding: 2rem; }
-                .reveal-header { margin-bottom: 3rem; text-shadow: 0 0 20px rgba(255,255,255,0.5); }
+                .reveal-header { 
+                    margin-bottom: 3rem; 
+                    text-shadow: 0 0 20px rgba(255,255,255,0.5);
+                    font-size: 2.5rem;
+                    letter-spacing: 10px;
+                }
                 .slots-container {
                     display: flex; flex-wrap: wrap; gap: 2rem;
                     justify-content: center; perspective: 1000px;
@@ -243,13 +311,15 @@ export default function PackOpener({ packType = 'single', onClose, onClaimReward
                     border: none; border-radius: 40px; color: #000;
                     font-size: 1.5rem; font-weight: 800; cursor: pointer;
                     font-family: 'Orbitron', sans-serif;
-                    box-shadow: 0 5px 30px rgba(0,255,135,0.4);
-                    transition: 0.3s;
+                    box-shadow: 0 0 30px rgba(0,255,135,0.4);
+                    transition: all 0.3s;
                     pointer-events: auto;
+                    text-transform: uppercase;
+                    letter-spacing: 2px;
                 }
                 .premium-claim-btn:hover {
                     transform: translateY(-5px) scale(1.05);
-                    box-shadow: 0 10px 50px rgba(0,255,135,0.6);
+                    box-shadow: 0 0 60px rgba(0,255,135,0.8);
                 }
 
                 @keyframes glitch {
@@ -267,6 +337,7 @@ function SlotCard({ slot, revealed }) {
     const tier = slot.tier ? TIERS[slot.tier] : null;
     const isFreePack = slot.type === 'free_pack_token';
     const isMystery = tier?.isMystery;
+    const color = tier?.color || '#00ff87';
 
     return (
         <div className={`card-wrapper ${revealed ? 'revealed' : ''}`}>
@@ -277,9 +348,9 @@ function SlotCard({ slot, revealed }) {
                 </div>
 
                 {/* Front of card (revealed) */}
-                <div className="card-front" style={{ borderColor: tier?.color || '#00ff87' }}>
-                    <div className="card-bg" style={{ background: `radial-gradient(circle at center, ${tier?.color || '#00ff87'}33, transparent)` }}></div>
-                    <div className="card-rarity" style={{ background: tier?.color || '#00ff87' }}>
+                <div className="card-front" style={{ borderColor: color, boxShadow: `0 0 30px ${color}66` }}>
+                    <div className="card-bg" style={{ background: `radial-gradient(circle at center, ${color}33, transparent)` }}></div>
+                    <div className="card-rarity" style={{ background: color }}>
                         {isFreePack ? 'BONUS' : (isMystery ? '???' : tier?.name.toUpperCase())}
                     </div>
                     <div className="card-visual">
@@ -314,7 +385,7 @@ function SlotCard({ slot, revealed }) {
                     background: linear-gradient(135deg, #1a1a1a, #0a0a0a);
                     box-shadow: inset 0 0 20px rgba(255,255,255,0.05);
                 }
-                .back-pattern { font-size: 4rem; opacity: 0.3; filter: grayscale(1); }
+                .back-pattern { font-size: 4rem; opacity: 0.3; filter: grayscale(1); animation: float 3s infinite ease-in-out; }
 
                 .card-front {
                     background: #111;
@@ -329,6 +400,7 @@ function SlotCard({ slot, revealed }) {
                     position: absolute; top: 15px; z-index: 2;
                     padding: 4px 15px; border-radius: 20px;
                     font-size: 0.7rem; font-weight: 900; color: #000;
+                    box-shadow: 0 0 10px rgba(0,0,0,0.5);
                 }
                 .card-visual { font-size: 5rem; z-index: 2; margin-bottom: 20px; filter: drop-shadow(0 0 10px rgba(255,255,255,0.2)); }
                 .card-name { z-index: 2; font-weight: bold; color: #fff; font-size: 0.9rem; letter-spacing: 1px; }
@@ -339,6 +411,11 @@ function SlotCard({ slot, revealed }) {
                     0% { transform: scale(0.8); }
                     50% { transform: scale(1.1); }
                     100% { transform: scale(1); }
+                }
+                
+                @keyframes float {
+                    0%, 100% { transform: translateY(0); }
+                    50% { transform: translateY(-10px); }
                 }
             `}</style>
         </div>

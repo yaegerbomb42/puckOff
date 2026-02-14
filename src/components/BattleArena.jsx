@@ -1,57 +1,39 @@
 import React, { useState, useCallback, Suspense, useRef, useEffect, useMemo } from 'react';
 import { Canvas } from '@react-three/fiber';
 import { Physics } from '@react-three/cannon';
-import { Stars, Environment, ContactShadows, Sparkles, useTexture } from '@react-three/drei';
-import * as THREE from 'three';
+import { Stars, Environment, ContactShadows, Sparkles } from '@react-three/drei';
+import { EffectComposer, Bloom, ChromaticAberration, ToneMapping, Vignette } from '@react-three/postprocessing';
 
-
+import DynamicCamera from './DynamicCamera';
+import ProceduralArena from './ProceduralArena';
 import ArenaChaos from './ArenaChaos';
 import Puck from './Puck';
 import PowerUps from './PowerUps';
 import KnockoutEffects from './KnockoutEffects';
-import PostProcessing from './effects/PostProcessing';
-import GameHUD, { VictoryScreen } from './UI/GameHUD';
-import Lobby from './UI/Lobby';
-import SandboxControls from './UI/SandboxControls';
-import DynamicCamera from './DynamicCamera';
-import LoadingScreen from './UI/LoadingScreen';
-import ControllerHints from './UI/ControllerHints';
-import MaintenanceOverlay from './UI/MaintenanceOverlay'; // [NEW]
-import ProjectileSystem from './ProjectileSystem';
-import ProceduralArena from './ProceduralArena';
 import ExplosionParticles from './ExplosionParticles';
+import ProjectileSystem from './ProjectileSystem';
+import { logGame } from './DebugLogger';
+import DebugLogger from './DebugLogger';
+import ReplayPlayer from './ReplaySystem';
+import { useReplayRecorder } from './ReplaySystem';
+
+import Lobby from './UI/Lobby';
+import { VictoryScreen } from './UI/GameHUD';
+import GameHUD from './UI/GameHUD';
+import SandboxControls from './UI/SandboxControls';
+import MaintenanceOverlay from './UI/MaintenanceOverlay';
+import ControllerHints from './UI/ControllerHints';
+import LoadingScreen from './UI/LoadingScreen';
+
 import { useMultiplayer } from '../hooks/useMultiplayer';
 import { useAuth } from '../contexts/AuthContext';
-import { audio } from '../utils/audio';
-import DebugLogger, { logGame } from './DebugLogger';
-import {
-    PHYSICS_CONFIG,
-    getRandomPowerupPosition,
-    getRandomPowerupType,
-    getSpawnPosition,
-    calculateStompDamage
-} from '../utils/physics';
-import { getPowerupInfo, DEFAULT_LOADOUT } from '../utils/powerups';
+
+import { PHYSICS_CONFIG, getSpawnPosition, calculateStompDamage, getRandomPowerupType, getRandomPowerupPosition } from '../utils/physics';
 import { generateMap } from '../utils/mapGenerator';
-import { analytics } from '../utils/analytics';
-import ReplayPlayer, { useReplayRecorder } from './ReplaySystem';
 import { GAME_MODES } from '../utils/gameModes';
-
-function LobbyEnvironment() {
-    const texture = useTexture('/images/lobby_background.png');
-    return (
-        <mesh>
-            <sphereGeometry args={[100, 64, 64]} />
-            <meshBasicMaterial
-                map={texture}
-                side={THREE.BackSide}
-                toneMapped={false}
-            />
-        </mesh>
-    );
-}
-
-// GAME_MODES moved to utils/gameModes.js
+import { analytics } from '../utils/analytics';
+import { audio } from '../utils/audio';
+import { getPowerupInfo, DEFAULT_LOADOUT } from '../utils/powerups';
 
 // ============================================
 // GAME SCENE COMPONENT
@@ -84,19 +66,15 @@ function GameScene({
 }) {
     return (
         <>
-            {/* Environment */}
-            <LobbyEnvironment />
-            {/* Environment & Lighting (Overhaul Phase 1) */}
-            <ambientLight intensity={0.4} />
-            <pointLight position={[10, 20, 10]} intensity={1.5} color="#ffffff" castShadow />
-            <pointLight position={[-10, 5, -10]} intensity={0.8} color="#00d4ff" /> {/* Cyan Rim */}
-            <pointLight position={[10, 5, -10]} intensity={0.8} color="#ff006e" /> {/* Pink Rim */}
-
-            {/* Ground Shadows (Steps 6) */}
-            {/* Note: ContactShadows is imported below */}
+            {/* Environment & Lighting (AAA Overhaul) */}
+            <Environment preset="city" blur={0.8} background />
+            <ambientLight intensity={0.5} />
+            <pointLight position={[10, 20, 10]} intensity={2} color="#ffffff" castShadow shadow-bias={-0.0001} />
+            <pointLight position={[-10, 5, -10]} intensity={1.5} color="#00d4ff" /> {/* Cyan Rim */}
+            <pointLight position={[10, 5, -10]} intensity={1.5} color="#ff006e" /> {/* Pink Rim */}
 
             {/* Fog (Dynamically matched to biome) */}
-            <fog attach="fog" args={[mapData?.biome?.fog?.color || '#0b0b15', 15, 60]} />
+            <fog attach="fog" args={[mapData?.biome?.fog?.color || '#0b0b15', 10, 50]} />
 
             {/* Dynamic Camera */}
             <DynamicCamera
@@ -114,7 +92,7 @@ function GameScene({
                 ) : (
                     <ArenaChaos mapType={mapType} />
                 )}
-                <ContactShadows resolution={1024} scale={50} blur={2.5} opacity={0.6} far={4} color="#000000" />
+                <ContactShadows resolution={1024} scale={100} blur={2} opacity={0.5} far={10} color="#000000" />
                 <Sparkles count={400} scale={40} size={3} speed={0.4} opacity={0.4} color="#ffffff" />
             </group>
 
@@ -127,6 +105,7 @@ function GameScene({
                     color={player.color}
                     startPosition={getSpawnPosition(index, mapData)}
                     isLocalPlayer={player.id === localPlayerId}
+                    isBot={player.isBot || false}
                     powerup={playerPowerups[player.id]}
                     damage={playerDamage[player.id] || 0}
                     onKnockout={onKnockout}
@@ -136,7 +115,7 @@ function GameScene({
                     onUseItem={player.id === localPlayerId ? onUseItem : undefined}
                     onImpact={player.id === localPlayerId ? onImpact : undefined}
                     isPaused={isPaused}
-                    remotePosition={player.id !== localPlayerId ? player.position : undefined}
+                    remotePosition={player.id !== localPlayerId ? (playerPositions[player.id] || player.position) : undefined}
                     remoteVelocity={player.id !== localPlayerId ? player.velocity : undefined}
                     allPlayerPositions={playerPositions}
                     gameMode={gameMode}
@@ -164,8 +143,13 @@ function GameScene({
                 />
             )}
 
-            {/* Post-processing */}
-            <PostProcessing impactIntensity={screenShake} />
+            {/* Post-processing (AAA Overhaul) */}
+            <EffectComposer disableNormalPass>
+                <Bloom luminanceThreshold={1} mipmapBlur intensity={1.5} radius={0.6} />
+                <ChromaticAberration offset={[0.002, 0.002]} />
+                <ToneMapping />
+                <Vignette eskil={false} offset={0.1} darkness={0.5} />
+            </EffectComposer>
         </>
     );
 }
@@ -617,7 +601,7 @@ export default function BattleArena() {
     // ========== POWERUP SPAWNING ==========
     useEffect(() => {
         if (multiplayer.gameState !== 'playing') return;
-        if (multiplayer.connected) return;
+        if (multiplayer.connected && !multiplayer.isOffline) return; // Allow offline with faked connection
 
         const spawnRate = modeConfig.powerupSpawnRate || 1;
         const interval = (PHYSICS_CONFIG.powerups.minSpawnInterval +
@@ -634,7 +618,87 @@ export default function BattleArena() {
         }, interval);
 
         return () => clearInterval(spawnInterval);
-    }, [multiplayer.gameState, multiplayer.connected, localPowerups.length, modeConfig.powerupSpawnRate, mapData, getNextId]);
+    }, [multiplayer.gameState, multiplayer.connected, multiplayer.isOffline, localPowerups.length, modeConfig.powerupSpawnRate, mapData, getNextId]);
+
+    // ========== BOT AI (Offline Mode) ==========
+    useEffect(() => {
+        if (!multiplayer.isOffline || multiplayer.gameState !== 'playing') return;
+
+        const BOT_ID = 'offline_bot';
+        const botState = { behavior: 'chase', timer: 0, orbitAngle: 0, dashCooldown: 0 };
+
+        const botLoop = setInterval(() => {
+            const playerPos = playerPositions[multiplayer.playerId];
+            const botPos = playerPositions[BOT_ID] || [5, 0.5, 0];
+
+            if (!playerPos) {
+                // Initialize bot position if needed
+                setPlayerPositions(prev => ({ ...prev, [BOT_ID]: [5, 0.5, 0] }));
+                return;
+            }
+
+            // Vector from bot to player
+            const dx = playerPos[0] - botPos[0];
+            const dz = playerPos[2] - botPos[2];
+            const dist = Math.sqrt(dx * dx + dz * dz);
+            const dirX = dist > 0.1 ? dx / dist : 0;
+            const dirZ = dist > 0.1 ? dz / dist : 0;
+
+            let moveX = 0, moveZ = 0;
+            const speed = 0.12;
+
+            botState.timer++;
+            botState.dashCooldown = Math.max(0, botState.dashCooldown - 1);
+
+            // State machine
+            if (dist > 8) {
+                // Far away — chase
+                botState.behavior = 'chase';
+            } else if (dist < 3 && botState.dashCooldown <= 0) {
+                // Close enough — dash attack
+                botState.behavior = 'dash';
+                botState.dashCooldown = 60; // ~2 seconds
+            } else if (dist < 6) {
+                // Mid range — orbit
+                botState.behavior = 'orbit';
+            }
+
+            switch (botState.behavior) {
+                case 'chase':
+                    moveX = dirX * speed;
+                    moveZ = dirZ * speed;
+                    break;
+                case 'orbit':
+                    botState.orbitAngle += 0.06;
+                    moveX = dirX * speed * 0.3 + Math.cos(botState.orbitAngle) * speed * 0.8;
+                    moveZ = dirZ * speed * 0.3 + Math.sin(botState.orbitAngle) * speed * 0.8;
+                    break;
+                case 'dash':
+                    moveX = dirX * speed * 3;
+                    moveZ = dirZ * speed * 3;
+                    // Reset to orbit after one tick of dash
+                    botState.behavior = 'orbit';
+                    break;
+                default:
+                    break;
+            }
+
+            // Add slight randomness for unpredictability
+            moveX += (Math.random() - 0.5) * 0.03;
+            moveZ += (Math.random() - 0.5) * 0.03;
+
+            // Clamp to arena bounds
+            const newX = Math.max(-12, Math.min(12, botPos[0] + moveX));
+            const newZ = Math.max(-12, Math.min(12, botPos[2] + moveZ));
+
+            setPlayerPositions(prev => ({
+                ...prev,
+                [BOT_ID]: [newX, 0.5, newZ]
+            }));
+        }, 33); // ~30fps bot tick
+
+        return () => clearInterval(botLoop);
+    }, [multiplayer.isOffline, multiplayer.gameState, multiplayer.playerId, playerPositions]);
 
     // ========== LOADOUT POWERUP REFRESH ==========
     useEffect(() => {
@@ -816,7 +880,7 @@ export default function BattleArena() {
                 gl={{ antialias: true, alpha: false }}
             >
                 <Suspense fallback={<LoadingScreen />}>
-                    <Physics gravity={PHYSICS_CONFIG.gravity}>
+                    <Physics gravity={PHYSICS_CONFIG.gravity} step={1 / 60} broadphase="SAP" allowSleep>
                         {multiplayer.gameState === 'playing' && (
                             <>
                                 <GameScene

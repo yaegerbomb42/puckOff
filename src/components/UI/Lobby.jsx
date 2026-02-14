@@ -4,6 +4,8 @@ import PackOpener from './PackOpener';
 import LoadoutMenu from './LoadoutMenu';
 import IconChooser from './IconChooser';
 import AdminDashboard from './AdminDashboard';
+import AdBanner from './AdBanner';
+import ZoinCube from './ZoinCube';
 import { getIconById } from '../../utils/economy';
 import { DEFAULT_LOADOUT } from '../../utils/powerups';
 import { useAuth } from '../../contexts/AuthContext';
@@ -11,7 +13,7 @@ import { audio } from '../../utils/audio';
 
 import { getBiomeList } from '../../utils/mapGenerator';
 import { GAME_MODES } from '../../utils/gameModes';
-import { getLevelFromXp, getLevelProgress, getRankName, LEVEL_CAP } from '../../utils/leveling';
+import { getLevelFromXp, getLevelProgress, getRankName } from '../../utils/leveling';
 
 export default function Lobby({
     connected,
@@ -239,25 +241,14 @@ export default function Lobby({
                     <button className="btn-admin-hidden" onClick={() => { audio.playClick(); setShowAdmin(true); }}>⚙️</button>
                     {user && (
                         <>
-                            <div className="zoin-display" style={{
-                                background: 'rgba(0,0,0,0.4)',
-                                padding: '0.4rem 0.8rem',
-                                borderRadius: '20px',
-                                border: '1px solid #ffd700',
-                                color: '#ffd700',
-                                fontWeight: 'bold',
-                                fontSize: '0.9rem',
-                                display: 'flex',
-                                alignItems: 'center',
-                                gap: '0.4rem'
-                            }}>
-                                <span style={{
-                                    background: '#ffd700', color: 'black',
-                                    width: '18px', height: '18px', borderRadius: '50%',
-                                    display: 'flex', alignItems: 'center', justifyContent: 'center',
-                                    fontSize: '0.7rem'
-                                }}>Z</span>
-                                {inventory?.zoins || 0}
+                            <div className="zoin-wallet-widget" title="My Stash (Zoins)">
+                                <div className="zoin-cube-wrapper">
+                                    <ZoinCube theme="STANDARD" />
+                                </div>
+                                <div className="zoin-balance-text">
+                                    <span className="z-icon">Z</span>
+                                    {inventory?.zoins || 0}
+                                </div>
                             </div>
                             <button className="btn-small" onClick={logout} style={{ opacity: 0.7 }}>
                                 Logout
@@ -352,27 +343,43 @@ export default function Lobby({
                                 )}
                             </div>
 
-                            <button className={`btn btn-large shimmer ${isWagerMode ? 'btn-wager' : 'btn-primary'}`} onClick={async () => {
-                                audio.playClick();
-                                if (isWagerMode) {
-                                    if ((inventory?.zoins || 0) < wagerAmount) {
-                                        // Show store or alert
-                                        alert("Low Fuel! Top up Zoins at the Store.");
-                                        setShowStore(true);
+                            <button
+                                className={`btn btn-large shimmer ${isWagerMode ? 'btn-wager' : 'btn-primary'} ${!user ? 'disabled' : ''}`}
+                                onClick={async () => {
+                                    if (!user) {
+                                        setShowAuthModal(true);
                                         return;
                                     }
-                                    const joined = await joinWagerMatch(wagerAmount);
-                                    if (!joined) return;
-                                }
-                                onQuickJoin(playerName, user?.email);
-                            }}>
-                                {isWagerMode ? `⚔️ WAGER ${wagerAmount} Z` : '⚡ QUICK PLAY'}
+                                    audio.playClick();
+                                    if (isWagerMode) {
+                                        if ((inventory?.zoins || 0) < wagerAmount) {
+                                            alert("Low Fuel! Top up Zoins at the Store.");
+                                            setShowStore(true);
+                                            return;
+                                        }
+                                        const joined = await joinWagerMatch(wagerAmount);
+                                        if (!joined) return;
+                                    }
+                                    onQuickJoin(playerName, user?.email);
+                                }}
+                            >
+                                {isWagerMode ? `⚔️ WAGER ${wagerAmount} Z` : (user ? '⚡ QUICK PLAY' : '🔒 SIGN IN TO PLAY')}
                             </button>
-                            <button className="btn btn-secondary btn-large" onClick={() => { audio.playClick(); onCreateRoom(playerName, user?.email); }}>
-                                🏠 CREATE ROOM
+                            <button
+                                className={`btn btn-secondary btn-large ${!user ? 'disabled' : ''}`}
+                                onClick={() => {
+                                    if (!user) {
+                                        setShowAuthModal(true);
+                                        return;
+                                    }
+                                    audio.playClick();
+                                    onCreateRoom(playerName, user?.email);
+                                }}
+                            >
+                                {user ? '🏠 CREATE ROOM' : '🔒 CREATE ROOM'}
                             </button>
-                            <button className="btn btn-secondary btn-large sandbox" onClick={() => { audio.playClick(); onJoinRoom('sandbox'); }}>
-                                🎮 FREE PLAY
+                            <button className={`btn btn-secondary btn-large sandbox ${!user ? 'primary-guest' : ''}`} onClick={() => { audio.playClick(); onJoinRoom('sandbox'); }}>
+                                🎮 FREE PLAY (OFFLINE)
                             </button>
                         </div>
 
@@ -422,6 +429,13 @@ export default function Lobby({
                                     <div className="icon-arrow">Change ▼</div>
                                 </button>
                             </div>
+                        </div>
+
+                        {/* Non-intrusive ad in main menu */}
+                        <AdBanner slot="" format="horizontal" style={{ marginTop: '1rem', opacity: 0.85 }} />
+
+                        <div className="lobby-footer-links">
+                            <a href="/privacy.html" target="_blank" rel="noopener noreferrer">Privacy Policy</a>
                         </div>
                     </div>
                 ) : (
@@ -503,6 +517,9 @@ export default function Lobby({
                         </div>
 
                         <div className="lobby-hint">Game starts when all players are ready!</div>
+
+                        {/* Non-intrusive ad in room waiting area */}
+                        <AdBanner slot="" format="horizontal" style={{ marginTop: '1rem', opacity: 0.8 }} />
                     </div>
                 )}
 
@@ -552,6 +569,65 @@ export default function Lobby({
                 }
                 .btn-admin-hidden:hover { opacity: 1; }
 
+                .btn-admin-hidden:hover { opacity: 1; }
+
+                /* NEW Zoin Wallet Widget */
+                .zoin-wallet-widget {
+                    position: relative;
+                    width: 140px;
+                    height: 44px;
+                    background: rgba(0, 0, 0, 0.6);
+                    border: 1px solid #ffd700;
+                    border-radius: 25px;
+                    display: flex;
+                    align-items: center;
+                    justify-content: flex-end;
+                    padding-right: 16px;
+                    overflow: visible;
+                    box-shadow: 0 0 15px rgba(255, 215, 0, 0.15);
+                    transition: transform 0.2s;
+                    margin-right: 0.5rem;
+                }
+                .zoin-wallet-widget:hover {
+                    transform: scale(1.05);
+                    background: rgba(20, 20, 20, 0.8);
+                }
+
+                .zoin-cube-wrapper {
+                    position: absolute;
+                    left: -12px;
+                    top: -12px;
+                    width: 68px;
+                    height: 68px;
+                    z-index: 10;
+                    /* Ensure events pass through to canvas but wrapper doesn't block layout */
+                    pointer-events: none; 
+                }
+
+                .zoin-balance-text {
+                    color: #ffd700;
+                    font-weight: 800;
+                    font-size: 1.1rem;
+                    display: flex;
+                    align-items: center;
+                    gap: 6px;
+                    text-shadow: 0 2px 4px rgba(0,0,0,0.8);
+                }
+
+                .z-icon {
+                    background: linear-gradient(135deg, #ffd700, #ff8c00);
+                    color: black;
+                    width: 20px;
+                    height: 20px;
+                    border-radius: 50%;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    font-size: 0.75rem;
+                    font-weight: 900;
+                    box-shadow: 0 2px 4px rgba(0,0,0,0.5);
+                }
+
                 .active-players-pill {
                     background: rgba(0, 0, 0, 0.4);
                     border: 1px solid #333;
@@ -565,6 +641,15 @@ export default function Lobby({
                 }
                 .live-dot { color: #00ff87; font-size: 0.6rem; animation: pulse 2s infinite; }
                 @keyframes pulse { 0% { opacity: 0.5; } 50% { opacity: 1; } 100% { opacity: 0.5; } }
+                
+                .btn-large.disabled {
+                    background: #2a2a2a; border-color: #444; color: #666; cursor: not-allowed;
+                    position: relative;
+                }
+                .btn-secondary.primary-guest {
+                    border-color: #00d4ff; box-shadow: 0 0 15px rgba(0, 212, 255, 0.3);
+                    background: rgba(0, 212, 255, 0.1);
+                }
 
                 .logo-container {
                     display: flex; flex-direction: column; align-items: center; margin-bottom: 0.5rem;
@@ -915,6 +1000,21 @@ export default function Lobby({
                 .openart-credit a:hover {
                     color: #00ff87;
                     text-decoration: underline;
+                }
+
+                .lobby-footer-links {
+                    text-align: center;
+                    margin-top: 0.5rem;
+                    padding: 0.5rem 0;
+                }
+                .lobby-footer-links a {
+                    color: #555;
+                    font-size: 0.7rem;
+                    text-decoration: none;
+                    transition: color 0.2s;
+                }
+                .lobby-footer-links a:hover {
+                    color: #00d4ff;
                 }
             `}</style>
         </div>

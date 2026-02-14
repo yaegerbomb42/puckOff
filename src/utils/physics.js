@@ -4,21 +4,21 @@
  */
 
 export const PHYSICS_CONFIG = {
-    // Gravity - Heavier for punchy jumps
-    gravity: [0, -35, 0],
+    // Gravity - Heavier for punchy jumps (AAA Feel)
+    gravity: [0, -50, 0],
 
     // Puck properties
     puck: {
-        mass: 1.2, // Slightly heavier
+        mass: 1.5, // Heavy, substantial feel
         radius: 0.5,
-        maxVelocity: 30, // Faster cap
-        acceleration: 32, // Snappier movement
-        linearDamping: 0.15, // Less drag = more momentum
+        maxVelocity: 45, // High speed cap
+        acceleration: 60, // Instant snappy movement
+        linearDamping: 0.1, // Maintains momentum
         angularDamping: 0.4,
-        restitution: 0.5, // Less bouncy by default
+        restitution: 0.4, // Less bouncy, more controlled
         friction: 0.1,
-        airControl: 0.6,
-        jumpForce: 16
+        airControl: 0.8,
+        jumpForce: 22 // Higher jump to match gravity
     },
 
     // Arena properties

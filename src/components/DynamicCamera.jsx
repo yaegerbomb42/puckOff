@@ -14,24 +14,24 @@ import * as THREE from 'three';
 // Camera mode configurations
 const CAMERA_MODES = {
     DEFAULT: {
-        height: 18,
-        distance: 15,
-        fov: 50,
-        followSpeed: 2.0,
-        lookAheadFactor: 0.3
-    },
-    COMBAT: {
-        height: 14,
-        distance: 12,
-        fov: 55,
-        followSpeed: 3.0,
+        height: 12, // Lower angle (was 18)
+        distance: 10, // Closer (was 15)
+        fov: 65, // Wider FOV (was 50) for speed
+        followSpeed: 4.0, // Snappier follow
         lookAheadFactor: 0.5
     },
-    KNOCKOUT: {
+    COMBAT: {
         height: 10,
         distance: 8,
-        fov: 42,
+        fov: 70, // Action distortion
         followSpeed: 5.0,
+        lookAheadFactor: 0.6
+    },
+    KNOCKOUT: {
+        height: 6, // Super low & close
+        distance: 5,
+        fov: 45, // Zoom in
+        followSpeed: 8.0,
         lookAheadFactor: 0
     },
     WIDE: {

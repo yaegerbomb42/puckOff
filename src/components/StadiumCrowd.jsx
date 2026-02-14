@@ -87,9 +87,11 @@ export default function StadiumCrowd({ biome, count = 1500 }) {
         <instancedMesh
             ref={meshRef}
             args={[null, null, count]}
-            frustumCulled={false} // Always render if in rough view
+            frustumCulled={false}
+            castShadow
+            receiveShadow
         >
-            <boxGeometry args={[0.8, 1.5, 0.5]} /> {/* Simple "human" box */}
+            <capsuleGeometry args={[0.3, 1, 4, 8]} /> {/* More organic "human" shape */}
             <meshStandardMaterial
                 toneMapped={false}
                 emissiveIntensity={0.5}

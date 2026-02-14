@@ -38,9 +38,12 @@ export function useMultiplayer() {
         setIsOffline(true);
         setConnected(true); // Fake connection
         setGameState('lobby');
+        setPlayerId('offline_p1');
+        setPlayerColor('#00d4ff');
+        setPlayerIndex(0);
         setPlayers([
             { id: 'offline_p1', name: 'Player 1', color: '#00d4ff', ready: false, isLocal: true },
-            { id: 'offline_bot', name: 'Bot', color: '#ff0000', ready: true, isBot: true }
+            { id: 'offline_bot', name: 'BOT', color: '#ff006e', ready: true, isBot: true }
         ]);
         setRoomCode('OFFLINE');
     }, []);
@@ -201,10 +204,6 @@ export function useMultiplayer() {
             setTimer(timeRemaining);
         });
 
-        newSocket.on('timerUpdate', (timeRemaining) => {
-            setTimer(timeRemaining);
-        });
-
         // Maintenance / Server Messages
         newSocket.on('server_message', (msg) => {
             console.log('📢 Server Message:', msg);
@@ -322,13 +321,11 @@ export function useMultiplayer() {
     }, [socket, isOffline, playerId]);
 
     const selectMode = useCallback((mode) => {
-        if (!socket) return;
-
-        // Optimistic update
+        // Optimistic update always
         setSelectedMode(mode);
-
+        if (isOffline || !socket) return;
         socket.emit('selectMode', { mode });
-    }, [socket]);
+    }, [socket, isOffline]);
 
     // ========== SPECTATOR MODE ==========
     const joinAsSpectator = useCallback((roomId) => {
@@ -388,13 +385,23 @@ export function useMultiplayer() {
     }, [socket]);
 
     const requestRematch = useCallback(() => {
-        if (!socket) return;
-        socket.emit('requestRematch');
         // Reset local state for new game
         setScores({});
         setWinner(null);
+        if (isOffline) {
+            // Offline: go back to lobby, player can ready up again
+            setGameState('lobby');
+            setPlayers([
+                { id: 'offline_p1', name: 'Player 1', color: '#00d4ff', ready: false, isLocal: true },
+                { id: 'offline_bot', name: 'BOT', color: '#ff006e', ready: true, isBot: true }
+            ]);
+            setSeed(null);
+            return;
+        }
+        if (!socket) return;
+        socket.emit('requestRematch');
         setGameState('lobby');
-    }, [socket]);
+    }, [socket, isOffline]);
 
     // ========== HANDLER REGISTRATION ==========
 

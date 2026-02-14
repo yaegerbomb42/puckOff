@@ -31,7 +31,8 @@ export default function Lobby({
     selectedMap,
     gameMode,
     onSelectMode,
-    mapVotes
+    mapVotes,
+    onTestMaintenance // [NEW]
 }) {
     const { user, inventory, loginWithGoogle, loginWithEmail, signupWithEmail, logout, equipIcon, updateLoadout, setActiveLoadout, updateUsername, loading, joinWagerMatch } = useAuth();
 
@@ -189,7 +190,7 @@ export default function Lobby({
             )}
 
             {showAdmin && (
-                <AdminDashboard onClose={() => setShowAdmin(false)} />
+                <AdminDashboard onClose={() => setShowAdmin(false)} onTestMaintenance={onTestMaintenance} />
             )}
 
             {/* Auth Modal */}

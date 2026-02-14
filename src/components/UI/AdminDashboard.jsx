@@ -5,7 +5,7 @@ import { db } from '../../firebase';
 
 const ADMIN_PASSWORD = 'Zawe1234!';
 
-export default function AdminDashboard({ onClose }) {
+export default function AdminDashboard({ onClose, onTestMaintenance }) {
     const { user, resetIcons, addIcons } = useAuth();
     const [authenticated, setAuthenticated] = useState(false);
     const [password, setPassword] = useState('');
@@ -357,6 +357,14 @@ export default function AdminDashboard({ onClose }) {
                                 <button className="tool-btn reset" onClick={handleResetIcons}>
                                     🗑️ Reset Your Icons
                                 </button>
+                                <button className="tool-btn test-maint" onClick={() => {
+                                    if (window.confirm('Trigger local maintenance warning? (Persists on refresh)')) {
+                                        onTestMaintenance && onTestMaintenance();
+                                        alert('Maintenance warning triggered! Refresh page to test persistence.');
+                                    }
+                                }}>
+                                    ⚠️ Test Maintenance
+                                </button>
                             </div>
 
                             <div className="tool-info">
@@ -502,6 +510,7 @@ export default function AdminDashboard({ onClose }) {
                 .tool-btn.grant { background: #00ff87; color: #000; }
                 .tool-btn.whale { background: #ffd700; color: #000; }
                 .tool-btn.reset { background: #ff006e; color: #fff; }
+                .tool-btn.test-maint { background: #ff4d4d; color: #fff; border: 2px solid #fff; }
                 .tool-info {
                     background: rgba(0,0,0,0.3); padding: 1rem;
                     border-radius: 10px; text-align: left;

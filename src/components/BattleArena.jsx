@@ -800,6 +800,7 @@ export default function BattleArena({ forceOffline }) {
                     onBack={multiplayer.leaveRoom}
                     connectionError={multiplayer.connectionError}
                     onPlayOffline={multiplayer.enableOfflineMode}
+                    onTestMaintenance={multiplayer.triggerTestMaintenance}
                 />
             );
         }

@@ -25,7 +25,14 @@ export function useMultiplayer() {
     // Offline / Error State (Missing in previous version)
     const [isOffline, setIsOffline] = useState(false);
     const [connectionError, setConnectionError] = useState(null);
-    const [serverMessage, setServerMessage] = useState(null); // { type, message, duration }
+    const [serverMessage, setServerMessage] = useState(() => {
+        // [NEW] Load persistent message
+        try {
+            const saved = localStorage.getItem('server_message');
+            if (saved) return JSON.parse(saved);
+        } catch (e) { }
+        return null;
+    }); // { type, message, duration }
 
     // Spectator Mode
     const [isSpectating, setIsSpectating] = useState(false);
@@ -208,10 +215,14 @@ export function useMultiplayer() {
         newSocket.on('server_message', (msg) => {
             console.log('📢 Server Message:', msg);
             setServerMessage(msg);
+            localStorage.setItem('server_message', JSON.stringify(msg));
 
             // Auto-clear notification after some time if it's not permanent
             if (msg.duration && msg.type !== 'maintenance') {
-                setTimeout(() => setServerMessage(null), msg.duration * 1000);
+                setTimeout(() => {
+                    setServerMessage(null);
+                    localStorage.removeItem('server_message');
+                }, msg.duration * 1000);
             }
         });
 
@@ -403,6 +414,18 @@ export function useMultiplayer() {
         setGameState('lobby');
     }, [socket, isOffline]);
 
+    const triggerTestMaintenance = useCallback(() => {
+        const msg = {
+            message: '⚠️ [TEST] Server Restarting in 2 minutes!',
+            duration: 120,
+            startTime: Date.now(),
+            type: 'maintenance'
+        };
+        setServerMessage(msg);
+        localStorage.setItem('server_message', JSON.stringify(msg));
+        console.log('Test Maintenance Triggered');
+    }, []);
+
     // ========== HANDLER REGISTRATION ==========
 
     const registerHandlers = useCallback((handlers) => {
@@ -431,11 +454,11 @@ export function useMultiplayer() {
         timer, // <--- Exposed to component
 
         // Offline / Error status
-        // Offline / Error status
         connectionError,
         isOffline,
         enableOfflineMode,
         serverMessage, // <--- Exposed
+        triggerTestMaintenance, // <--- [NEW]
 
         // Spectator Mode
         isSpectating,

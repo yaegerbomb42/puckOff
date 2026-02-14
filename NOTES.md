@@ -30,3 +30,14 @@
   - `zoin_starter.png` — Teal/mint (Starter tier)
   - `zoin_pro.png` — Blue/violet (Pro tier)
   - `zoin_whale.png` — Gold/magenta (Whale/Legendary tier)
+
+## Deployment (.env & Secrets)
+
+- `.env` is **gitignored** — it never reaches the Oracle server via git pull
+- `deploy.yml` generates `.env` on the server from **GitHub repo secrets** before `docker compose build`
+- Both frontend (build args) and backend (env_file) read from this generated `.env`
+- **If you add a new env var**, you MUST also:
+  1. Add it as a GitHub secret in repo Settings → Secrets → Actions
+  2. Add it to `deploy.yml` in BOTH the `env:` block AND `envs:` list
+  3. Add an `echo` line to write it into `.env`
+- The YAML linter warns "Context access might be invalid" for all secrets — this is a false positive

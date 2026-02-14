@@ -717,19 +717,19 @@ export default function Puck({
                 </mesh>
 
 
-                {/* 3. Segmented Armor Plates (6 Segments) */}
+                {/* 3. Segmented Armor Plates (6 Segments) — Dark Metal */}
                 {[0, 60, 120, 180, 240, 300].map((angle, i) => (
                     <group key={i} rotation={[0, angle * Math.PI / 180, 0]}>
                         <mesh position={[0, 0, 0]}>
                             <cylinderGeometry
                                 args={[bodyRadius + 0.02, bodyRadius + 0.02, bodyHeight * 0.85, 16, 1, false, -Math.PI / 6 + 0.1, Math.PI / 3 - 0.2]}
                             />
-                            {/* USE TEXTURE ON SIDES */}
                             <meshStandardMaterial
-                                map={iconTexture}
-                                color={isFlashing ? "#fff" : "#ffffff"}
-                                metalness={0.5}
-                                roughness={0.4}
+                                color={isFlashing ? "#fff" : "#1a1a1a"}
+                                metalness={0.85}
+                                roughness={0.15}
+                                emissive={color}
+                                emissiveIntensity={isFlashing ? 1 : 0.05}
                             />
                         </mesh>
                         {/* Detail vents on plates */}
@@ -792,20 +792,20 @@ export default function Puck({
                     </mesh>
                 </group>
 
-                {/* 6. Bottom Detail - NOW WITH TEXTURE */}
+                {/* 6. Bottom Detail — Player Color Glow */}
                 <mesh position={[0, -bodyHeight / 2 - 0.01, 0]} rotation={[Math.PI / 2, 0, 0]}>
                     <circleGeometry args={[bodyRadius * 0.85, 32]} />
-                    {/* Apply texture to bottom too */}
                     <meshStandardMaterial
-                        map={iconTexture}
-                        color="#bbbbbb"
-                        metalness={0.5}
-                        roughness={0.3}
+                        color="#111111"
+                        metalness={0.9}
+                        roughness={0.1}
+                        emissive={color}
+                        emissiveIntensity={0.3}
                     />
                 </mesh>
                 <mesh position={[0, -bodyHeight / 2 - 0.02, 0]} rotation={[Math.PI / 2, 0, 0]}>
                     <ringGeometry args={[bodyRadius * 0.6, bodyRadius * 0.9, 32]} />
-                    <meshBasicMaterial color={color} transparent opacity={0.2} />
+                    <meshBasicMaterial color={color} transparent opacity={0.4} toneMapped={false} />
                 </mesh>
             </group>
         </group>

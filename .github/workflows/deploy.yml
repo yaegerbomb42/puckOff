@@ -27,12 +27,24 @@ jobs:
 
       - name: 🚚 Deploy via SSH
         uses: appleboy/ssh-action@v1.0.3
+        env:
+          REACT_APP_SERVER_URL: ${{ secrets.REACT_APP_SERVER_URL }}
+          REACT_APP_FIREBASE_API_KEY: ${{ secrets.REACT_APP_FIREBASE_API_KEY }}
+          REACT_APP_FIREBASE_AUTH_DOMAIN: ${{ secrets.REACT_APP_FIREBASE_AUTH_DOMAIN }}
+          REACT_APP_FIREBASE_PROJECT_ID: ${{ secrets.REACT_APP_FIREBASE_PROJECT_ID }}
+          REACT_APP_FIREBASE_STORAGE_BUCKET: ${{ secrets.REACT_APP_FIREBASE_STORAGE_BUCKET }}
+          REACT_APP_FIREBASE_MESSAGING_SENDER_ID: ${{ secrets.REACT_APP_FIREBASE_MESSAGING_SENDER_ID }}
+          REACT_APP_FIREBASE_APP_ID: ${{ secrets.REACT_APP_FIREBASE_APP_ID }}
+          FIREBASE_SERVICE_ACCOUNT_BASE64: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_BASE64 }}
+          STRIPE_SECRET_KEY: ${{ secrets.STRIPE_SECRET_KEY }}
+          STRIPE_WEBHOOK_SECRET: ${{ secrets.STRIPE_WEBHOOK_SECRET }}
         with:
           host: ${{ secrets.ORACLE_HOST }}
           username: ubuntu
           key: ${{ secrets.ORACLE_SSH_KEY }}
           port: 22
           command_timeout: 15m
+          envs: REACT_APP_SERVER_URL,REACT_APP_FIREBASE_API_KEY,REACT_APP_FIREBASE_AUTH_DOMAIN,REACT_APP_FIREBASE_PROJECT_ID,REACT_APP_FIREBASE_STORAGE_BUCKET,REACT_APP_FIREBASE_MESSAGING_SENDER_ID,REACT_APP_FIREBASE_APP_ID,FIREBASE_SERVICE_ACCOUNT_BASE64,STRIPE_SECRET_KEY,STRIPE_WEBHOOK_SECRET
           script: |
             set -e
             echo "=== Connected to Oracle Cloud ==="
@@ -47,6 +59,22 @@ jobs:
             git reset --hard origin/main
             echo "=== NOW ON COMMIT ==="
             git log --oneline -1
+
+            echo "=== WRITING .env FOR DOCKER COMPOSE ==="
+            echo "REACT_APP_SERVER_URL=${REACT_APP_SERVER_URL}" > .env
+            echo "REACT_APP_FIREBASE_API_KEY=${REACT_APP_FIREBASE_API_KEY}" >> .env
+            echo "REACT_APP_FIREBASE_AUTH_DOMAIN=${REACT_APP_FIREBASE_AUTH_DOMAIN}" >> .env
+            echo "REACT_APP_FIREBASE_PROJECT_ID=${REACT_APP_FIREBASE_PROJECT_ID}" >> .env
+            echo "REACT_APP_FIREBASE_STORAGE_BUCKET=${REACT_APP_FIREBASE_STORAGE_BUCKET}" >> .env
+            echo "REACT_APP_FIREBASE_MESSAGING_SENDER_ID=${REACT_APP_FIREBASE_MESSAGING_SENDER_ID}" >> .env
+            echo "REACT_APP_FIREBASE_APP_ID=${REACT_APP_FIREBASE_APP_ID}" >> .env
+            echo "PORT=3002" >> .env
+            echo "CLIENT_URL=https://puckoff.tech" >> .env
+            echo "FIREBASE_SERVICE_ACCOUNT_BASE64=${FIREBASE_SERVICE_ACCOUNT_BASE64}" >> .env
+            echo "STRIPE_SECRET_KEY=${STRIPE_SECRET_KEY}" >> .env
+            echo "STRIPE_WEBHOOK_SECRET=${STRIPE_WEBHOOK_SECRET}" >> .env
+            echo "=== .env written ==="
+            echo "FIREBASE_API_KEY starts with: $(echo $REACT_APP_FIREBASE_API_KEY | head -c 8)..."
 
             echo "=== BUILDING CONTAINERS (FRESH) ==="
             sudo docker compose build --no-cache frontend backend
@@ -64,3 +92,4 @@ jobs:
             echo "=== VERIFYING ==="
             sudo docker ps --format "table {{.Names}}\t{{.Status}}\t{{.Ports}}"
             echo "✅ Deployment Complete!"
+

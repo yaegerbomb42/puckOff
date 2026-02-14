@@ -33,12 +33,20 @@ jobs:
           key: ${{ secrets.ORACLE_SSH_KEY }}
           port: 22
           script: |
-            echo "Connected to Oracle Cloud..."
+            echo "=== Connected to Oracle Cloud ==="
             cd puckOff
-            echo "⬇️ Pulling latest code..."
-            git pull
-            echo "🐳 Rebuilding containers..."
-            sudo docker compose up -d --build --remove-orphans
-            echo "🧹 Cleaning up..."
+            echo "=== PRE-PULL STATUS ==="
+            git status
+            git log --oneline -1
+            echo "=== PULLING LATEST CODE ==="
+            git stash || true
+            git pull --ff-only origin main
+            echo "=== POST-PULL STATUS ==="
+            git log --oneline -3
+            echo "=== REBUILDING CONTAINERS (NO CACHE) ==="
+            sudo docker compose up -d --build --no-cache --remove-orphans 2>&1 | tail -50
+            echo "=== CLEANING UP ==="
             sudo docker image prune -f
+            echo "=== VERIFYING CONTAINERS ==="
+            sudo docker ps --format "table {{.Names}}\t{{.Status}}\t{{.Ports}}"
             echo "✅ Deployment Complete!"

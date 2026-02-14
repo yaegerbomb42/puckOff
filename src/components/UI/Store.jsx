@@ -4,7 +4,7 @@ import { TIERS, getCollectionStats, ZOIN_BUNDLES, BETTING_OPTS } from '../../uti
 import { audio } from '../../utils/audio';
 import SkeletonLoader from './SkeletonLoader';
 import ZoinCube from './ZoinCube';
-import AdBanner from './AdBanner';
+// AdBanner removed (AdSense policy compliance)
 
 // Animated Counter Component
 function RollingCounter({ value }) {
@@ -268,8 +268,7 @@ export default function Store({ onClose, onOpenPack }) {
                     </div>
                 </div>
 
-                {/* Non-intrusive ad */}
-                <AdBanner slot="" format="horizontal" style={{ marginTop: '1.5rem', opacity: 0.8 }} />
+                {/* AdBanner removed — AdSense policy: no ads on modal/overlay screens */}
             </div>
 
             <style jsx>{`

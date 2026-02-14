@@ -4,7 +4,7 @@ import PackOpener from './PackOpener';
 import LoadoutMenu from './LoadoutMenu';
 import IconChooser from './IconChooser';
 import AdminDashboard from './AdminDashboard';
-import AdBanner from './AdBanner';
+// AdBanner removed from Lobby (AdSense policy: no ads on nav/menu screens)
 import ZoinCube from './ZoinCube';
 import { getIconById } from '../../utils/economy';
 import { DEFAULT_LOADOUT } from '../../utils/powerups';
@@ -432,8 +432,7 @@ export default function Lobby({
                             </div>
                         </div>
 
-                        {/* Non-intrusive ad in main menu */}
-                        <AdBanner slot="" format="horizontal" style={{ marginTop: '1rem', opacity: 0.85 }} />
+                        {/* AdBanner removed — AdSense policy violation on nav screens */}
 
                         <div className="lobby-footer-links">
                             <a href="/privacy.html" target="_blank" rel="noopener noreferrer">Privacy Policy</a>
@@ -519,8 +518,7 @@ export default function Lobby({
 
                         <div className="lobby-hint">Game starts when all players are ready!</div>
 
-                        {/* Non-intrusive ad in room waiting area */}
-                        <AdBanner slot="" format="horizontal" style={{ marginTop: '1rem', opacity: 0.8 }} />
+                        {/* AdBanner removed — AdSense policy violation on low-content screens */}
                     </div>
                 )}
 

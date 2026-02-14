@@ -9,7 +9,7 @@ jobs:
     name: 🚀 Deploy to Oracle
     runs-on: ubuntu-latest
     steps:
-      - name: 📢 Announce Maintenance (10m Warning)
+      - name: 📢 Announce Maintenance (1m Warning)
         uses: appleboy/ssh-action@v1.0.3
         with:
           host: ${{ secrets.ORACLE_HOST }}
@@ -18,12 +18,12 @@ jobs:
           port: 22
           script: |
             echo "📢 Triggering Maintenance Alert on Server..."
-            curl -v -X POST http://localhost:3002/api/admin/maintenance \
+            curl -s -X POST http://localhost:3002/api/admin/maintenance \
             -H "Content-Type: application/json" \
-            -d '{"secret": "puckoff_deploy_secret_2026", "duration": 10}' || echo "⚠️ Failed to announce, but continuing..."
+            -d '{"secret": "puckoff_deploy_secret_2026", "duration": 1}' || echo "⚠️ Failed to announce, but continuing..."
       
-      - name: ⏳ Waiting 10 Minutes for Players to Finish...
-        run: sleep 600
+      - name: ⏳ Waiting 1 Minute for Players to Finish...
+        run: sleep 60
 
       - name: 🚚 Deploy via SSH
         uses: appleboy/ssh-action@v1.0.3
@@ -32,21 +32,30 @@ jobs:
           username: ubuntu
           key: ${{ secrets.ORACLE_SSH_KEY }}
           port: 22
+          command_timeout: 15m
           script: |
+            set -e
             echo "=== Connected to Oracle Cloud ==="
             cd puckOff
-            echo "=== PRE-PULL STATUS ==="
-            git status
-            git log --oneline -1
+
+            echo "=== PRE-PULL: Cleaning untracked conflicts ==="
+            git checkout -- . 2>/dev/null || true
+            git clean -fd scripts/ 2>/dev/null || true
+
             echo "=== PULLING LATEST CODE ==="
-            git stash || true
-            git pull --ff-only origin main
-            echo "=== POST-PULL STATUS ==="
-            git log --oneline -3
-            echo "=== REBUILDING CONTAINERS (NO CACHE) ==="
-            sudo docker compose up -d --build --no-cache --remove-orphans 2>&1 | tail -50
+            git fetch origin main
+            git reset --hard origin/main
+            echo "=== NOW ON COMMIT ==="
+            git log --oneline -1
+
+            echo "=== BUILDING CONTAINERS (FRESH) ==="
+            sudo docker compose build --no-cache
+            echo "=== STARTING CONTAINERS ==="
+            sudo docker compose up -d --remove-orphans
+
             echo "=== CLEANING UP ==="
             sudo docker image prune -f
-            echo "=== VERIFYING CONTAINERS ==="
+
+            echo "=== VERIFYING ==="
             sudo docker ps --format "table {{.Names}}\t{{.Status}}\t{{.Ports}}"
             echo "✅ Deployment Complete!"

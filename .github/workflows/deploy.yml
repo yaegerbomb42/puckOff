@@ -49,9 +49,9 @@ jobs:
             git log --oneline -1
 
             echo "=== BUILDING CONTAINERS (FRESH) ==="
-            sudo docker compose build --no-cache
+            sudo docker compose build --no-cache frontend backend
             echo "=== STARTING CONTAINERS ==="
-            sudo docker compose up -d --remove-orphans
+            sudo docker compose up -d --no-deps frontend backend
 
             echo "=== CLEANING UP ==="
             sudo docker image prune -f

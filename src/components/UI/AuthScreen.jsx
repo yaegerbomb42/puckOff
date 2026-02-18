@@ -1,7 +1,7 @@
 import React from 'react';
 import { audio } from '../../utils/audio';
 
-export default function AuthScreen({ onLogin, onOffline }) {
+export default function AuthScreen({ onLogin, onOffline, error }) {
     return (
         <div className="auth-screen">
             <div className="auth-container">
@@ -9,6 +9,12 @@ export default function AuthScreen({ onLogin, onOffline }) {
                     <h1 className="game-title">puck<span>OFF</span></h1>
                     <p className="subtitle">ULTIMATE ARENA COMBAT</p>
                 </div>
+
+                {error && (
+                    <div className="error-message">
+                        ⚠️ {error}
+                    </div>
+                )}
 
                 <div className="auth-actions">
                     <button
@@ -100,6 +106,19 @@ export default function AuthScreen({ onLogin, onOffline }) {
                     margin-top: 0.5rem;
                     font-size: 0.9rem;
                     text-align: center;
+                }
+
+                .error-message {
+                    background: rgba(255, 0, 50, 0.2);
+                    border: 1px solid #ff0033;
+                    color: #ffcccc;
+                    padding: 1rem;
+                    border-radius: 8px;
+                    text-align: center;
+                    width: 100%;
+                    font-size: 0.9rem;
+                    animation: fadeIn 0.3s ease-out;
+                    box-shadow: 0 0 15px rgba(255, 0, 50, 0.2);
                 }
 
                 .auth-actions {

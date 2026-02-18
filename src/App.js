@@ -9,7 +9,7 @@ import AutoTester from './components/Debug/AutoTester';
 import './App.css';
 
 function App() {
-  const { user, loading, loginWithGoogle } = useAuth();
+  const { user, loading, error, loginWithGoogle } = useAuth(); // Destructure error
   const [showIntro, setShowIntro] = useState(true);
   const [showTester, setShowTester] = useState(false);
   const [offlineMode, setOfflineMode] = useState(false);
@@ -47,6 +47,7 @@ function App() {
       <AuthScreen
         onLogin={loginWithGoogle}
         onOffline={() => setOfflineMode(true)}
+        error={error} // Pass error state
       />
     );
   }

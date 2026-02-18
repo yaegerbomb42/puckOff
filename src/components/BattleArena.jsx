@@ -892,6 +892,7 @@ export default function BattleArena({ forceOffline }) {
             )}
 
             {isAdmin && <DebugLogger visible={true} />}
+            import {Stars, Environment, ContactShadows, Sparkles, Html} from '@react-three/drei';
             <ControllerHints />
             {renderOverlay()}
 
@@ -901,7 +902,7 @@ export default function BattleArena({ forceOffline }) {
                 camera={{ position: [0, 18, 15], fov: 50 }}
                 gl={{ antialias: true, alpha: false }}
             >
-                <Suspense fallback={<LoadingScreen />}>
+                <Suspense fallback={<Html center><LoadingScreen /></Html>}>
                     <Physics gravity={PHYSICS_CONFIG.gravity} step={1 / 60} broadphase="SAP" allowSleep>
                         {multiplayer.gameState === 'playing' && (
                             <>

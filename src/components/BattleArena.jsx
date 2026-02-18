@@ -64,6 +64,20 @@ function GameScene({
     onInvincibleChange,
     explosionEvent
 }) {
+    // [PERFORMANCE] Pause rendering when tab is hidden to save GPU/Battery
+    const [isVisible, setIsVisible] = useState(true);
+
+    useEffect(() => {
+        const handleVisibilityChange = () => {
+            setIsVisible(document.visibilityState === 'visible');
+        };
+        document.addEventListener('visibilitychange', handleVisibilityChange);
+        return () => document.removeEventListener('visibilitychange', handleVisibilityChange);
+    }, []);
+
+    // If tab is hidden, don't render ANYTHING heavy
+    if (!isVisible) return null;
+
     return (
         <>
             {/* Environment & Lighting (AAA Overhaul) */}

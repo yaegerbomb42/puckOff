@@ -1,7 +1,7 @@
 import React, { useState, useCallback, Suspense, useRef, useEffect, useMemo } from 'react';
 import { Canvas } from '@react-three/fiber';
 import { Physics } from '@react-three/cannon';
-import { Stars, Environment, ContactShadows, Sparkles } from '@react-three/drei';
+import { Stars, Environment, ContactShadows, Sparkles, Html } from '@react-three/drei';
 import { EffectComposer, Bloom, ChromaticAberration, ToneMapping, Vignette } from '@react-three/postprocessing';
 
 import DynamicCamera from './DynamicCamera';
@@ -892,7 +892,6 @@ export default function BattleArena({ forceOffline }) {
             )}
 
             {isAdmin && <DebugLogger visible={true} />}
-            import {Stars, Environment, ContactShadows, Sparkles, Html} from '@react-three/drei';
             <ControllerHints />
             {renderOverlay()}
 

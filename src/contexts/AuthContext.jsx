@@ -62,11 +62,25 @@ export function AuthProvider({ children }) {
 
     // Listen to auth state changes
     useEffect(() => {
+        let mounted = true;
+
+        // Safety timeout: If auth takes too long (e.g. 6s), force loading to false
+        const safetyTimer = setTimeout(() => {
+            if (mounted) {
+                console.warn("Auth check timed out, forcing app load.");
+                setLoading(false);
+            }
+        }, 6000);
+
         const unsubscribe = onAuthStateChanged(auth, async (firebaseUser) => {
             try {
                 if (firebaseUser) {
                     setUser(firebaseUser);
-                    await loadUserData(firebaseUser.uid);
+                    // Wrap data load in a race with a 4s timeout
+                    await Promise.race([
+                        loadUserData(firebaseUser.uid),
+                        new Promise((_, reject) => setTimeout(() => reject(new Error("Firestore Timeout")), 4000))
+                    ]);
                 } else {
                     setUser(null);
                     setInventory(DEFAULT_INVENTORY);
@@ -74,11 +88,19 @@ export function AuthProvider({ children }) {
                 }
             } catch (err) {
                 console.error("Auth state change error:", err);
-                setError("Failed to load user data. Please refresh.");
+                if (mounted) setError("Loading profile took too long. Some features may be unavailable.");
             }
-            setLoading(false);
+
+            // Clear the safety timer since we finished normally
+            clearTimeout(safetyTimer);
+            if (mounted) setLoading(false);
         });
-        return unsubscribe;
+
+        return () => {
+            mounted = false;
+            clearTimeout(safetyTimer);
+            unsubscribe();
+        };
     }, []);
 
     // Load user data from Firestore

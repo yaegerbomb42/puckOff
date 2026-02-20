@@ -137,6 +137,33 @@ export default function Lobby({
     const localPlayer = players.find(p => p.id === playerId);
     const isReady = localPlayer?.ready;
 
+    // [NEW] Map options logic
+    const getVotingOptions = (code) => {
+        const allBiomes = getBiomeList();
+        if (code === 'OFFLINE') return allBiomes; // Show all maps for free play
+
+        // Online: Pseudo-random based on roomCode so all clients see same 3
+        if (!code) return allBiomes.slice(0, 3);
+
+        let hash = 0;
+        for (let i = 0; i < code.length; i++) {
+            hash = code.charCodeAt(i) + ((hash << 5) - hash);
+        }
+
+        // Simple seeded shuffle
+        const shuffled = [...allBiomes];
+        let m = shuffled.length, t, idx;
+        let seedRng = Math.abs(hash);
+        while (m) {
+            seedRng = (seedRng * 9301 + 49297) % 233280;
+            idx = Math.floor((seedRng / 233280) * m--);
+            t = shuffled[m];
+            shuffled[m] = shuffled[idx];
+            shuffled[idx] = t;
+        }
+        return shuffled.slice(0, 3);
+    };
+
     return (
         <div className="lobby-overlay">
             {/* Modals */}
@@ -497,10 +524,12 @@ export default function Lobby({
                         </div>
 
                         <div className="map-voting">
-                            <h3>VOTE FOR BIOME</h3>
-                            <div className="vote-subtext">Vote for the arena theme. Layout is procedurally generated.</div>
-                            <div className="vote-options">
-                                {getBiomeList().slice(0, 3).map(biome => (
+                            <h3>{roomCode === 'OFFLINE' ? 'SELECT ARENA' : 'VOTE FOR BIOME'}</h3>
+                            <div className="vote-subtext">
+                                {roomCode === 'OFFLINE' ? 'Select your precise battleground layout will be procedurally generated.' : 'Vote for the arena theme. Layout is procedurally generated.'}
+                            </div>
+                            <div className={`vote-options ${roomCode === 'OFFLINE' ? 'offline-grid' : ''}`}>
+                                {getVotingOptions(roomCode).map(biome => (
                                     <div
                                         key={biome.id}
                                         className={`map-card ${selectedMap === biome.id ? 'selected' : ''}`}
@@ -508,7 +537,9 @@ export default function Lobby({
                                     >
                                         <div className="map-preview" style={{ background: `linear-gradient(45deg, ${biome.colors.floor}, ${biome.colors.accent})` }}>
                                             <div className="map-overlay">
-                                                <div className="vote-count">🔥 {Object.values(mapVotes).filter(v => v === biome.id).length}</div>
+                                                {roomCode !== 'OFFLINE' && (
+                                                    <div className="vote-count">🔥 {Object.values(mapVotes).filter(v => v === biome.id).length}</div>
+                                                )}
                                             </div>
                                         </div>
                                         <div className="map-info">
@@ -962,6 +993,7 @@ export default function Lobby({
                 .map-voting h3 { color: #fff; margin-bottom: 0.2rem; font-size: 1rem; letter-spacing: 2px; }
                 .vote-subtext { color: #888; font-size: 0.7rem; margin-bottom: 1rem; font-style: italic; }
                 .vote-options { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; }
+                .vote-options.offline-grid { grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); }
                 
                 .map-card {
                     background: rgba(255,255,255,0.03); border-radius: 12px; overflow: hidden;

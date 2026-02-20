@@ -1,4 +1,4 @@
-import React, { useRef, useEffect } from 'react';
+import React, { useRef, useEffect, useMemo } from 'react';
 import { useFrame } from '@react-three/fiber';
 import { useSphere } from '@react-three/cannon';
 import { Billboard, useTexture } from '@react-three/drei';
@@ -32,6 +32,11 @@ function Projectile({ id, type, position, velocity, ownerId, onHit, playerPositi
         return unsubscribe;
     }, [api.velocity]);
 
+    const targetVec = useMemo(() => new THREE.Vector3(), []);
+    const currentVelVec = useMemo(() => new THREE.Vector3(), []);
+    const desiredDirVec = useMemo(() => new THREE.Vector3(), []);
+    const steeringVec = useMemo(() => new THREE.Vector3(), []);
+
     // Physics Logic
     useFrame(() => {
         if (!ref.current) return;
@@ -41,11 +46,12 @@ function Projectile({ id, type, position, velocity, ownerId, onHit, playerPositi
             // Find nearest enemy
             let nearestId = null;
             let minDst = Infinity;
-            const myPos = ref.current.position; // Vector3
+            const myPos = ref.current.position;
 
             Object.entries(playerPositions).forEach(([pid, pos]) => {
-                if (pid === ownerId) return; // Don't target self
-                const dst = myPos.distanceTo(new THREE.Vector3(...pos));
+                if (pid === ownerId) return;
+                targetVec.set(pos[0], pos[1], pos[2]);
+                const dst = myPos.distanceTo(targetVec);
                 if (dst < minDst) {
                     minDst = dst;
                     nearestId = pid;
@@ -53,24 +59,20 @@ function Projectile({ id, type, position, velocity, ownerId, onHit, playerPositi
             });
 
             if (nearestId && minDst < 50) {
-                const targetPos = new THREE.Vector3(...playerPositions[nearestId]);
-                const desiredDir = new THREE.Vector3().subVectors(targetPos, myPos).normalize();
+                const pos = playerPositions[nearestId];
+                targetVec.set(pos[0], pos[1], pos[2]);
+                desiredDirVec.subVectors(targetVec, myPos).normalize();
 
-                // Current velocity vector
-                const currentVel = new THREE.Vector3(...velocityRef.current);
+                currentVelVec.set(...velocityRef.current);
 
-                // Steer force: Desired velocity - Current velocity
-                // We want to go towards target at max speed (e.g. 15)
                 const maxSpeed = 15;
-                const steering = desiredDir.multiplyScalar(maxSpeed).sub(currentVel);
+                steeringVec.copy(desiredDirVec).multiplyScalar(maxSpeed).sub(currentVelVec);
+                steeringVec.clampLength(0, 0.5);
 
-                // Apply steering force (clamped)
-                steering.clampLength(0, 0.5); // Max force
-
-                api.applyForce([steering.x * 20, steering.y * 20, steering.z * 20], [0, 0, 0]);
+                api.applyForce([steeringVec.x * 20, steeringVec.y * 20, steeringVec.z * 20], [0, 0, 0]);
 
                 // Look at target
-                ref.current.lookAt(targetPos);
+                ref.current.lookAt(targetVec);
             }
         }
 

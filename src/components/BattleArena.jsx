@@ -203,6 +203,14 @@ export default function BattleArena({ forceOffline }) {
     const [isPaused, setIsPaused] = useState(false);
     const [screenShake, setScreenShake] = useState(0);
     const [slowmo, setSlowmo] = useState(false);
+    const shakeDecayTimerRef = useRef(null);
+
+    // Cleanup shake timer on unmount
+    useEffect(() => {
+        return () => {
+            if (shakeDecayTimerRef.current) clearInterval(shakeDecayTimerRef.current);
+        };
+    }, []);
 
     // Timer - Timestamp based for smooth syncing
     const [gameTimer, setGameTimer] = useState(180);
@@ -408,10 +416,12 @@ export default function BattleArena({ forceOffline }) {
         setTimeout(() => setIsPaused(false), 30 + Math.min(scaledIntensity * 3, 80));
 
         // Shake decay
-        const decay = setInterval(() => {
+        if (shakeDecayTimerRef.current) clearInterval(shakeDecayTimerRef.current);
+        shakeDecayTimerRef.current = setInterval(() => {
             setScreenShake(prev => {
                 if (prev <= 0.005) {
-                    clearInterval(decay);
+                    clearInterval(shakeDecayTimerRef.current);
+                    shakeDecayTimerRef.current = null;
                     return 0;
                 }
                 return prev * 0.85;

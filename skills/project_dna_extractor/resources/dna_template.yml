@@ -1,0 +1,26 @@
+# .agent_dna.yml
+# This file contains the distilled architectural logic and constraints for this project.
+# The AI agent should review this file before making architectural decisions.
+
+project_name: "Unnamed Project"
+last_sequenced: "YYYY-MM-DD"
+
+core_architecture:
+  pattern: "e.g., MVC, Event-Driven, Hub-and-Spoke"
+  main_entry_point: "e.g., main.py"
+  state_management: "e.g., Singleton Store, Redux, Local JSON"
+
+project_specific_rules:
+  - "Rule 1: Detailed explanation of a required pattern."
+  - "Rule 2: Specific library usage guidelines."
+
+anti_patterns_to_avoid:
+  - "Anti-Pattern 1: Explain what NOT to do, and WHY."
+  - "Anti-Pattern 2: Explain standard practices that are forbidden here."
+
+key_directories:
+  "src/core": "Brief description of contents."
+  "src/utils": "Brief description of contents."
+
+critical_dependencies:
+  - "Name: Reason it is critical."

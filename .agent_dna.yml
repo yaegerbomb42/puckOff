@@ -1,0 +1,34 @@
+# .agent_dna.yml
+# This file contains the distilled architectural logic and constraints for this project.
+# The AI agent should review this file before making architectural decisions.
+
+project_name: "puckOff"
+last_sequenced: "2026-02-19"
+
+core_architecture:
+  pattern: "Client-Server Multiplayer Physics Game"
+  main_entry_point: "src/index.js (Client), server/index.js (Server)"
+  state_management: "React Context (AuthContext) & Socket.io for real-time game state"
+
+project_specific_rules:
+  - "Multiplayer interactions must be handled via the useMultiplayer custom hook."
+  - "Authentication and user data (inventory, zoins) must route through AuthContext using Firebase/Firestore."
+  - "3D Scene elements must be valid React Three Fiber components. Standard DOM elements must be wrapped in <Html center> from @react-three/drei inside the <Canvas>."
+
+anti_patterns_to_avoid:
+  - "Do not directly manipulate the DOM outside of React lifecycle methods."
+  - "Avoid synchronous blocking operations or unbounded Promises in auth state checks to prevent infinite loading screens."
+  - "Avoid rendering 2D generic HTML directly as fallbacks inside R3F <Canvas> without the <Html> wrapper."
+
+key_directories:
+  "src/components": "React UI and Game components (BattleArena, Lobby, AuthScreen)."
+  "src/contexts": "Global state providers (AuthContext)."
+  "src/hooks": "Custom React hooks (useMultiplayer, useAuth, useReplayRecorder)."
+  "src/utils": "Game logic, map procedural generation, leveling, physics constants."
+  "server": "Node.js authoritative Socket.IO server handling room states and validation."
+
+critical_dependencies:
+  - "firebase: For user authentication and database (Firestore)."
+  - "socket.io: For real-time bidirectional multiplayer communication."
+  - "@react-three/fiber & @react-three/drei: For 3D WebGL rendering."
+  - "@react-three/cannon: For physics simulation of the pucks/arena."

@@ -1,4 +1,4 @@
-import React, { useRef, useMemo, useEffect } from 'react';
+import React, { useRef, useMemo } from 'react';
 import { useFrame } from '@react-three/fiber';
 import * as THREE from 'three';
 
@@ -129,7 +129,7 @@ export function ShockwaveRing({ position, color, onComplete }) {
 }
 
 // Collision spark effect
-export function CollisionSparks({ position, color }) {
+export function CollisionSparks({ position, color, onComplete }) {
     const sparksRef = useRef();
     const startTime = useRef(Date.now());
     const duration = 300;
@@ -154,9 +154,8 @@ export function CollisionSparks({ position, color }) {
         const progress = elapsed / duration;
 
         if (progress >= 1) {
-            if (sparksRef.current.parent) {
-                sparksRef.current.parent.remove(sparksRef.current);
-            }
+            sparksRef.current.visible = false;
+            onComplete?.();
             return;
         }
 
@@ -214,6 +213,7 @@ export default function KnockoutEffects({ effects, onEffectComplete }) {
                                 key={effect.id}
                                 position={effect.position}
                                 color={effect.color}
+                                onComplete={() => onEffectComplete(effect.id)}
                             />
                         );
                     default:

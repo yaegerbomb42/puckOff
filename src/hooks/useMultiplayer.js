@@ -295,7 +295,11 @@ export function useMultiplayer() {
         if (isOffline) {
             setGameState('playing');
             setPlayers(prev => prev.map(p => ({ ...p, ready: true })));
-            if (!seed) setSeed(Math.floor(Math.random() * 1000000));
+
+            // [IMPROVED] High-entropy seed for unique ID every time
+            // Date.now() guarantees time difference, random adds noise
+            const uniqueSeed = Date.now() + Math.floor(Math.random() * 100000);
+            if (!seed) setSeed(uniqueSeed);
             return;
         }
         if (!socket) return;
